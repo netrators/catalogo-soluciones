@@ -1,1 +1,1024 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AutoManager - Sistema de Gestión Automotriz de Alto Rendimiento">
+    <title>AutoManager | Dashboard</title>
 
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS (Despliegue Rápido) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            200: '#99f6e4',
+                            300: '#5eead4',
+                            400: '#2dd4bf',
+                            500: '#14b8a6', // Teal principal
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            800: '#115e59',
+                            900: '#134e4a',
+                            950: '#042f2e',
+                        },
+                        surface: {
+                            dark: '#0f172a',    // bg-slate-900
+                            darker: '#020617',  // bg-slate-950
+                            card: '#1e293b',    // bg-slate-800
+                            border: '#334155'   // border-slate-700
+                        }
+                    },
+                    boxShadow: {
+                        'neon': '0 0 15px rgba(20, 184, 166, 0.3)',
+                        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* ==========================================================================
+           RESET & GLOBALS
+           ========================================================================== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #020617; /* Slate 950 */
+            color: #f8fafc; /* Slate 50 */
+            overflow: hidden; /* Evitar scroll general, manejado por paneles */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Custom Scrollbar Premium */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #14b8a6; /* Brand 500 */
+        }
+
+        /* ==========================================================================
+           UTILITIES & ANIMATIONS
+           ========================================================================== */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .glass-card {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            border: 1px solid #334155;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+            border-color: #14b8a6; /* Hover border neon effect */
+        }
+
+        /* Animaciones de entrada SPA */
+        .view-section {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeInView 0.4s ease forwards;
+        }
+        .view-section.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes fadeInView {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Pulso para estados activos */
+        .status-pulse {
+            position: relative;
+        }
+        .status-pulse::after {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            border-radius: 50%;
+            background: inherit;
+            animation: pulse 2s infinite;
+            z-index: -1;
+            opacity: 0.7;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.7; }
+            100% { transform: scale(2.5); opacity: 0; }
+        }
+
+        /* ==========================================================================
+           KANBAN DRAG & DROP STYLES
+           ========================================================================== */
+        .kanban-column {
+            min-height: 500px;
+            transition: background-color 0.2s ease;
+        }
+        .kanban-column.drag-over {
+            background-color: rgba(20, 184, 166, 0.1);
+            border: 1px dashed #14b8a6;
+        }
+        
+        .kanban-card {
+            cursor: grab;
+            transition: transform 0.1s ease, box-shadow 0.2s ease;
+        }
+        .kanban-card:active {
+            cursor: grabbing;
+            transform: scale(1.02) rotate(1deg);
+        }
+        .kanban-card.dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+
+        /* Imagen fluida de refacciones/autos */
+        .img-cover {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: inherit;
+        }
+
+        /* ==========================================================================
+           TOAST NOTIFICATIONS
+           ========================================================================== */
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+        .toast-msg {
+            background: #1e293b;
+            color: #fff;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            border-left: 4px solid #14b8a6;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            transform: translateX(120%);
+            animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .toast-msg.error { border-color: #ef4444; }
+        .toast-msg.warning { border-color: #f59e0b; }
+        .toast-msg.fade-out {
+            animation: slideOutRight 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes slideInRight {
+            to { transform: translateX(0); }
+        }
+        @keyframes slideOutRight {
+            to { transform: translateX(120%); }
+        }
+
+        /* Gráfico Canvas Contenedor */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+    </style>
+</head>
+<body class="text-slate-300">
+
+    <!-- Contenedor Principal SPA -->
+    <div id="app" class="flex h-screen w-full overflow-hidden">
+
+        <!-- SIDEBAR -->
+        <aside class="w-64 bg-surface-dark border-r border-surface-border hidden md:flex flex-col justify-between z-20 shadow-2xl">
+            <!-- Logo & Brand -->
+            <div class="h-16 flex items-center px-6 border-b border-surface-border glass-panel">
+                <div class="w-8 h-8 rounded bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center mr-3 shadow-neon">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </div>
+                <span class="text-xl font-bold tracking-wide text-white">Auto<span class="text-brand-500">Manager</span></span>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
+                <p class="px-2 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">Módulos</p>
+                
+                <a href="#" data-target="dashboard" class="nav-link flex items-center px-4 py-3 text-sm font-medium rounded-xl text-white bg-brand-500/10 border border-brand-500/20 group transition-all">
+                    <svg class="w-5 h-5 mr-3 text-brand-400 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                    Resumen Operativo
+                </a>
+
+                <a href="#" data-target="taller" class="nav-link flex items-center px-4 py-3 text-sm font-medium rounded-xl text-slate-400 hover:text-white hover:bg-surface-card group transition-all">
+                    <svg class="w-5 h-5 mr-3 text-slate-500 group-hover:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    Taller (Kanban)
+                </a>
+
+                <a href="#" data-target="inventario" class="nav-link flex items-center px-4 py-3 text-sm font-medium rounded-xl text-slate-400 hover:text-white hover:bg-surface-card group transition-all">
+                    <svg class="w-5 h-5 mr-3 text-slate-500 group-hover:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                    Inventario & Refacciones
+                </a>
+
+                <a href="#" data-target="clientes" class="nav-link flex items-center px-4 py-3 text-sm font-medium rounded-xl text-slate-400 hover:text-white hover:bg-surface-card group transition-all">
+                    <svg class="w-5 h-5 mr-3 text-slate-500 group-hover:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    Directorio Clientes
+                </a>
+            </nav>
+
+            <!-- User Widget Base -->
+            <div class="p-4 border-t border-surface-border">
+                <div class="glass-card rounded-xl p-3 flex items-center gap-3 cursor-pointer hover:border-brand-500/50">
+                    <img src="https://ui-avatars.com/api/?name=Admin+Netrators&background=0D9488&color=fff" alt="Admin" class="w-10 h-10 rounded-full border border-surface-border">
+                    <div class="flex-1 overflow-hidden">
+                        <p class="text-sm font-medium text-white truncate">Gerencia General</p>
+                        <p class="text-xs text-brand-400 truncate">Admin System</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="flex-1 flex flex-col bg-surface-darker relative">
+            
+            <!-- CONTENEDOR DE TOASTS -->
+            <div id="toast-container"></div>
+
+            <!-- Header Superior -->
+            <header class="h-16 flex items-center justify-between px-8 border-b border-surface-border bg-surface-dark/80 backdrop-blur-md z-10 sticky top-0">
+                <!-- Buscador Global -->
+                <div class="flex-1 max-w-xl relative">
+                    <svg class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <input type="text" placeholder="Buscar placas, número de orden o cliente (Cmd/Ctrl + K)" class="w-full bg-surface-card border border-surface-border rounded-full pl-10 pr-4 py-2 text-sm text-white focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all placeholder-slate-500 shadow-inner">
+                </div>
+
+                <!-- Acciones Header -->
+                <div class="flex items-center gap-4 ml-6">
+                    <button class="relative p-2 text-slate-400 hover:text-white transition-colors" onclick="App.showToast('No hay notificaciones nuevas', 'info')">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                        <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-surface-darker status-pulse"></span>
+                    </button>
+                    <button class="bg-brand-600 hover:bg-brand-500 text-white text-sm font-semibold py-2 px-5 rounded-full shadow-lg hover:shadow-neon transition-all flex items-center gap-2" onclick="App.openModal('new-order')">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Nueva Orden
+                    </button>
+                </div>
+            </header>
+
+            <!-- VISTAS SPA (Inyectadas mediante JS router) -->
+            <div class="flex-1 overflow-y-auto p-8 scroll-smooth" id="router-view-container">
+                
+                <!-- VIEW 1: DASHBOARD -->
+                <section id="view-dashboard" class="view-section active w-full max-w-7xl mx-auto space-y-8">
+                    
+                    <div class="flex justify-between items-end">
+                        <div>
+                            <h1 class="text-3xl font-bold text-white tracking-tight">Resumen Operativo</h1>
+                            <p class="text-slate-400 mt-1">Métricas en tiempo real de tu taller.</p>
+                        </div>
+                        <div class="text-right font-mono">
+                            <p class="text-sm text-slate-500">Fecha de Corte</p>
+                            <p class="text-brand-400" id="current-date">--/--/----</p>
+                        </div>
+                    </div>
+
+                    <!-- Widgets Financieros -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <!-- Widget 1 -->
+                        <div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+                            <div class="absolute -right-6 -top-6 w-24 h-24 bg-brand-500/10 rounded-full blur-xl group-hover:bg-brand-500/20 transition-all"></div>
+                            <p class="text-sm font-medium text-slate-400">Ingresos Mensuales</p>
+                            <h3 class="text-3xl font-bold text-white mt-2 font-mono" id="stat-revenue">$0.00</h3>
+                            <div class="mt-4 flex items-center text-sm text-emerald-400">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                                <span>+14.5% vs mes anterior</span>
+                            </div>
+                        </div>
+                        <!-- Widget 2 -->
+                        <div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+                            <div class="absolute -right-6 -top-6 w-24 h-24 bg-blue-500/10 rounded-full blur-xl group-hover:bg-blue-500/20 transition-all"></div>
+                            <p class="text-sm font-medium text-slate-400">Autos en Taller</p>
+                            <h3 class="text-3xl font-bold text-white mt-2 font-mono" id="stat-active-cars">0</h3>
+                            <div class="mt-4 flex items-center text-sm text-slate-400">
+                                <span class="w-2 h-2 rounded-full bg-blue-500 mr-2"></span> 6 en reparación
+                            </div>
+                        </div>
+                        <!-- Widget 3 -->
+                        <div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+                            <div class="absolute -right-6 -top-6 w-24 h-24 bg-purple-500/10 rounded-full blur-xl group-hover:bg-purple-500/20 transition-all"></div>
+                            <p class="text-sm font-medium text-slate-400">Órdenes Completadas</p>
+                            <h3 class="text-3xl font-bold text-white mt-2 font-mono" id="stat-completed">0</h3>
+                            <div class="mt-4 flex items-center text-sm text-emerald-400">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <span>Esta semana</span>
+                            </div>
+                        </div>
+                        <!-- Widget 4 -->
+                        <div class="glass-card rounded-2xl p-6 relative overflow-hidden group border-red-500/30">
+                            <div class="absolute -right-6 -top-6 w-24 h-24 bg-red-500/10 rounded-full blur-xl group-hover:bg-red-500/20 transition-all"></div>
+                            <p class="text-sm font-medium text-red-400">Alertas Inventario</p>
+                            <h3 class="text-3xl font-bold text-white mt-2 font-mono" id="stat-low-stock">0</h3>
+                            <div class="mt-4 flex items-center text-sm text-slate-400">
+                                Refacciones bajo límite
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gráfica Custom Canvas & Actividad Reciente -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <!-- Canvas Chart Area (Ocupa 2 columnas) -->
+                        <div class="glass-card rounded-3xl p-6 lg:col-span-2 flex flex-col">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="text-lg font-bold text-white">Flujo de Efectivo (Proyección)</h3>
+                                <select class="bg-surface-dark border border-surface-border text-sm text-slate-300 rounded-lg px-3 py-1 outline-none">
+                                    <option>Últimos 7 días</option>
+                                    <option>Este Mes</option>
+                                    <option>Trimestre</option>
+                                </select>
+                            </div>
+                            <!-- Contenedor del Motor Gráfico Custom -->
+                            <div class="chart-container flex-1" id="custom-chart-container">
+                                <canvas id="revenueChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Actividad Reciente List -->
+                        <div class="glass-card rounded-3xl p-6 flex flex-col h-full">
+                            <h3 class="text-lg font-bold text-white mb-6">Actividad Reciente</h3>
+                            <div class="flex-1 overflow-y-auto pr-2 space-y-6" id="activity-feed">
+                                <!-- Llenado por JS -->
+                            </div>
+                            <button class="w-full mt-4 py-2 border border-surface-border rounded-xl text-sm text-brand-400 hover:bg-surface-border transition-colors">Ver Todo</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW 2: TALLER KANBAN -->
+                <section id="view-taller" class="view-section w-full h-full flex flex-col">
+                    <div class="flex justify-between items-center mb-6 shrink-0">
+                        <div>
+                            <h1 class="text-3xl font-bold text-white tracking-tight">Tablero de Servicio</h1>
+                            <p class="text-slate-400 mt-1">Arrastra las tarjetas para actualizar el estado del vehículo.</p>
+                        </div>
+                    </div>
+
+                    <!-- Kanban Grid -->
+                    <div class="flex-1 flex gap-6 overflow-x-auto pb-4 items-start" id="kanban-board">
+                        
+                        <!-- Columna: Recepción -->
+                        <div class="flex-none w-80 bg-surface-darker/50 rounded-2xl p-4 border border-surface-border flex flex-col kanban-column" data-status="recepcion">
+                            <div class="flex items-center justify-between mb-4 px-1">
+                                <h3 class="font-bold text-white flex items-center">
+                                    <span class="w-3 h-3 rounded-full bg-slate-500 mr-2"></span>
+                                    Recepción
+                                </h3>
+                                <span class="bg-surface-card text-xs font-mono px-2 py-1 rounded-md text-slate-400" id="count-recepcion">0</span>
+                            </div>
+                            <div class="flex-1 space-y-4 kanban-dropzone" id="col-recepcion">
+                                <!-- Cards dinámicas -->
+                            </div>
+                        </div>
+
+                        <!-- Columna: Diagnóstico -->
+                        <div class="flex-none w-80 bg-surface-darker/50 rounded-2xl p-4 border border-surface-border flex flex-col kanban-column" data-status="diagnostico">
+                            <div class="flex items-center justify-between mb-4 px-1">
+                                <h3 class="font-bold text-white flex items-center">
+                                    <span class="w-3 h-3 rounded-full bg-yellow-500 mr-2"></span>
+                                    Diagnóstico
+                                </h3>
+                                <span class="bg-surface-card text-xs font-mono px-2 py-1 rounded-md text-slate-400" id="count-diagnostico">0</span>
+                            </div>
+                            <div class="flex-1 space-y-4 kanban-dropzone" id="col-diagnostico"></div>
+                        </div>
+
+                        <!-- Columna: Reparación -->
+                        <div class="flex-none w-80 bg-surface-darker/50 rounded-2xl p-4 border border-surface-border flex flex-col kanban-column" data-status="reparacion">
+                            <div class="flex items-center justify-between mb-4 px-1">
+                                <h3 class="font-bold text-white flex items-center">
+                                    <span class="w-3 h-3 rounded-full bg-blue-500 mr-2"></span>
+                                    En Reparación
+                                </h3>
+                                <span class="bg-surface-card text-xs font-mono px-2 py-1 rounded-md text-slate-400" id="count-reparacion">0</span>
+                            </div>
+                            <div class="flex-1 space-y-4 kanban-dropzone" id="col-reparacion"></div>
+                        </div>
+
+                        <!-- Columna: Terminado -->
+                        <div class="flex-none w-80 bg-surface-darker/50 rounded-2xl p-4 border border-surface-border flex flex-col kanban-column" data-status="terminado">
+                            <div class="flex items-center justify-between mb-4 px-1">
+                                <h3 class="font-bold text-white flex items-center">
+                                    <span class="w-3 h-3 rounded-full bg-emerald-500 mr-2"></span>
+                                    Listo / Entregado
+                                </h3>
+                                <span class="bg-surface-card text-xs font-mono px-2 py-1 rounded-md text-slate-400" id="count-terminado">0</span>
+                            </div>
+                            <div class="flex-1 space-y-4 kanban-dropzone" id="col-terminado"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW 3: INVENTARIO -->
+                <section id="view-inventario" class="view-section w-full max-w-7xl mx-auto flex flex-col h-full">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                        <div>
+                            <h1 class="text-3xl font-bold text-white tracking-tight">Inventario de Refacciones</h1>
+                            <p class="text-slate-400 mt-1">Control de stock, alertas y precios de piezas.</p>
+                        </div>
+                        <div class="flex gap-3 w-full md:w-auto">
+                            <div class="relative flex-1 md:w-64">
+                                <svg class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                <input type="text" id="search-inventory" placeholder="Buscar refacción..." class="w-full bg-surface-dark border border-surface-border rounded-lg pl-10 pr-4 py-2 text-sm text-white focus:border-brand-500 outline-none">
+                            </div>
+                            <button class="bg-surface-card border border-surface-border hover:bg-surface-border text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                                Filtros
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tabla Contenedor -->
+                    <div class="glass-card rounded-2xl overflow-hidden flex-1 flex flex-col">
+                        <div class="overflow-x-auto flex-1">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-surface-dark border-b border-surface-border text-xs uppercase tracking-wider text-slate-400">
+                                        <th class="px-6 py-4 font-semibold">Código / Pieza</th>
+                                        <th class="px-6 py-4 font-semibold">Categoría</th>
+                                        <th class="px-6 py-4 font-semibold">Stock</th>
+                                        <th class="px-6 py-4 font-semibold">Precio Costo</th>
+                                        <th class="px-6 py-4 font-semibold">Precio Venta</th>
+                                        <th class="px-6 py-4 font-semibold text-right">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inventory-table-body" class="divide-y divide-surface-border text-sm">
+                                    <!-- Inyectado por JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="bg-surface-dark border-t border-surface-border p-4 flex justify-between items-center text-sm text-slate-400">
+                            <span id="inventory-count">Mostrando 0 resultados</span>
+                            <div class="flex gap-2">
+                                <button class="px-3 py-1 rounded bg-surface-card hover:bg-surface-border disabled:opacity-50">Anterior</button>
+                                <button class="px-3 py-1 rounded bg-surface-card hover:bg-surface-border disabled:opacity-50">Siguiente</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Placeholder Views -->
+                <section id="view-clientes" class="view-section w-full flex items-center justify-center h-full">
+                    <div class="text-center">
+                        <svg class="w-16 h-16 text-slate-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        <h2 class="text-2xl font-bold text-slate-300">Directorio de Clientes</h2>
+                        <p class="text-slate-500 mt-2">Módulo en construcción para esta demostración.</p>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- SCRIPT PRINCIPAL: LA MAGIA SPA -->
+    <script>
+        /**
+         * AUTO MANAGER CORE ENGINE
+         * Arquitectura Vanilla JS simulando un framework reactivo.
+         * Nivel de producción: Enterprise Mock.
+         */
+
+        // ============================================================================
+        // 1. MOCK DATABASE (Simulación de Backend JSON)
+        // ============================================================================
+        const DB = {
+            config: {
+                shopName: "Taller Hermanos Motors",
+                currency: "MXN"
+            },
+            stats: {
+                revenue: 124500.00,
+                revenueHistory: [15000, 22000, 18000, 35000, 28000, 45000, 124500] // Semanal/Mensual
+            },
+            // Coches activos en el taller
+            vehicles: [
+                { id: "v1", client: "Roberto Gómez", car: "Honda Civic 2018", plate: "JYK-9821", status: "reparacion", desc: "Cambio de balatas y rectificado", priority: "high", img: "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?auto=format&fit=crop&q=80&w=200&h=150" },
+                { id: "v2", client: "Ana Laura Torres", car: "VW Jetta 2020", plate: "PMM-102", status: "recepcion", desc: "Ruido extraño en motor al acelerar", priority: "normal", img: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&q=80&w=200&h=150" },
+                { id: "v3", client: "Empresa Logística", car: "Ford Transit 2021", plate: "XX-990-A", status: "diagnostico", desc: "Servicio mayor, 100k km", priority: "high", img: null },
+                { id: "v4", client: "Luis Ramírez", car: "Mazda 3 2017", plate: "LTY-554", status: "terminado", desc: "Alineación y balanceo", priority: "normal", img: null },
+                { id: "v5", client: "Mariana Ríos", car: "Nissan Versa 2019", plate: "GGT-881", status: "reparacion", desc: "Reparación sistema eléctrico", priority: "normal", img: "https://images.unsplash.com/photo-1530046339160-ce3e530c7d2f?auto=format&fit=crop&q=80&w=200&h=150" },
+                { id: "v6", client: "Carlos Fuentes", car: "Toyota Hilux 2022", plate: "RTY-442", status: "diagnostico", desc: "Revisión de suspensión por terracería", priority: "high", img: null },
+            ],
+            // Inventario Masivo Simulado
+            inventory: [
+                { id: "i1", code: "BLT-001", name: "Balatas Delanteras Cerámicas", cat: "Frenos", stock: 12, minStock: 5, cost: 450, price: 850 },
+                { id: "i2", code: "BLT-002", name: "Balatas Traseras Tambor", cat: "Frenos", stock: 4, minStock: 5, cost: 300, price: 600 },
+                { id: "i3", code: "FLT-A01", name: "Filtro de Aire Universal", cat: "Filtros", stock: 25, minStock: 10, cost: 120, price: 250 },
+                { id: "i4", code: "FLT-O15", name: "Filtro de Aceite Sintético", cat: "Filtros", stock: 3, minStock: 15, cost: 180, price: 350 },
+                { id: "i5", code: "OIL-5W30", name: "Aceite Sintético 5W-30 (Garrafa)", cat: "Líquidos", stock: 8, minStock: 10, cost: 750, price: 1200 },
+                { id: "i6", code: "SPK-IR4", name: "Bujías Iridium (Set 4)", cat: "Motor", stock: 15, minStock: 10, cost: 400, price: 900 },
+                { id: "i7", code: "BTR-L42", name: "Batería 42 Amperes", cat: "Eléctrico", stock: 2, minStock: 5, cost: 1200, price: 1800 },
+                { id: "i8", code: "SHK-F01", name: "Amortiguadores Delanteros (Par)", cat: "Suspensión", stock: 6, minStock: 4, cost: 1500, price: 2800 },
+                { id: "i9", code: "WPR-22", name: "Plumillas Limpiaparabrisas 22\"", cat: "Accesorios", stock: 30, minStock: 10, cost: 80, price: 200 },
+                { id: "i10", code: "BLB-H4", name: "Foco Halógeno H4", cat: "Eléctrico", stock: 45, minStock: 20, cost: 45, price: 150 },
+            ],
+            // Actividad para el log
+            activities: [
+                { time: "Hace 10 min", text: "Vehículo JYK-9821 movido a Reparación.", type: "update" },
+                { time: "Hace 45 min", text: "Nueva orden de ingreso: VW Jetta (PMM-102).", type: "new" },
+                { time: "Hace 2 hrs", text: "Inventario bajo alerta: Filtro de Aceite (Quedan 3).", type: "alert" },
+                { time: "Ayer 16:30", text: "Pago recibido de Luis Ramírez ($1,200.00).", type: "money" },
+                { time: "Ayer 14:00", text: "Refacciones recibidas: Lote Filtros de Aire x20.", type: "inventory" }
+            ]
+        };
+
+        // ============================================================================
+        // 2. UTILIDADES Y FORMATOS
+        // ============================================================================
+        const Utils = {
+            formatMoney: (amount) => {
+                return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(amount);
+            },
+            formatDate: () => {
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                return new Date().toLocaleDateString('es-MX', options).toUpperCase();
+            },
+            getInitials: (name) => {
+                return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+            }
+        };
+
+        // ============================================================================
+        // 3. CORE APP OBJECT (Controlador Principal)
+        // ============================================================================
+        const App = {
+            currentView: 'dashboard',
+            draggedCard: null, // Para el Kanban
+
+            init: function() {
+                // UI Inicial
+                document.getElementById('current-date').innerText = Utils.formatDate();
+                
+                this.setupNavigation();
+                this.renderDashboard();
+                this.renderKanban();
+                this.renderInventory();
+                
+                // Mostrar vista inicial
+                this.navigate('dashboard');
+                
+                // Renderizar gráfico complejo
+                setTimeout(() => CanvasEngine.drawChart(DB.stats.revenueHistory), 500);
+                
+                this.showToast('Sistema Inicializado. Datos sincronizados.', 'success');
+            },
+
+            // Sistema de Notificaciones (Toasts) Vanilla
+            showToast: function(message, type = 'info') {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.className = `toast-msg ${type}`;
+                
+                let icon = '';
+                if(type === 'success') icon = `<svg class="w-5 h-5 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+                else if(type === 'error') icon = `<svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+                else if(type === 'warning') icon = `<svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
+                else icon = `<svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+
+                toast.innerHTML = `${icon} <span>${message}</span>`;
+                container.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.classList.add('fade-out');
+                    setTimeout(() => toast.remove(), 300); // Remover del DOM post-animación
+                }, 3000);
+            },
+
+            // Sistema de Router SPA (Pestañas)
+            setupNavigation: function() {
+                const links = document.querySelectorAll('.nav-link');
+                links.forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const target = link.getAttribute('data-target');
+                        this.navigate(target);
+
+                        // Actualizar UI activa
+                        links.forEach(l => {
+                            l.classList.remove('bg-brand-500/10', 'border-brand-500/20', 'text-white');
+                            l.classList.add('text-slate-400', 'hover:text-white', 'hover:bg-surface-card');
+                            l.querySelector('svg').classList.remove('text-brand-400');
+                            l.querySelector('svg').classList.add('text-slate-500');
+                        });
+                        
+                        link.classList.remove('text-slate-400', 'hover:text-white', 'hover:bg-surface-card');
+                        link.classList.add('bg-brand-500/10', 'border', 'border-brand-500/20', 'text-white');
+                        link.querySelector('svg').classList.remove('text-slate-500');
+                        link.querySelector('svg').classList.add('text-brand-400');
+                    });
+                });
+            },
+
+            navigate: function(viewId) {
+                document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+                const view = document.getElementById(`view-${viewId}`);
+                if(view) {
+                    // Forzar re-flow para animar
+                    view.classList.remove('active');
+                    void view.offsetWidth; 
+                    view.classList.add('active');
+                    this.currentView = viewId;
+                    
+                    if(viewId === 'dashboard') CanvasEngine.drawChart(DB.stats.revenueHistory);
+                }
+            },
+
+            // Render Dashboard Data
+            renderDashboard: function() {
+                document.getElementById('stat-revenue').innerText = Utils.formatMoney(DB.stats.revenue);
+                document.getElementById('stat-active-cars').innerText = DB.vehicles.length;
+                
+                const completedCount = DB.vehicles.filter(v => v.status === 'terminado').length;
+                document.getElementById('stat-completed').innerText = completedCount;
+
+                const lowStockCount = DB.inventory.filter(i => i.stock <= i.minStock).length;
+                const statLow = document.getElementById('stat-low-stock');
+                statLow.innerText = lowStockCount;
+                if(lowStockCount > 0) statLow.classList.add('text-red-400');
+
+                // Activity Feed
+                const feed = document.getElementById('activity-feed');
+                feed.innerHTML = '';
+                DB.activities.forEach(act => {
+                    let iconColor = 'bg-slate-700 text-slate-300';
+                    let iconSvg = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>`;
+                    
+                    if(act.type === 'alert') { iconColor = 'bg-red-500/20 text-red-400'; iconSvg = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>`;}
+                    if(act.type === 'money') { iconColor = 'bg-emerald-500/20 text-emerald-400'; iconSvg = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>`;}
+                    if(act.type === 'new') { iconColor = 'bg-blue-500/20 text-blue-400'; iconSvg = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>`;}
+
+                    feed.innerHTML += `
+                        <div class="flex items-start gap-4">
+                            <div class="w-8 h-8 rounded-full ${iconColor} flex items-center justify-center shrink-0 mt-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">${iconSvg}</svg>
+                            </div>
+                            <div>
+                                <p class="text-sm text-white">${act.text}</p>
+                                <p class="text-xs text-slate-500 mt-1">${act.time}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+            },
+
+            // Render Kanban Board
+            renderKanban: function() {
+                const cols = {
+                    recepcion: document.getElementById('col-recepcion'),
+                    diagnostico: document.getElementById('col-diagnostico'),
+                    reparacion: document.getElementById('col-reparacion'),
+                    terminado: document.getElementById('col-terminado')
+                };
+
+                // Limpiar columnas
+                Object.values(cols).forEach(col => col.innerHTML = '');
+
+                const counts = { recepcion: 0, diagnostico: 0, reparacion: 0, terminado: 0 };
+
+                DB.vehicles.forEach(v => {
+                    counts[v.status]++;
+                    
+                    // Priority Badge
+                    let badge = '';
+                    if(v.priority === 'high') badge = `<span class="bg-red-500/20 text-red-400 text-xs px-2 py-0.5 rounded border border-red-500/30">Urgente</span>`;
+
+                    // Image Layout
+                    let imgHtml = '';
+                    if(v.img) {
+                        imgHtml = `<div class="h-24 w-full mb-3 rounded-lg overflow-hidden border border-surface-border"><img src="${v.img}" alt="Car" class="img-cover"></div>`;
+                    }
+
+                    const cardHTML = `
+                        <div class="kanban-card glass-card rounded-xl p-4 border border-surface-border hover:border-brand-500/50" draggable="true" data-id="${v.id}">
+                            ${imgHtml}
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="text-xs font-mono text-slate-400 bg-surface-darker px-2 py-1 rounded">${v.plate}</span>
+                                ${badge}
+                            </div>
+                            <h4 class="font-bold text-white text-sm mb-1">${v.car}</h4>
+                            <p class="text-xs text-slate-400 line-clamp-2 mb-3">${v.desc}</p>
+                            <div class="flex items-center justify-between mt-auto pt-3 border-t border-surface-border/50">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded-full bg-gradient-to-tr from-brand-600 to-blue-600 flex items-center justify-center text-[10px] font-bold text-white shadow-inner">
+                                        ${Utils.getInitials(v.client)}
+                                    </div>
+                                    <span class="text-xs text-slate-300 truncate w-24">${v.client}</span>
+                                </div>
+                                <button class="text-slate-500 hover:text-brand-400" title="Ver Detalles">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    if(cols[v.status]) cols[v.status].insertAdjacentHTML('beforeend', cardHTML);
+                });
+
+                // Actualizar contadores
+                Object.keys(counts).forEach(key => {
+                    document.getElementById(`count-${key}`).innerText = counts[key];
+                });
+
+                this.setupDragAndDrop();
+            },
+
+            // Lógica Drag & Drop
+            setupDragAndDrop: function() {
+                const cards = document.querySelectorAll('.kanban-card');
+                const dropzones = document.querySelectorAll('.kanban-column');
+
+                cards.forEach(card => {
+                    card.addEventListener('dragstart', (e) => {
+                        this.draggedCard = card;
+                        card.classList.add('dragging');
+                        // Necesario para Firefox
+                        e.dataTransfer.setData('text/plain', card.dataset.id);
+                    });
+
+                    card.addEventListener('dragend', () => {
+                        this.draggedCard.classList.remove('dragging');
+                        this.draggedCard = null;
+                        dropzones.forEach(dz => dz.classList.remove('drag-over'));
+                    });
+                });
+
+                dropzones.forEach(zone => {
+                    zone.addEventListener('dragover', (e) => {
+                        e.preventDefault(); // Permitir drop
+                        zone.classList.add('drag-over');
+                    });
+
+                    zone.addEventListener('dragleave', () => {
+                        zone.classList.remove('drag-over');
+                    });
+
+                    zone.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        zone.classList.remove('drag-over');
+                        
+                        const newStatus = zone.dataset.status;
+                        const cardId = this.draggedCard.dataset.id;
+                        
+                        // Encontrar vehículo y actualizar DB simulada
+                        const vehicle = DB.vehicles.find(v => v.id === cardId);
+                        if(vehicle && vehicle.status !== newStatus) {
+                            vehicle.status = newStatus;
+                            this.renderKanban(); // Re-render rápido
+                            this.showToast(`Estatus de ${vehicle.plate} actualizado a ${newStatus.toUpperCase()}`, 'success');
+                            
+                            // Forzar actualización Dashboard
+                            this.renderDashboard();
+                        }
+                    });
+                });
+            },
+
+            // Render Inventory Table
+            renderInventory: function(searchTerm = '') {
+                const tbody = document.getElementById('inventory-table-body');
+                tbody.innerHTML = '';
+
+                let filtered = DB.inventory;
+                if(searchTerm) {
+                    const term = searchTerm.toLowerCase();
+                    filtered = DB.inventory.filter(i => 
+                        i.name.toLowerCase().includes(term) || 
+                        i.code.toLowerCase().includes(term) ||
+                        i.cat.toLowerCase().includes(term)
+                    );
+                }
+
+                document.getElementById('inventory-count').innerText = `Mostrando ${filtered.length} de ${DB.inventory.length} resultados`;
+
+                filtered.forEach(item => {
+                    // Logica de Alertas
+                    let stockBadge = `<span class="bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-full text-xs border border-emerald-500/20">${item.stock} u. (Suficiente)</span>`;
+                    if(item.stock === 0) {
+                        stockBadge = `<span class="bg-red-500/10 text-red-400 px-2 py-1 rounded-full text-xs border border-red-500/20 animate-pulse">0 u. (Agotado)</span>`;
+                    } else if(item.stock <= item.minStock) {
+                        stockBadge = `<span class="bg-yellow-500/10 text-yellow-400 px-2 py-1 rounded-full text-xs border border-yellow-500/20">Solo ${item.stock} (Reordenar)</span>`;
+                    }
+
+                    const tr = `
+                        <tr class="hover:bg-surface-card transition-colors group">
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-white text-sm">${item.name}</div>
+                                <div class="text-xs text-brand-400 font-mono mt-0.5">${item.code}</div>
+                            </td>
+                            <td class="px-6 py-4 text-slate-300">${item.cat}</td>
+                            <td class="px-6 py-4">${stockBadge}</td>
+                            <td class="px-6 py-4 text-slate-400">${Utils.formatMoney(item.cost)}</td>
+                            <td class="px-6 py-4 font-semibold text-emerald-400">${Utils.formatMoney(item.price)}</td>
+                            <td class="px-6 py-4 text-right opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button class="text-slate-400 hover:text-white p-1" title="Editar">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.insertAdjacentHTML('beforeend', tr);
+                });
+
+                // Listener de Búsqueda
+                const searchInput = document.getElementById('search-inventory');
+                // Remover listener previo para evitar duplicados si se re-renderiza
+                const newSearchInput = searchInput.cloneNode(true);
+                searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+                
+                newSearchInput.addEventListener('input', (e) => {
+                    this.renderInventory(e.target.value);
+                });
+            }
+        };
+
+        // ============================================================================
+        // 4. CANVAS GRAPHIC ENGINE (Cero dependencias)
+        // ============================================================================
+        const CanvasEngine = {
+            canvas: null,
+            ctx: null,
+            data: [],
+            
+            drawChart: function(dataArray) {
+                this.canvas = document.getElementById('revenueChart');
+                if(!this.canvas) return;
+                
+                this.ctx = this.canvas.getContext('2d');
+                this.data = dataArray;
+                
+                // Ajustar resolución de canvas (Anti-aliasing)
+                const container = this.canvas.parentElement;
+                const dpr = window.devicePixelRatio || 1;
+                this.canvas.width = container.clientWidth * dpr;
+                this.canvas.height = container.clientHeight * dpr;
+                this.ctx.scale(dpr, dpr);
+                
+                this.render();
+
+                // Hacer responsive
+                window.addEventListener('resize', () => {
+                    if(App.currentView === 'dashboard') {
+                        this.canvas.width = container.clientWidth * dpr;
+                        this.canvas.height = container.clientHeight * dpr;
+                        this.ctx.scale(dpr, dpr);
+                        this.render();
+                    }
+                });
+            },
+
+            render: function() {
+                const width = this.canvas.clientWidth;
+                const height = this.canvas.clientHeight;
+                const ctx = this.ctx;
+                
+                ctx.clearRect(0, 0, width, height);
+
+                // Configuración
+                const padding = { top: 20, right: 20, bottom: 30, left: 50 };
+                const graphWidth = width - padding.left - padding.right;
+                const graphHeight = height - padding.top - padding.bottom;
+                
+                const maxData = Math.max(...this.data) * 1.1; // 10% margen arriba
+                
+                // Dibujar Grid (Líneas horizontales tenues)
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                for(let i=0; i<=5; i++) {
+                    const y = padding.top + (graphHeight / 5) * i;
+                    ctx.moveTo(padding.left, y);
+                    ctx.lineTo(width - padding.right, y);
+                }
+                ctx.stroke();
+
+                // Dibujar Línea de Gráfica
+                ctx.beginPath();
+                ctx.strokeStyle = '#14b8a6'; // Brand 500
+                ctx.lineWidth = 4;
+                ctx.lineJoin = 'round';
+                ctx.lineCap = 'round';
+
+                const points = [];
+                const stepX = graphWidth / (this.data.length - 1);
+
+                this.data.forEach((val, index) => {
+                    const x = padding.left + (index * stepX);
+                    // Invertir Y (Canvas 0,0 es arriba izquierda)
+                    const y = padding.top + graphHeight - ((val / maxData) * graphHeight); 
+                    points.push({x, y});
+                    
+                    if(index === 0) ctx.moveTo(x, y);
+                    else {
+                        // Curva suave (Bezier cuadrática aproximada)
+                        const prev = points[index-1];
+                        const cpX = (prev.x + x) / 2;
+                        ctx.bezierCurveTo(cpX, prev.y, cpX, y, x, y);
+                    }
+                });
+                ctx.stroke();
+
+                // Relleno Gradiente debajo de la curva
+                const gradient = ctx.createLinearGradient(0, padding.top, 0, height - padding.bottom);
+                gradient.addColorStop(0, 'rgba(20, 184, 166, 0.3)');
+                gradient.addColorStop(1, 'rgba(20, 184, 166, 0)');
+                
+                ctx.lineTo(points[points.length-1].x, padding.top + graphHeight);
+                ctx.lineTo(points[0].x, padding.top + graphHeight);
+                ctx.fillStyle = gradient;
+                ctx.fill();
+
+                // Dibujar Puntos Reales (Nodos)
+                points.forEach(p => {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+                    ctx.fillStyle = '#020617'; // Fondo oscuro
+                    ctx.fill();
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = '#38bdf8'; // Blue hover effect
+                    ctx.stroke();
+                });
+
+                // Eje X (Etiquetas)
+                ctx.fillStyle = '#64748b'; // Slate 500
+                ctx.font = '12px Inter';
+                ctx.textAlign = 'center';
+                const days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Hoy'];
+                points.forEach((p, i) => {
+                    ctx.fillText(days[i], p.x, height - 5);
+                });
+
+                // Eje Y (Cantidades)
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'middle';
+                for(let i=0; i<=5; i++) {
+                    const y = padding.top + (graphHeight / 5) * i;
+                    const val = maxData - ((maxData/5) * i);
+                    let text = `$${(val/1000).toFixed(0)}k`;
+                    if(val === 0) text = '0';
+                    ctx.fillText(text, padding.left - 10, y);
+                }
+            }
+        };
+
+        // ============================================================================
+        // 5. INICIALIZACIÓN
+        // ============================================================================
+        window.addEventListener('DOMContentLoaded', () => {
+            App.init();
+        });
+
+    </script>
+</body>
+</html>
