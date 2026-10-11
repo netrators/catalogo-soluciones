@@ -1,21 +1,21 @@
 <!DOCTYPE html>
-<html lang="es" class="dark">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="AutoManager - Sistema de Gestión Automotriz de Alto Rendimiento">
-    <title>AutoManager | Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="description" content="AutoManager - Sistema de Gestión Automotriz SaaS">
+    <title>AutoManager | App</title>
 
-    <!-- Google Fonts -->
+    <!-- Google Fonts: Inter para UI clara y legible -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CSS (Despliegue Rápido) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            darkMode: 'class',
+            darkMode: 'class', // Soporte futuro, pero forzaremos light theme ahora
             theme: {
                 extend: {
                     fontFamily: {
@@ -24,28 +24,40 @@
                     },
                     colors: {
                         brand: {
-                            50: '#f0fdfa',
-                            100: '#ccfbf1',
-                            200: '#99f6e4',
-                            300: '#5eead4',
-                            400: '#2dd4bf',
-                            500: '#14b8a6', // Teal principal
-                            600: '#0d9488',
-                            700: '#0f766e',
-                            800: '#115e59',
-                            900: '#134e4a',
-                            950: '#042f2e',
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6', // Primary Blue
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
                         },
                         surface: {
-                            dark: '#0f172a',    // bg-slate-900
-                            darker: '#020617',  // bg-slate-950
-                            card: '#1e293b',    // bg-slate-800
-                            border: '#334155'   // border-slate-700
+                            50: '#f8fafc',  // Background principal app
+                            100: '#f1f5f9', // Hover states
+                            200: '#e2e8f0', // Borders suaves
+                            300: '#cbd5e1', // Borders fuertes
+                            400: '#94a3b8', // Text muted
+                            500: '#64748b', // Text secondary
+                            600: '#475569',
+                            700: '#334155', // Text primary
+                            800: '#1e293b', // Text headings
+                            900: '#0f172a',
+                        },
+                        status: {
+                            success: '#10b981',
+                            warning: '#f59e0b',
+                            danger: '#ef4444',
+                            info: '#0ea5e9'
                         }
                     },
                     boxShadow: {
-                        'neon': '0 0 15px rgba(20, 184, 166, 0.3)',
-                        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+                        'app': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                        'drawer': '-10px 0 25px rgba(0,0,0,0.05)',
+                        'floating': '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
                     }
                 }
             }
@@ -54,667 +66,1005 @@
 
     <style>
         /* ==========================================================================
-           RESET & GLOBALS
+           RESET & APP FEEL
            ========================================================================== */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            -webkit-tap-highlight-color: transparent; /* Quitar destello azul en móviles */
         }
 
         body {
-            background-color: #020617; /* Slate 950 */
-            color: #f8fafc; /* Slate 50 */
-            overflow: hidden; /* Evitar scroll general, manejado por paneles */
+            background-color: #f8fafc; /* surface-50 */
+            color: #334155; /* surface-700 */
+            overflow: hidden; /* App feel: no scroll general */
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            overscroll-behavior-y: none; /* Prevenir pull-to-refresh nativo */
         }
 
-        /* Custom Scrollbar Premium */
-        ::-webkit-scrollbar {
+        /* Ocultar scrollbars para diseño más limpio, pero permitir scroll */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Scrollbar sutil para tablas y vistas largas en desktop */
+        .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
             height: 6px;
         }
-        ::-webkit-scrollbar-track {
+        .custom-scrollbar::-webkit-scrollbar-track {
             background: transparent;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #334155;
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
             border-radius: 10px;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #14b8a6; /* Brand 500 */
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
 
         /* ==========================================================================
-           UTILITIES & ANIMATIONS
+           COMPONENTES UI NATIVOS (RIPPLE, CARDS, BUTTONS)
            ========================================================================== */
-        .glass-panel {
-            background: rgba(30, 41, 59, 0.6);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+        
+        .app-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
         }
 
-        .glass-card {
-            background: linear-gradient(145deg, #1e293b, #0f172a);
-            border: 1px solid #334155;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        /* Efecto Ripple (Material Design) */
+        .ripple {
+            position: relative;
+            overflow: hidden;
         }
-        .glass-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
-            border-color: #14b8a6; /* Hover border neon effect */
+        .ripple-effect {
+            position: absolute;
+            border-radius: 50%;
+            transform: scale(0);
+            animation: ripple-anim 0.6s linear;
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+        .ripple-dark .ripple-effect {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+        @keyframes ripple-anim {
+            to { transform: scale(4); opacity: 0; }
         }
 
-        /* Animaciones de entrada SPA */
+        /* ==========================================================================
+           SISTEMA DE NAVEGACIÓN Y VISTAS (SPA)
+           ========================================================================== */
+        
         .view-section {
             display: none;
             opacity: 0;
-            transform: translateY(10px);
-            animation: fadeInView 0.4s ease forwards;
+            transform: translateY(15px) scale(0.98);
+            transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+            overflow-y: auto;
         }
+        
         .view-section.active {
             display: flex;
             flex-direction: column;
+            opacity: 1;
+            transform: translateY(0) scale(1);
         }
 
-        @keyframes fadeInView {
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Pulso para estados activos */
-        .status-pulse {
-            position: relative;
-        }
-        .status-pulse::after {
-            content: '';
-            position: absolute;
-            top: -2px; left: -2px; right: -2px; bottom: -2px;
-            border-radius: 50%;
-            background: inherit;
-            animation: pulse 2s infinite;
-            z-index: -1;
-            opacity: 0.7;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.7; }
-            100% { transform: scale(2.5); opacity: 0; }
+        /* Navegación Inferior (Móviles) */
+        @media (max-width: 767px) {
+            .mobile-nav {
+                padding-bottom: env(safe-area-inset-bottom); /* iPhone safe area */
+            }
+            .main-content-wrapper {
+                padding-bottom: calc(4rem + env(safe-area-inset-bottom));
+            }
         }
 
         /* ==========================================================================
-           KANBAN DRAG & DROP STYLES
+           PANELES LATERALES (DRAWERS)
            ========================================================================== */
-        .kanban-column {
-            min-height: 500px;
-            transition: background-color 0.2s ease;
+        
+        .drawer-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
         }
-        .kanban-column.drag-over {
-            background-color: rgba(20, 184, 166, 0.1);
-            border: 1px dashed #14b8a6;
+        .drawer-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .drawer-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            max-width: 480px;
+            background: #ffffff;
+            z-index: 101;
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: -10px 0 25px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
         }
         
-        .kanban-card {
-            cursor: grab;
-            transition: transform 0.1s ease, box-shadow 0.2s ease;
+        @media (max-width: 640px) {
+            /* En móvil el drawer sale de abajo como una hoja modal de iOS */
+            .drawer-panel {
+                top: 10vh;
+                right: 0;
+                left: 0;
+                max-width: 100%;
+                border-top-left-radius: 1.5rem;
+                border-top-right-radius: 1.5rem;
+                transform: translateY(100%);
+            }
+            .drawer-panel.active { transform: translateY(0); }
         }
-        .kanban-card:active {
-            cursor: grabbing;
-            transform: scale(1.02) rotate(1deg);
-        }
-        .kanban-card.dragging {
-            opacity: 0.5;
-            transform: scale(0.95);
-        }
-
-        /* Imagen fluida de refacciones/autos */
-        .img-cover {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: inherit;
+        
+        @media (min-width: 641px) {
+            .drawer-panel.active { transform: translateX(0); }
         }
 
         /* ==========================================================================
-           TOAST NOTIFICATIONS
+           KANBAN SPECIFICS (TOUCH & MOUSE)
            ========================================================================== */
+        
+        .kanban-board {
+            display: flex;
+            gap: 1.5rem;
+            height: 100%;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            padding-bottom: 1rem;
+        }
+        
+        .kanban-column {
+            min-width: 300px;
+            width: 320px;
+            flex-shrink: 0;
+            background: #f1f5f9;
+            border-radius: 1rem;
+            display: flex;
+            flex-direction: column;
+            scroll-snap-align: start;
+            border: 1px solid #e2e8f0;
+            transition: background 0.2s ease;
+        }
+        
+        .kanban-column.drag-over {
+            background: #eff6ff;
+            border-color: #3b82f6;
+            border-style: dashed;
+        }
+
+        .kanban-dropzone {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .kanban-card {
+            background: #ffffff;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            cursor: grab;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            user-select: none; /* Prevenir selección de texto al arrastrar */
+            touch-action: none; /* Crítico para touch events fluidos */
+        }
+
+        .kanban-card:active {
+            cursor: grabbing;
+        }
+
+        .kanban-card.dragging {
+            opacity: 0.6;
+            transform: scale(0.95);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .kanban-card.touch-dragging {
+            position: fixed;
+            z-index: 9999;
+            pointer-events: none;
+            width: 280px; /* Ancho fijo para cuando se saca del DOM normal */
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            transform: scale(1.05);
+            opacity: 0.9;
+        }
+
+        /* ==========================================================================
+           TOAST NOTIFICATIONS (APP STYLE)
+           ========================================================================== */
+        
         #toast-container {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             z-index: 9999;
             display: flex;
             flex-direction: column;
             gap: 10px;
             pointer-events: none;
+            width: 90%;
+            max-width: 400px;
         }
+        
+        @media (min-width: 768px) {
+            #toast-container {
+                bottom: 20px;
+                right: 20px;
+                left: auto;
+                transform: none;
+            }
+        }
+
         .toast-msg {
             background: #1e293b;
-            color: #fff;
-            padding: 1rem 1.5rem;
-            border-radius: 0.5rem;
-            border-left: 4px solid #14b8a6;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-            transform: translateX(120%);
-            animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            color: #ffffff;
+            padding: 1rem 1.25rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             display: flex;
             align-items: center;
             gap: 0.75rem;
             font-size: 0.875rem;
             font-weight: 500;
-        }
-        .toast-msg.error { border-color: #ef4444; }
-        .toast-msg.warning { border-color: #f59e0b; }
-        .toast-msg.fade-out {
-            animation: slideOutRight 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
-
-        @keyframes slideInRight {
-            to { transform: translateX(0); }
-        }
-        @keyframes slideOutRight {
-            to { transform: translateX(120%); }
-        }
-
-        /* Gráfico Canvas Contenedor */
-        .chart-container {
+            transform: translateY(100%);
+            opacity: 0;
+            animation: toast-slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             position: relative;
-            width: 100%;
-            height: 300px;
+            overflow: hidden;
         }
-        canvas {
-            display: block;
+
+        .toast-msg.fade-out {
+            animation: toast-fade-out 0.3s ease forwards;
+        }
+
+        .toast-progress {
+            position: absolute;
+            bottom: 0; left: 0; height: 3px;
+            background: rgba(255,255,255,0.3);
+            width: 100%;
+            animation: progress 3s linear forwards;
+        }
+
+        @keyframes toast-slide-up {
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes toast-fade-out {
+            to { transform: translateY(-20px); opacity: 0; }
+        }
+        @keyframes progress {
+            to { width: 0%; }
+        }
+
+        /* Canvas Chart Base */
+        .chart-canvas {
             width: 100%;
             height: 100%;
+            display: block;
         }
 
     </style>
 </head>
-<body class="text-slate-300">
+<body class="text-surface-700 antialiased h-screen w-screen flex flex-col md:flex-row overflow-hidden">
 
-    <!-- Contenedor Principal SPA -->
-    <div id="app" class="flex h-screen w-full overflow-hidden">
+    
+    <!-- DESKTOP SIDEBAR -->
+    <aside class="hidden md:flex w-64 bg-white border-r border-surface-200 flex-col h-full z-20">
+        <!-- Brand / Logo -->
+        <div class="h-16 flex items-center px-6 border-b border-surface-100">
+            <div class="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center mr-3 shadow-md shadow-brand-200">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            </div>
+            <span class="text-xl font-bold tracking-tight text-surface-900">Auto<span class="text-brand-600">Manager</span></span>
+        </div>
 
-        <!-- SIDEBAR -->
-        <aside class="w-64 bg-surface-dark border-r border-surface-border hidden md:flex flex-col justify-between z-20 shadow-2xl">
-            <!-- Logo & Brand -->
-            <div class="h-16 flex items-center px-6 border-b border-surface-border glass-panel">
-                <div class="w-8 h-8 rounded bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center mr-3 shadow-neon">
+        <!-- Desktop Navigation -->
+        <nav class="flex-1 overflow-y-auto custom-scrollbar py-6 px-4 space-y-1">
+            <p class="px-3 text-xs font-bold text-surface-400 uppercase tracking-wider mb-2">Principal</p>
+            
+            <a href="#" data-target="dashboard" class="nav-item ripple ripple-dark flex items-center px-3 py-2.5 text-sm font-medium rounded-lg text-brand-700 bg-brand-50 transition-colors">
+                <svg class="w-5 h-5 mr-3 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                Dashboard
+            </a>
+
+            <a href="#" data-target="taller" class="nav-item ripple ripple-dark flex items-center px-3 py-2.5 text-sm font-medium rounded-lg text-surface-600 hover:text-surface-900 hover:bg-surface-100 transition-colors">
+                <svg class="w-5 h-5 mr-3 text-surface-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                Tablero Kanban
+            </a>
+
+            <a href="#" data-target="inventario" class="nav-item ripple ripple-dark flex items-center px-3 py-2.5 text-sm font-medium rounded-lg text-surface-600 hover:text-surface-900 hover:bg-surface-100 transition-colors">
+                <svg class="w-5 h-5 mr-3 text-surface-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                Inventario
+            </a>
+
+            <p class="px-3 text-xs font-bold text-surface-400 uppercase tracking-wider mb-2 mt-6">Administración</p>
+
+            <a href="#" data-target="clientes" class="nav-item ripple ripple-dark flex items-center px-3 py-2.5 text-sm font-medium rounded-lg text-surface-600 hover:text-surface-900 hover:bg-surface-100 transition-colors">
+                <svg class="w-5 h-5 mr-3 text-surface-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                Clientes
+            </a>
+
+            <a href="#" data-target="finanzas" class="nav-item ripple ripple-dark flex items-center px-3 py-2.5 text-sm font-medium rounded-lg text-surface-600 hover:text-surface-900 hover:bg-surface-100 transition-colors">
+                <svg class="w-5 h-5 mr-3 text-surface-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Finanzas & Facturas
+            </a>
+        </nav>
+
+        <!-- User Profile Widget (Desktop) -->
+        <div class="p-4 border-t border-surface-200">
+            <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-surface-50 cursor-pointer transition-colors">
+                <img src="https://ui-avatars.com/api/?name=Admin+User&background=3b82f6&color=fff" alt="User" class="w-10 h-10 rounded-full border border-surface-200 shadow-sm">
+                <div class="flex-1 overflow-hidden">
+                    <p class="text-sm font-semibold text-surface-900 truncate">Gerencia General</p>
+                    <p class="text-xs text-surface-500 truncate">admin@taller.com</p>
+                </div>
+                <svg class="w-5 h-5 text-surface-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 flex flex-col h-full relative main-content-wrapper bg-surface-50">
+        
+        <!-- MOBILE HEADER -->
+        <header class="md:hidden flex items-center justify-between px-4 h-16 bg-white border-b border-surface-200 z-10 sticky top-0">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center">
                     <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                 </div>
-                <span class="text-xl font-bold tracking-wide text-white">Auto<span class="text-brand-500">Manager</span></span>
+                <span class="text-lg font-bold text-surface-900">AutoManager</span>
+            </div>
+            <button class="w-8 h-8 rounded-full overflow-hidden border border-surface-200 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                <img src="https://ui-avatars.com/api/?name=Admin&background=3b82f6&color=fff" alt="User" class="w-full h-full object-cover">
+            </button>
+        </header>
+
+        <!-- DESKTOP TOP BAR (Search & Actions) -->
+        <header class="hidden md:flex items-center justify-between px-8 h-16 bg-white border-b border-surface-200 z-10 shrink-0">
+            <!-- Search -->
+            <div class="flex-1 max-w-lg relative">
+                <svg class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-surface-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <input type="text" placeholder="Buscar por placas, cliente o folio (Cmd+K)" class="w-full bg-surface-50 border border-surface-300 rounded-lg pl-10 pr-4 py-2 text-sm text-surface-900 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-shadow shadow-inner">
             </div>
 
-            <!-- Navigation Links -->
-            <nav class="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
-                <p class="px-2 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">Módulos</p>
-                
-                <a href="#" data-target="dashboard" class="nav-link flex items-center px-4 py-3 text-sm font-medium rounded-xl text-white bg-brand-500/10 border border-brand-500/20 group transition-all">
-                    <svg class="w-5 h-5 mr-3 text-brand-400 group-hover:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-                    Resumen Operativo
-                </a>
-
-                <a href="#" data-target="taller" class="nav-link flex items-center px-4 py-3 text-sm font-medium rounded-xl text-slate-400 hover:text-white hover:bg-surface-card group transition-all">
-                    <svg class="w-5 h-5 mr-3 text-slate-500 group-hover:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                    Taller (Kanban)
-                </a>
-
-                <a href="#" data-target="inventario" class="nav-link flex items-center px-4 py-3 text-sm font-medium rounded-xl text-slate-400 hover:text-white hover:bg-surface-card group transition-all">
-                    <svg class="w-5 h-5 mr-3 text-slate-500 group-hover:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                    Inventario & Refacciones
-                </a>
-
-                <a href="#" data-target="clientes" class="nav-link flex items-center px-4 py-3 text-sm font-medium rounded-xl text-slate-400 hover:text-white hover:bg-surface-card group transition-all">
-                    <svg class="w-5 h-5 mr-3 text-slate-500 group-hover:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                    Directorio Clientes
-                </a>
-            </nav>
-
-            <!-- User Widget Base -->
-            <div class="p-4 border-t border-surface-border">
-                <div class="glass-card rounded-xl p-3 flex items-center gap-3 cursor-pointer hover:border-brand-500/50">
-                    <img src="https://ui-avatars.com/api/?name=Admin+Netrators&background=0D9488&color=fff" alt="Admin" class="w-10 h-10 rounded-full border border-surface-border">
-                    <div class="flex-1 overflow-hidden">
-                        <p class="text-sm font-medium text-white truncate">Gerencia General</p>
-                        <p class="text-xs text-brand-400 truncate">Admin System</p>
-                    </div>
-                </div>
+            <!-- Actions -->
+            <div class="flex items-center gap-4 ml-4">
+                <button class="relative p-2 text-surface-500 hover:text-brand-600 transition-colors rounded-full hover:bg-brand-50" onclick="UI.showToast('Sin notificaciones nuevas')">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                    <span class="absolute top-2 right-2 w-2 h-2 bg-status-danger rounded-full ring-2 ring-white"></span>
+                </button>
+                <button class="ripple bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold py-2 px-4 rounded-lg shadow-sm transition-colors flex items-center gap-2" onclick="UI.openModal('modal-nuevo-ingreso')">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Nuevo Ingreso
+                </button>
             </div>
-        </aside>
+        </header>
 
-        <!-- MAIN CONTENT AREA -->
-        <main class="flex-1 flex flex-col bg-surface-darker relative">
+        <!-- ROUTER CONTAINER (Donde viven las vistas) -->
+        <div id="router-view-container" class="flex-1 overflow-hidden relative">
             
-            <!-- CONTENEDOR DE TOASTS -->
-            <div id="toast-container"></div>
-
-            <!-- Header Superior -->
-            <header class="h-16 flex items-center justify-between px-8 border-b border-surface-border bg-surface-dark/80 backdrop-blur-md z-10 sticky top-0">
-                <!-- Buscador Global -->
-                <div class="flex-1 max-w-xl relative">
-                    <svg class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    <input type="text" placeholder="Buscar placas, número de orden o cliente (Cmd/Ctrl + K)" class="w-full bg-surface-card border border-surface-border rounded-full pl-10 pr-4 py-2 text-sm text-white focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all placeholder-slate-500 shadow-inner">
-                </div>
-
-                <!-- Acciones Header -->
-                <div class="flex items-center gap-4 ml-6">
-                    <button class="relative p-2 text-slate-400 hover:text-white transition-colors" onclick="App.showToast('No hay notificaciones nuevas', 'info')">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-                        <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-surface-darker status-pulse"></span>
-                    </button>
-                    <button class="bg-brand-600 hover:bg-brand-500 text-white text-sm font-semibold py-2 px-5 rounded-full shadow-lg hover:shadow-neon transition-all flex items-center gap-2" onclick="App.openModal('new-order')">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                        Nueva Orden
-                    </button>
-                </div>
-            </header>
-
-            <!-- VISTAS SPA (Inyectadas mediante JS router) -->
-            <div class="flex-1 overflow-y-auto p-8 scroll-smooth" id="router-view-container">
-                
-                <!-- VIEW 1: DASHBOARD -->
-                <section id="view-dashboard" class="view-section active w-full max-w-7xl mx-auto space-y-8">
+            <section id="view-dashboard" class="view-section custom-scrollbar p-4 md:p-8">
+                <div class="max-w-7xl mx-auto w-full space-y-6">
                     
-                    <div class="flex justify-between items-end">
+                    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
                         <div>
-                            <h1 class="text-3xl font-bold text-white tracking-tight">Resumen Operativo</h1>
-                            <p class="text-slate-400 mt-1">Métricas en tiempo real de tu taller.</p>
+                            <h1 class="text-2xl font-bold text-surface-900 tracking-tight">Resumen Operativo</h1>
+                            <p class="text-sm text-surface-500 mt-1">Métricas y alertas en tiempo real del taller.</p>
                         </div>
-                        <div class="text-right font-mono">
-                            <p class="text-sm text-slate-500">Fecha de Corte</p>
-                            <p class="text-brand-400" id="current-date">--/--/----</p>
+                        <div class="text-left md:text-right">
+                            <p class="text-xs font-bold text-surface-400 uppercase tracking-wide">Fecha de Corte</p>
+                            <p class="text-brand-600 font-mono text-sm mt-0.5" id="dash-date">--/--/----</p>
                         </div>
                     </div>
 
-                    <!-- Widgets Financieros -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <!-- Widget 1 -->
-                        <div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
-                            <div class="absolute -right-6 -top-6 w-24 h-24 bg-brand-500/10 rounded-full blur-xl group-hover:bg-brand-500/20 transition-all"></div>
-                            <p class="text-sm font-medium text-slate-400">Ingresos Mensuales</p>
-                            <h3 class="text-3xl font-bold text-white mt-2 font-mono" id="stat-revenue">$0.00</h3>
-                            <div class="mt-4 flex items-center text-sm text-emerald-400">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                    <!-- Widgets Grid -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                        <!-- Widget 1: Ingresos -->
+                        <div class="app-card p-4 md:p-5 relative overflow-hidden group">
+                            <div class="w-10 h-10 rounded-full bg-brand-100 flex items-center justify-center mb-3">
+                                <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </div>
+                            <p class="text-sm font-medium text-surface-500">Ingresos del Mes</p>
+                            <h3 class="text-2xl md:text-3xl font-bold text-surface-900 mt-1 font-mono tracking-tight" id="dash-ingresos">$0</h3>
+                            <div class="mt-2 flex items-center text-xs text-status-success font-medium">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
                                 <span>+14.5% vs mes anterior</span>
                             </div>
                         </div>
-                        <!-- Widget 2 -->
-                        <div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
-                            <div class="absolute -right-6 -top-6 w-24 h-24 bg-blue-500/10 rounded-full blur-xl group-hover:bg-blue-500/20 transition-all"></div>
-                            <p class="text-sm font-medium text-slate-400">Autos en Taller</p>
-                            <h3 class="text-3xl font-bold text-white mt-2 font-mono" id="stat-active-cars">0</h3>
-                            <div class="mt-4 flex items-center text-sm text-slate-400">
-                                <span class="w-2 h-2 rounded-full bg-blue-500 mr-2"></span> 6 en reparación
+
+                        <!-- Widget 2: Autos Activos -->
+                        <div class="app-card p-4 md:p-5 relative overflow-hidden">
+                            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mb-3">
+                                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                             </div>
+                            <p class="text-sm font-medium text-surface-500">En Taller</p>
+                            <h3 class="text-2xl md:text-3xl font-bold text-surface-900 mt-1 font-mono tracking-tight" id="dash-activos">0</h3>
+                            <div class="mt-2 text-xs text-surface-500">Vehículos en proceso</div>
                         </div>
-                        <!-- Widget 3 -->
-                        <div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
-                            <div class="absolute -right-6 -top-6 w-24 h-24 bg-purple-500/10 rounded-full blur-xl group-hover:bg-purple-500/20 transition-all"></div>
-                            <p class="text-sm font-medium text-slate-400">Órdenes Completadas</p>
-                            <h3 class="text-3xl font-bold text-white mt-2 font-mono" id="stat-completed">0</h3>
-                            <div class="mt-4 flex items-center text-sm text-emerald-400">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                <span>Esta semana</span>
+
+                        <!-- Widget 3: Entregados -->
+                        <div class="app-card p-4 md:p-5 relative overflow-hidden">
+                            <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center mb-3">
+                                <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             </div>
+                            <p class="text-sm font-medium text-surface-500">Entregados</p>
+                            <h3 class="text-2xl md:text-3xl font-bold text-surface-900 mt-1 font-mono tracking-tight" id="dash-entregados">0</h3>
+                            <div class="mt-2 text-xs text-surface-500">Esta semana</div>
                         </div>
-                        <!-- Widget 4 -->
-                        <div class="glass-card rounded-2xl p-6 relative overflow-hidden group border-red-500/30">
-                            <div class="absolute -right-6 -top-6 w-24 h-24 bg-red-500/10 rounded-full blur-xl group-hover:bg-red-500/20 transition-all"></div>
-                            <p class="text-sm font-medium text-red-400">Alertas Inventario</p>
-                            <h3 class="text-3xl font-bold text-white mt-2 font-mono" id="stat-low-stock">0</h3>
-                            <div class="mt-4 flex items-center text-sm text-slate-400">
-                                Refacciones bajo límite
+
+                        <!-- Widget 4: Alertas Inventario -->
+                        <div class="app-card p-4 md:p-5 relative overflow-hidden border-status-danger/30 bg-red-50/30">
+                            <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center mb-3">
+                                <svg class="w-5 h-5 text-status-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                             </div>
+                            <p class="text-sm font-medium text-status-danger">Alertas Stock</p>
+                            <h3 class="text-2xl md:text-3xl font-bold text-status-danger mt-1 font-mono tracking-tight" id="dash-alertas">0</h3>
+                            <div class="mt-2 text-xs text-status-danger/80">Refacciones críticas</div>
                         </div>
                     </div>
 
-                    <!-- Gráfica Custom Canvas & Actividad Reciente -->
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <!-- Canvas Chart Area (Ocupa 2 columnas) -->
-                        <div class="glass-card rounded-3xl p-6 lg:col-span-2 flex flex-col">
-                            <div class="flex justify-between items-center mb-6">
-                                <h3 class="text-lg font-bold text-white">Flujo de Efectivo (Proyección)</h3>
-                                <select class="bg-surface-dark border border-surface-border text-sm text-slate-300 rounded-lg px-3 py-1 outline-none">
-                                    <option>Últimos 7 días</option>
-                                    <option>Este Mes</option>
-                                    <option>Trimestre</option>
-                                </select>
+                    <!-- Gráficas y Actividad -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Chart Area -->
+                        <div class="app-card p-5 lg:col-span-2 flex flex-col h-[400px]">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-base font-bold text-surface-900">Flujo de Efectivo (Últimos 7 días)</h3>
+                                <div class="px-2 py-1 bg-surface-100 rounded text-xs font-medium text-surface-600">MXN</div>
                             </div>
-                            <!-- Contenedor del Motor Gráfico Custom -->
-                            <div class="chart-container flex-1" id="custom-chart-container">
-                                <canvas id="revenueChart"></canvas>
+                            <div class="flex-1 relative w-full h-full">
+                                <canvas id="chart-revenue" class="chart-canvas"></canvas>
                             </div>
                         </div>
 
-                        <!-- Actividad Reciente List -->
-                        <div class="glass-card rounded-3xl p-6 flex flex-col h-full">
-                            <h3 class="text-lg font-bold text-white mb-6">Actividad Reciente</h3>
-                            <div class="flex-1 overflow-y-auto pr-2 space-y-6" id="activity-feed">
-                                <!-- Llenado por JS -->
+                        <!-- Activity Feed -->
+                        <div class="app-card p-5 flex flex-col h-[400px]">
+                            <h3 class="text-base font-bold text-surface-900 mb-4 shrink-0">Actividad Reciente</h3>
+                            <div class="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-4" id="dash-activity-feed">
+                                <!-- Poblado por JS -->
                             </div>
-                            <button class="w-full mt-4 py-2 border border-surface-border rounded-xl text-sm text-brand-400 hover:bg-surface-border transition-colors">Ver Todo</button>
                         </div>
                     </div>
-                </section>
+                </div>
+            </section>
 
-                <!-- VIEW 2: TALLER KANBAN -->
-                <section id="view-taller" class="view-section w-full h-full flex flex-col">
-                    <div class="flex justify-between items-center mb-6 shrink-0">
-                        <div>
-                            <h1 class="text-3xl font-bold text-white tracking-tight">Tablero de Servicio</h1>
-                            <p class="text-slate-400 mt-1">Arrastra las tarjetas para actualizar el estado del vehículo.</p>
-                        </div>
+            <section id="view-taller" class="view-section flex flex-col h-full bg-surface-100">
+                <!-- Header del Kanban -->
+                <div class="px-4 md:px-8 py-4 bg-white border-b border-surface-200 shrink-0 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-surface-900">Control de Servicio</h2>
+                        <p class="text-sm text-surface-500">Arrastra las tarjetas para cambiar el estatus del vehículo.</p>
                     </div>
+                    <div class="flex gap-2">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">
+                            Urgentes: <span id="count-urgentes" class="ml-1">0</span>
+                        </span>
+                        <button class="bg-white border border-surface-300 text-surface-700 px-3 py-1.5 rounded-lg text-sm font-medium shadow-sm hover:bg-surface-50 flex items-center gap-2" onclick="UI.showToast('Filtros próximamente')">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                            Filtrar
+                        </button>
+                    </div>
+                </div>
 
-                    <!-- Kanban Grid -->
-                    <div class="flex-1 flex gap-6 overflow-x-auto pb-4 items-start" id="kanban-board">
+                <!-- Scrollable Kanban Area -->
+                <div class="flex-1 overflow-hidden relative">
+                    <div class="kanban-board hide-scrollbar px-4 md:px-8 pt-6 pb-20 md:pb-6" id="kanban-container">
                         
                         <!-- Columna: Recepción -->
-                        <div class="flex-none w-80 bg-surface-darker/50 rounded-2xl p-4 border border-surface-border flex flex-col kanban-column" data-status="recepcion">
-                            <div class="flex items-center justify-between mb-4 px-1">
-                                <h3 class="font-bold text-white flex items-center">
-                                    <span class="w-3 h-3 rounded-full bg-slate-500 mr-2"></span>
+                        <div class="kanban-column" data-status="recepcion">
+                            <div class="px-4 py-3 border-b border-surface-200 flex justify-between items-center bg-surface-50/50 rounded-t-xl shrink-0">
+                                <h3 class="font-bold text-surface-800 flex items-center text-sm uppercase tracking-wide">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-surface-400 mr-2"></span>
                                     Recepción
                                 </h3>
-                                <span class="bg-surface-card text-xs font-mono px-2 py-1 rounded-md text-slate-400" id="count-recepcion">0</span>
+                                <span class="bg-white border border-surface-200 text-xs font-mono px-2 py-0.5 rounded-full text-surface-600 shadow-sm" id="kb-count-recepcion">0</span>
                             </div>
-                            <div class="flex-1 space-y-4 kanban-dropzone" id="col-recepcion">
-                                <!-- Cards dinámicas -->
-                            </div>
+                            <div class="kanban-dropzone custom-scrollbar" id="col-recepcion"></div>
                         </div>
 
                         <!-- Columna: Diagnóstico -->
-                        <div class="flex-none w-80 bg-surface-darker/50 rounded-2xl p-4 border border-surface-border flex flex-col kanban-column" data-status="diagnostico">
-                            <div class="flex items-center justify-between mb-4 px-1">
-                                <h3 class="font-bold text-white flex items-center">
-                                    <span class="w-3 h-3 rounded-full bg-yellow-500 mr-2"></span>
+                        <div class="kanban-column" data-status="diagnostico">
+                            <div class="px-4 py-3 border-b border-surface-200 flex justify-between items-center bg-surface-50/50 rounded-t-xl shrink-0">
+                                <h3 class="font-bold text-surface-800 flex items-center text-sm uppercase tracking-wide">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-status-warning mr-2"></span>
                                     Diagnóstico
                                 </h3>
-                                <span class="bg-surface-card text-xs font-mono px-2 py-1 rounded-md text-slate-400" id="count-diagnostico">0</span>
+                                <span class="bg-white border border-surface-200 text-xs font-mono px-2 py-0.5 rounded-full text-surface-600 shadow-sm" id="kb-count-diagnostico">0</span>
                             </div>
-                            <div class="flex-1 space-y-4 kanban-dropzone" id="col-diagnostico"></div>
+                            <div class="kanban-dropzone custom-scrollbar" id="col-diagnostico"></div>
                         </div>
 
                         <!-- Columna: Reparación -->
-                        <div class="flex-none w-80 bg-surface-darker/50 rounded-2xl p-4 border border-surface-border flex flex-col kanban-column" data-status="reparacion">
-                            <div class="flex items-center justify-between mb-4 px-1">
-                                <h3 class="font-bold text-white flex items-center">
-                                    <span class="w-3 h-3 rounded-full bg-blue-500 mr-2"></span>
+                        <div class="kanban-column" data-status="reparacion">
+                            <div class="px-4 py-3 border-b border-surface-200 flex justify-between items-center bg-surface-50/50 rounded-t-xl shrink-0">
+                                <h3 class="font-bold text-surface-800 flex items-center text-sm uppercase tracking-wide">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-brand-500 mr-2"></span>
                                     En Reparación
                                 </h3>
-                                <span class="bg-surface-card text-xs font-mono px-2 py-1 rounded-md text-slate-400" id="count-reparacion">0</span>
+                                <span class="bg-white border border-surface-200 text-xs font-mono px-2 py-0.5 rounded-full text-surface-600 shadow-sm" id="kb-count-reparacion">0</span>
                             </div>
-                            <div class="flex-1 space-y-4 kanban-dropzone" id="col-reparacion"></div>
+                            <div class="kanban-dropzone custom-scrollbar" id="col-reparacion"></div>
                         </div>
 
-                        <!-- Columna: Terminado -->
-                        <div class="flex-none w-80 bg-surface-darker/50 rounded-2xl p-4 border border-surface-border flex flex-col kanban-column" data-status="terminado">
-                            <div class="flex items-center justify-between mb-4 px-1">
-                                <h3 class="font-bold text-white flex items-center">
-                                    <span class="w-3 h-3 rounded-full bg-emerald-500 mr-2"></span>
+                        <!-- Columna: Control Calidad / Terminado -->
+                        <div class="kanban-column" data-status="terminado">
+                            <div class="px-4 py-3 border-b border-surface-200 flex justify-between items-center bg-surface-50/50 rounded-t-xl shrink-0">
+                                <h3 class="font-bold text-surface-800 flex items-center text-sm uppercase tracking-wide">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-status-success mr-2"></span>
                                     Listo / Entregado
                                 </h3>
-                                <span class="bg-surface-card text-xs font-mono px-2 py-1 rounded-md text-slate-400" id="count-terminado">0</span>
+                                <span class="bg-white border border-surface-200 text-xs font-mono px-2 py-0.5 rounded-full text-surface-600 shadow-sm" id="kb-count-terminado">0</span>
                             </div>
-                            <div class="flex-1 space-y-4 kanban-dropzone" id="col-terminado"></div>
+                            <div class="kanban-dropzone custom-scrollbar" id="col-terminado"></div>
                         </div>
                     </div>
-                </section>
+                </div>
+            </section>
 
-                <!-- VIEW 3: INVENTARIO -->
-                <section id="view-inventario" class="view-section w-full max-w-7xl mx-auto flex flex-col h-full">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <section id="view-inventario" class="view-section custom-scrollbar p-4 md:p-8">
+                <div class="max-w-7xl mx-auto w-full space-y-6">
+                    
+                    <!-- Header y Buscador -->
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
-                            <h1 class="text-3xl font-bold text-white tracking-tight">Inventario de Refacciones</h1>
-                            <p class="text-slate-400 mt-1">Control de stock, alertas y precios de piezas.</p>
+                            <h2 class="text-2xl font-bold text-surface-900">Catálogo e Inventario</h2>
+                            <p class="text-sm text-surface-500">Gestión de refacciones, consumibles y mano de obra.</p>
                         </div>
-                        <div class="flex gap-3 w-full md:w-auto">
+                        <div class="flex w-full md:w-auto gap-2">
                             <div class="relative flex-1 md:w-64">
-                                <svg class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                                <input type="text" id="search-inventory" placeholder="Buscar refacción..." class="w-full bg-surface-dark border border-surface-border rounded-lg pl-10 pr-4 py-2 text-sm text-white focus:border-brand-500 outline-none">
+                                <svg class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-surface-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                <input type="text" id="inv-search" placeholder="Buscar código o pieza..." class="w-full bg-white border border-surface-300 rounded-lg pl-9 pr-3 py-2 text-sm text-surface-900 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none shadow-sm">
                             </div>
-                            <button class="bg-surface-card border border-surface-border hover:bg-surface-border text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                                Filtros
+                            <button class="bg-brand-600 text-white px-3 py-2 rounded-lg text-sm font-medium shadow-sm hover:bg-brand-700 whitespace-nowrap" onclick="UI.showToast('Módulo de alta de inventario bloqueado en demo.', 'warning')">
+                                + Nuevo
                             </button>
                         </div>
                     </div>
 
-                    <!-- Tabla Contenedor -->
-                    <div class="glass-card rounded-2xl overflow-hidden flex-1 flex flex-col">
-                        <div class="overflow-x-auto flex-1">
-                            <table class="w-full text-left border-collapse">
-                                <thead>
-                                    <tr class="bg-surface-dark border-b border-surface-border text-xs uppercase tracking-wider text-slate-400">
-                                        <th class="px-6 py-4 font-semibold">Código / Pieza</th>
-                                        <th class="px-6 py-4 font-semibold">Categoría</th>
-                                        <th class="px-6 py-4 font-semibold">Stock</th>
-                                        <th class="px-6 py-4 font-semibold">Precio Costo</th>
-                                        <th class="px-6 py-4 font-semibold">Precio Venta</th>
-                                        <th class="px-6 py-4 font-semibold text-right">Acción</th>
+                    <!-- Sub-tabs -->
+                    <div class="border-b border-surface-200">
+                        <nav class="-mb-px flex space-x-6" aria-label="Tabs">
+                            <button class="border-brand-500 text-brand-600 whitespace-nowrap py-3 border-b-2 font-medium text-sm">Refacciones</button>
+                            <button class="border-transparent text-surface-500 hover:text-surface-700 hover:border-surface-300 whitespace-nowrap py-3 border-b-2 font-medium text-sm">Consumibles</button>
+                            <button class="border-transparent text-surface-500 hover:text-surface-700 hover:border-surface-300 whitespace-nowrap py-3 border-b-2 font-medium text-sm">Servicios (Mano Obra)</button>
+                        </nav>
+                    </div>
+
+                    <!-- Tabla de Inventario -->
+                    <div class="app-card overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-surface-200">
+                                <thead class="bg-surface-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-surface-500 uppercase tracking-wider">Código / Artículo</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-surface-500 uppercase tracking-wider">Categoría</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-surface-500 uppercase tracking-wider">Stock</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-surface-500 uppercase tracking-wider">Precio Venta</th>
+                                        <th scope="col" class="px-6 py-3 text-right text-xs font-bold text-surface-500 uppercase tracking-wider">Acciones</th>
                                     </tr>
                                 </thead>
-                                <tbody id="inventory-table-body" class="divide-y divide-surface-border text-sm">
-                                    <!-- Inyectado por JS -->
+                                <tbody class="bg-white divide-y divide-surface-200" id="inv-table-body">
+                                    <!-- Renderizado por JS -->
                                 </tbody>
                             </table>
                         </div>
-                        <div class="bg-surface-dark border-t border-surface-border p-4 flex justify-between items-center text-sm text-slate-400">
-                            <span id="inventory-count">Mostrando 0 resultados</span>
+                        <!-- Paginación Simple -->
+                        <div class="bg-white px-4 py-3 border-t border-surface-200 flex items-center justify-between sm:px-6">
+                            <div class="text-sm text-surface-500">
+                                Mostrando <span class="font-medium" id="inv-count">0</span> resultados
+                            </div>
                             <div class="flex gap-2">
-                                <button class="px-3 py-1 rounded bg-surface-card hover:bg-surface-border disabled:opacity-50">Anterior</button>
-                                <button class="px-3 py-1 rounded bg-surface-card hover:bg-surface-border disabled:opacity-50">Siguiente</button>
+                                <button class="relative inline-flex items-center px-3 py-1.5 border border-surface-300 text-sm font-medium rounded-md text-surface-700 bg-white hover:bg-surface-50">Anterior</button>
+                                <button class="relative inline-flex items-center px-3 py-1.5 border border-surface-300 text-sm font-medium rounded-md text-surface-700 bg-white hover:bg-surface-50">Siguiente</button>
                             </div>
                         </div>
                     </div>
-                </section>
-                
-                <!-- Placeholder Views -->
-                <section id="view-clientes" class="view-section w-full flex items-center justify-center h-full">
-                    <div class="text-center">
-                        <svg class="w-16 h-16 text-slate-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                        <h2 class="text-2xl font-bold text-slate-300">Directorio de Clientes</h2>
-                        <p class="text-slate-500 mt-2">Módulo en construcción para esta demostración.</p>
-                    </div>
-                </section>
+                </div>
+            </section>
 
+            <section id="view-clientes" class="view-section custom-scrollbar p-4 md:p-8">
+                <div class="max-w-7xl mx-auto w-full space-y-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 class="text-2xl font-bold text-surface-900">Directorio de Clientes</h2>
+                            <p class="text-sm text-surface-500">Gestión de CRM, historial y datos de contacto.</p>
+                        </div>
+                        <button class="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm hover:bg-brand-700" onclick="UI.showToast('Añadir cliente bloqueado.')">
+                            Añadir Cliente
+                        </button>
+                    </div>
+
+                    <!-- Grid de Tarjetas de Clientes -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="clientes-grid">
+                        <!-- Renderizado por JS -->
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-finanzas" class="view-section custom-scrollbar p-4 md:p-8">
+                <div class="max-w-7xl mx-auto w-full space-y-6">
+                    <h2 class="text-2xl font-bold text-surface-900">Finanzas y Facturación</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Mini Charts -->
+                        <div class="app-card p-5 flex flex-col items-center justify-center h-64">
+                            <h4 class="text-sm font-bold text-surface-500 mb-2">Distribución de Ingresos</h4>
+                            <div class="w-40 h-40 relative">
+                                <canvas id="chart-doughnut" class="chart-canvas"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="app-card p-5 md:col-span-2 h-64 flex flex-col">
+                            <h4 class="text-sm font-bold text-surface-500 mb-2">Ingresos vs Gastos (Mensual)</h4>
+                            <div class="flex-1 relative w-full h-full">
+                                <canvas id="chart-bar" class="chart-canvas"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de Facturas Recientes -->
+                    <div class="app-card overflow-hidden">
+                        <div class="px-5 py-4 border-b border-surface-200">
+                            <h3 class="text-lg font-bold text-surface-900">Facturas Recientes</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-surface-200">
+                                <thead class="bg-surface-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-surface-500 uppercase">Folio</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-surface-500 uppercase">Cliente</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-surface-500 uppercase">Monto</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-surface-500 uppercase">Estado</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-surface-500 uppercase">Fecha</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-surface-200" id="finanzas-table-body">
+                                    <!-- Renderizado por JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <nav class="md:hidden mobile-nav bg-white border-t border-surface-200 fixed bottom-0 left-0 w-full z-20 flex justify-around items-center h-16 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+            <a href="#" data-target="dashboard" class="nav-item mobile-nav-btn flex flex-col items-center justify-center w-full h-full text-brand-600">
+                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                <span class="text-[10px] font-medium">Inicio</span>
+            </a>
+            <a href="#" data-target="taller" class="nav-item mobile-nav-btn flex flex-col items-center justify-center w-full h-full text-surface-400">
+                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                <span class="text-[10px] font-medium">Taller</span>
+            </a>
+            <!-- FAB button in middle -->
+            <div class="relative w-full h-full flex justify-center">
+                <button class="absolute -top-5 w-12 h-12 bg-brand-600 rounded-full text-white shadow-lg flex items-center justify-center border-4 border-surface-50" onclick="UI.openModal('modal-nuevo-ingreso')">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                </button>
             </div>
-        </main>
+            <a href="#" data-target="inventario" class="nav-item mobile-nav-btn flex flex-col items-center justify-center w-full h-full text-surface-400">
+                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                <span class="text-[10px] font-medium">Stock</span>
+            </a>
+            <a href="#" data-target="clientes" class="nav-item mobile-nav-btn flex flex-col items-center justify-center w-full h-full text-surface-400">
+                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <span class="text-[10px] font-medium">CRM</span>
+            </a>
+        </nav>
+    </main>
+
+    
+    <!-- Drawer: Detalles del Vehículo -->
+    <div id="drawer-overlay" class="drawer-overlay" onclick="UI.closeDrawer()"></div>
+    <div id="drawer-panel" class="drawer-panel">
+        <div class="px-6 py-4 border-b border-surface-200 flex justify-between items-center bg-surface-50 shrink-0">
+            <h3 class="text-lg font-bold text-surface-900" id="drawer-title">Detalles del Servicio</h3>
+            <button class="text-surface-400 hover:text-surface-700 bg-surface-200/50 hover:bg-surface-200 rounded-full p-2 transition-colors" onclick="UI.closeDrawer()">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <div class="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6" id="drawer-content">
+            <!-- Inyectado por JS -->
+        </div>
+        <div class="p-4 border-t border-surface-200 bg-white shrink-0 flex gap-3" id="drawer-actions">
+            <!-- Inyectado por JS -->
+        </div>
     </div>
 
-    <!-- SCRIPT PRINCIPAL: LA MAGIA SPA -->
+    <!-- Contenedor de Toasts -->
+    <div id="toast-container"></div>
+
     <script>
         /**
-         * AUTO MANAGER CORE ENGINE
-         * Arquitectura Vanilla JS simulando un framework reactivo.
-         * Nivel de producción: Enterprise Mock.
+         * AUTOMANAGER SaaS - Vanilla JS Architecture
+         * Simulación completa de un entorno de producción (Mock Data, Reactividad Manual, UI Engine).
          */
 
         // ============================================================================
-        // 1. MOCK DATABASE (Simulación de Backend JSON)
+        // 1. MOCK DATABASE EXPANDIDA
         // ============================================================================
         const DB = {
-            config: {
-                shopName: "Taller Hermanos Motors",
-                currency: "MXN"
-            },
+            config: { name: "AutoManager Demo", currency: "MXN" },
             stats: {
-                revenue: 124500.00,
-                revenueHistory: [15000, 22000, 18000, 35000, 28000, 45000, 124500] // Semanal/Mensual
+                revenue: 148500.00,
+                revenueHistory: [45000, 32000, 28000, 55000, 48000, 65000, 148500],
+                expensesHistory: [20000, 15000, 18000, 25000, 22000, 30000, 80000]
             },
-            // Coches activos en el taller
+            // Generación extensa de vehículos
             vehicles: [
-                { id: "v1", client: "Roberto Gómez", car: "Honda Civic 2018", plate: "JYK-9821", status: "reparacion", desc: "Cambio de balatas y rectificado", priority: "high", img: "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?auto=format&fit=crop&q=80&w=200&h=150" },
-                { id: "v2", client: "Ana Laura Torres", car: "VW Jetta 2020", plate: "PMM-102", status: "recepcion", desc: "Ruido extraño en motor al acelerar", priority: "normal", img: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&q=80&w=200&h=150" },
-                { id: "v3", client: "Empresa Logística", car: "Ford Transit 2021", plate: "XX-990-A", status: "diagnostico", desc: "Servicio mayor, 100k km", priority: "high", img: null },
-                { id: "v4", client: "Luis Ramírez", car: "Mazda 3 2017", plate: "LTY-554", status: "terminado", desc: "Alineación y balanceo", priority: "normal", img: null },
-                { id: "v5", client: "Mariana Ríos", car: "Nissan Versa 2019", plate: "GGT-881", status: "reparacion", desc: "Reparación sistema eléctrico", priority: "normal", img: "https://images.unsplash.com/photo-1530046339160-ce3e530c7d2f?auto=format&fit=crop&q=80&w=200&h=150" },
-                { id: "v6", client: "Carlos Fuentes", car: "Toyota Hilux 2022", plate: "RTY-442", status: "diagnostico", desc: "Revisión de suspensión por terracería", priority: "high", img: null },
+                { id: "v1", clientId: "c1", car: "Honda Civic 2018", plate: "JYK-9821", status: "reparacion", desc: "Cambio de balatas y rectificado de discos delanteros.", priority: "high", img: "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?auto=format&fit=crop&q=80&w=400&h=300", mechanic: "José Luis", entryDate: "2026-10-09" },
+                { id: "v2", clientId: "c2", car: "VW Jetta 2020", plate: "PMM-102", status: "recepcion", desc: "Ruido extraño en motor al acelerar. Check engine encendido.", priority: "normal", img: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&q=80&w=400&h=300", mechanic: "Sin asignar", entryDate: "2026-10-11" },
+                { id: "v3", clientId: "c3", car: "Ford Transit 2021", plate: "XX-990-A", status: "diagnostico", desc: "Servicio mayor de flotilla, 100k km.", priority: "high", img: null, mechanic: "Armando", entryDate: "2026-10-10" },
+                { id: "v4", clientId: "c4", car: "Mazda 3 2017", plate: "LTY-554", status: "terminado", desc: "Alineación, balanceo y rotación de llantas.", priority: "normal", img: null, mechanic: "Pedro", entryDate: "2026-10-08" },
+                { id: "v5", clientId: "c5", car: "Nissan Versa 2019", plate: "GGT-881", status: "reparacion", desc: "Reparación sistema eléctrico, falla en luces.", priority: "normal", img: "https://images.unsplash.com/photo-1530046339160-ce3e530c7d2f?auto=format&fit=crop&q=80&w=400&h=300", mechanic: "Armando", entryDate: "2026-10-09" },
+                { id: "v6", clientId: "c6", car: "Toyota Hilux 2022", plate: "RTY-442", status: "diagnostico", desc: "Revisión de suspensión por uso en terracería.", priority: "high", img: null, mechanic: "José Luis", entryDate: "2026-10-11" },
+                { id: "v7", clientId: "c7", car: "Chevrolet Aveo 2016", plate: "ABC-123", status: "recepcion", desc: "Cambio de aceite y filtros.", priority: "low", img: null, mechanic: "Sin asignar", entryDate: "2026-10-11" },
             ],
-            // Inventario Masivo Simulado
+            clients: [
+                { id: "c1", name: "Roberto Gómez", phone: "555-0101", email: "roberto@mail.com", type: "particular", totalSpent: 12500 },
+                { id: "c2", name: "Ana Laura Torres", phone: "555-0102", email: "ana@mail.com", type: "particular", totalSpent: 4500 },
+                { id: "c3", name: "Logística del Norte S.A.", phone: "555-0103", email: "flotilla@lognor.com", type: "empresa", totalSpent: 89000 },
+                { id: "c4", name: "Luis Ramírez", phone: "555-0104", email: "luis@mail.com", type: "particular", totalSpent: 1200 },
+                { id: "c5", name: "Mariana Ríos", phone: "555-0105", email: "mariana@mail.com", type: "particular", totalSpent: 3400 },
+                { id: "c6", name: "Carlos Fuentes", phone: "555-0106", email: "carlos@mail.com", type: "particular", totalSpent: 7800 },
+                { id: "c7", name: "Héctor Silva", phone: "555-0107", email: "hector@mail.com", type: "particular", totalSpent: 900 },
+            ],
             inventory: [
-                { id: "i1", code: "BLT-001", name: "Balatas Delanteras Cerámicas", cat: "Frenos", stock: 12, minStock: 5, cost: 450, price: 850 },
-                { id: "i2", code: "BLT-002", name: "Balatas Traseras Tambor", cat: "Frenos", stock: 4, minStock: 5, cost: 300, price: 600 },
-                { id: "i3", code: "FLT-A01", name: "Filtro de Aire Universal", cat: "Filtros", stock: 25, minStock: 10, cost: 120, price: 250 },
-                { id: "i4", code: "FLT-O15", name: "Filtro de Aceite Sintético", cat: "Filtros", stock: 3, minStock: 15, cost: 180, price: 350 },
-                { id: "i5", code: "OIL-5W30", name: "Aceite Sintético 5W-30 (Garrafa)", cat: "Líquidos", stock: 8, minStock: 10, cost: 750, price: 1200 },
-                { id: "i6", code: "SPK-IR4", name: "Bujías Iridium (Set 4)", cat: "Motor", stock: 15, minStock: 10, cost: 400, price: 900 },
-                { id: "i7", code: "BTR-L42", name: "Batería 42 Amperes", cat: "Eléctrico", stock: 2, minStock: 5, cost: 1200, price: 1800 },
-                { id: "i8", code: "SHK-F01", name: "Amortiguadores Delanteros (Par)", cat: "Suspensión", stock: 6, minStock: 4, cost: 1500, price: 2800 },
-                { id: "i9", code: "WPR-22", name: "Plumillas Limpiaparabrisas 22\"", cat: "Accesorios", stock: 30, minStock: 10, cost: 80, price: 200 },
-                { id: "i10", code: "BLB-H4", name: "Foco Halógeno H4", cat: "Eléctrico", stock: 45, minStock: 20, cost: 45, price: 150 },
+                { id: "i1", code: "BLT-001", name: "Balatas Delanteras Cerámicas", cat: "Frenos", stock: 12, minStock: 5, price: 850.00 },
+                { id: "i2", code: "BLT-002", name: "Balatas Traseras Tambor", cat: "Frenos", stock: 4, minStock: 5, price: 600.00 },
+                { id: "i3", code: "FLT-A01", name: "Filtro de Aire Universal", cat: "Filtros", stock: 25, minStock: 10, price: 250.00 },
+                { id: "i4", code: "FLT-O15", name: "Filtro de Aceite Sintético", cat: "Filtros", stock: 3, minStock: 15, price: 350.00 },
+                { id: "i5", code: "OIL-5W30", name: "Aceite Sintético 5W-30 (Garrafa 5L)", cat: "Líquidos", stock: 8, minStock: 10, price: 1200.00 },
+                { id: "i6", code: "SPK-IR4", name: "Bujías Iridium (Set 4)", cat: "Motor", stock: 15, minStock: 10, price: 900.00 },
+                { id: "i7", code: "BTR-L42", name: "Batería 42 Amperes LTH", cat: "Eléctrico", stock: 2, minStock: 5, price: 1800.00 },
+                { id: "i8", code: "SHK-F01", name: "Amortiguadores Delanteros (Par)", cat: "Suspensión", stock: 6, minStock: 4, price: 2800.00 },
             ],
-            // Actividad para el log
             activities: [
-                { time: "Hace 10 min", text: "Vehículo JYK-9821 movido a Reparación.", type: "update" },
-                { time: "Hace 45 min", text: "Nueva orden de ingreso: VW Jetta (PMM-102).", type: "new" },
-                { time: "Hace 2 hrs", text: "Inventario bajo alerta: Filtro de Aceite (Quedan 3).", type: "alert" },
-                { time: "Ayer 16:30", text: "Pago recibido de Luis Ramírez ($1,200.00).", type: "money" },
-                { time: "Ayer 14:00", text: "Refacciones recibidas: Lote Filtros de Aire x20.", type: "inventory" }
+                { id: 1, time: "Hace 10 min", text: "Vehículo JYK-9821 movido a Reparación por Admin.", type: "update" },
+                { id: 2, time: "Hace 45 min", text: "Nueva orden generada: VW Jetta (PMM-102).", type: "new" },
+                { id: 3, time: "Hace 2 hrs", text: "Alerta de inventario: Filtro de Aceite Sintético (Stock: 3).", type: "alert" },
+                { id: 4, time: "Ayer 16:30", text: "Factura #F-1029 pagada por Luis Ramírez ($1,200.00).", type: "money" },
+                { id: 5, time: "Ayer 14:00", text: "Entrada almacén: Aceite Sintético x10.", type: "inventory" }
+            ],
+            invoices: [
+                { id: "F-1030", clientId: "c3", amount: 15400.00, status: "pendiente", date: "2026-10-10" },
+                { id: "F-1029", clientId: "c4", amount: 1200.00, status: "pagada", date: "2026-10-09" },
+                { id: "F-1028", clientId: "c1", amount: 3500.00, status: "pagada", date: "2026-10-08" },
+                { id: "F-1027", clientId: "c6", amount: 890.00, status: "cancelada", date: "2026-10-05" },
             ]
         };
 
         // ============================================================================
-        // 2. UTILIDADES Y FORMATOS
+        // 2. UTILIDADES
         // ============================================================================
         const Utils = {
-            formatMoney: (amount) => {
-                return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(amount);
+            money: (amount) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(amount),
+            date: () => {
+                const options = { year: 'numeric', month: 'short', day: 'numeric' };
+                return new Date().toLocaleDateString('es-MX', options);
             },
-            formatDate: () => {
-                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                return new Date().toLocaleDateString('es-MX', options).toUpperCase();
-            },
-            getInitials: (name) => {
-                return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+            initials: (name) => name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase(),
+            getClientName: (id) => {
+                const c = DB.clients.find(c => c.id === id);
+                return c ? c.name : 'Desconocido';
             }
         };
 
         // ============================================================================
-        // 3. CORE APP OBJECT (Controlador Principal)
+        // 3. UI ENGINE (Interacciones App-like)
         // ============================================================================
-        const App = {
-            currentView: 'dashboard',
-            draggedCard: null, // Para el Kanban
-
+        const UI = {
             init: function() {
-                // UI Inicial
-                document.getElementById('current-date').innerText = Utils.formatDate();
-                
+                this.setupRipples();
                 this.setupNavigation();
-                this.renderDashboard();
-                this.renderKanban();
-                this.renderInventory();
-                
-                // Mostrar vista inicial
-                this.navigate('dashboard');
-                
-                // Renderizar gráfico complejo
-                setTimeout(() => CanvasEngine.drawChart(DB.stats.revenueHistory), 500);
-                
-                this.showToast('Sistema Inicializado. Datos sincronizados.', 'success');
             },
 
-            // Sistema de Notificaciones (Toasts) Vanilla
+            // Añadir efecto visual al hacer click (Ripple)
+            setupRipples: function() {
+                document.addEventListener('mousedown', function(e) {
+                    const target = e.target.closest('.ripple');
+                    if (!target) return;
+
+                    const circle = document.createElement('span');
+                    const diameter = Math.max(target.clientWidth, target.clientHeight);
+                    const radius = diameter / 2;
+
+                    const rect = target.getBoundingClientRect();
+                    circle.style.width = circle.style.height = `${diameter}px`;
+                    circle.style.left = `${e.clientX - rect.left - radius}px`;
+                    circle.style.top = `${e.clientY - rect.top - radius}px`;
+                    circle.classList.add('ripple-effect');
+
+                    const existingRipple = target.querySelector('.ripple-effect');
+                    if (existingRipple) existingRipple.remove();
+
+                    target.appendChild(circle);
+                    setTimeout(() => circle.remove(), 600);
+                });
+            },
+
+            // Sistema de Notificaciones (Toasts)
             showToast: function(message, type = 'info') {
                 const container = document.getElementById('toast-container');
                 const toast = document.createElement('div');
-                toast.className = `toast-msg ${type}`;
+                toast.className = `toast-msg`;
                 
                 let icon = '';
-                if(type === 'success') icon = `<svg class="w-5 h-5 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
-                else if(type === 'error') icon = `<svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
-                else if(type === 'warning') icon = `<svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
-                else icon = `<svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+                let borderColor = '#0ea5e9'; // Info blue
+                
+                if(type === 'success') {
+                    icon = `<svg class="w-5 h-5 text-status-success shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+                    borderColor = '#10b981';
+                } else if(type === 'warning') {
+                    icon = `<svg class="w-5 h-5 text-status-warning shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
+                    borderColor = '#f59e0b';
+                } else {
+                    icon = `<svg class="w-5 h-5 text-brand-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+                }
 
-                toast.innerHTML = `${icon} <span>${message}</span>`;
+                toast.style.borderLeft = `4px solid ${borderColor}`;
+                toast.innerHTML = `
+                    ${icon} 
+                    <span class="flex-1">${message}</span>
+                    <div class="toast-progress" style="background-color: ${borderColor}40"></div>
+                `;
+                
                 container.appendChild(toast);
 
                 setTimeout(() => {
                     toast.classList.add('fade-out');
-                    setTimeout(() => toast.remove(), 300); // Remover del DOM post-animación
+                    setTimeout(() => toast.remove(), 300);
                 }, 3000);
             },
 
-            // Sistema de Router SPA (Pestañas)
+            // Router SPA
             setupNavigation: function() {
-                const links = document.querySelectorAll('.nav-link');
+                const links = document.querySelectorAll('.nav-item');
                 links.forEach(link => {
                     link.addEventListener('click', (e) => {
                         e.preventDefault();
-                        const target = link.getAttribute('data-target');
-                        this.navigate(target);
+                        // Encontrar link original si se hizo click en un hijo
+                        const targetElement = e.target.closest('.nav-item');
+                        if(!targetElement) return;
+                        
+                        const targetView = targetElement.getAttribute('data-target');
+                        if(targetView) Router.navigate(targetView);
 
-                        // Actualizar UI activa
-                        links.forEach(l => {
-                            l.classList.remove('bg-brand-500/10', 'border-brand-500/20', 'text-white');
-                            l.classList.add('text-slate-400', 'hover:text-white', 'hover:bg-surface-card');
-                            l.querySelector('svg').classList.remove('text-brand-400');
-                            l.querySelector('svg').classList.add('text-slate-500');
+                        // Actualizar UI activa Desktop
+                        document.querySelectorAll('aside .nav-item').forEach(l => {
+                            l.classList.remove('text-brand-700', 'bg-brand-50');
+                            l.classList.add('text-surface-600');
+                            const svg = l.querySelector('svg');
+                            if(svg) { svg.classList.remove('text-brand-500'); svg.classList.add('text-surface-400'); }
                         });
                         
-                        link.classList.remove('text-slate-400', 'hover:text-white', 'hover:bg-surface-card');
-                        link.classList.add('bg-brand-500/10', 'border', 'border-brand-500/20', 'text-white');
-                        link.querySelector('svg').classList.remove('text-slate-500');
-                        link.querySelector('svg').classList.add('text-brand-400');
+                        // Actualizar UI activa Mobile
+                        document.querySelectorAll('.mobile-nav .nav-item').forEach(l => {
+                            l.classList.remove('text-brand-600');
+                            l.classList.add('text-surface-400');
+                        });
+
+                        // Set active desktop
+                        const desktopActive = document.querySelector(`aside .nav-item[data-target="${targetView}"]`);
+                        if(desktopActive) {
+                            desktopActive.classList.add('text-brand-700', 'bg-brand-50');
+                            desktopActive.classList.remove('text-surface-600');
+                            desktopActive.querySelector('svg').classList.add('text-brand-500');
+                            desktopActive.querySelector('svg').classList.remove('text-surface-400');
+                        }
+
+                        // Set active mobile
+                        const mobileActive = document.querySelector(`.mobile-nav .nav-item[data-target="${targetView}"]`);
+                        if(mobileActive) {
+                            mobileActive.classList.add('text-brand-600');
+                            mobileActive.classList.remove('text-surface-400');
+                        }
                     });
                 });
             },
 
+            // Drawers (Paneles laterales para detalles)
+            openDrawer: function(title, contentHTML, actionsHTML) {
+                document.getElementById('drawer-title').innerText = title;
+                document.getElementById('drawer-content').innerHTML = contentHTML;
+                document.getElementById('drawer-actions').innerHTML = actionsHTML || '';
+                
+                document.getElementById('drawer-overlay').classList.add('active');
+                document.getElementById('drawer-panel').classList.add('active');
+            },
+
+            closeDrawer: function() {
+                document.getElementById('drawer-overlay').classList.remove('active');
+                document.getElementById('drawer-panel').classList.remove('active');
+            },
+
+            openModal: function(id) {
+                this.showToast('Esta función requiere conexión a backend en la versión final.', 'warning');
+            }
+        };
+
+        const Router = {
+            current: 'dashboard',
             navigate: function(viewId) {
                 document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
                 const view = document.getElementById(`view-${viewId}`);
                 if(view) {
-                    // Forzar re-flow para animar
-                    view.classList.remove('active');
-                    void view.offsetWidth; 
                     view.classList.add('active');
-                    this.currentView = viewId;
+                    this.current = viewId;
                     
-                    if(viewId === 'dashboard') CanvasEngine.drawChart(DB.stats.revenueHistory);
+                    // Disparar renderizados específicos por vista
+                    if(viewId === 'dashboard') Views.renderDashboard();
+                    if(viewId === 'taller') Views.renderKanban();
+                    if(viewId === 'inventario') Views.renderInventory();
+                    if(viewId === 'clientes') Views.renderClients();
+                    if(viewId === 'finanzas') Views.renderFinances();
                 }
-            },
+            }
+        };
 
-            // Render Dashboard Data
+        const Views = {
+            
             renderDashboard: function() {
-                document.getElementById('stat-revenue').innerText = Utils.formatMoney(DB.stats.revenue);
-                document.getElementById('stat-active-cars').innerText = DB.vehicles.length;
+                document.getElementById('dash-date').innerText = Utils.date();
+                document.getElementById('dash-ingresos').innerText = Utils.money(DB.stats.revenue);
+                document.getElementById('dash-activos').innerText = DB.vehicles.length;
+                document.getElementById('dash-entregados').innerText = DB.vehicles.filter(v => v.status === 'terminado').length;
                 
-                const completedCount = DB.vehicles.filter(v => v.status === 'terminado').length;
-                document.getElementById('stat-completed').innerText = completedCount;
+                const alerts = DB.inventory.filter(i => i.stock <= i.minStock).length;
+                document.getElementById('dash-alertas').innerText = alerts;
 
-                const lowStockCount = DB.inventory.filter(i => i.stock <= i.minStock).length;
-                const statLow = document.getElementById('stat-low-stock');
-                statLow.innerText = lowStockCount;
-                if(lowStockCount > 0) statLow.classList.add('text-red-400');
-
-                // Activity Feed
-                const feed = document.getElementById('activity-feed');
+                // Activity
+                const feed = document.getElementById('dash-activity-feed');
                 feed.innerHTML = '';
                 DB.activities.forEach(act => {
-                    let iconColor = 'bg-slate-700 text-slate-300';
-                    let iconSvg = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>`;
-                    
-                    if(act.type === 'alert') { iconColor = 'bg-red-500/20 text-red-400'; iconSvg = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>`;}
-                    if(act.type === 'money') { iconColor = 'bg-emerald-500/20 text-emerald-400'; iconSvg = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>`;}
-                    if(act.type === 'new') { iconColor = 'bg-blue-500/20 text-blue-400'; iconSvg = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>`;}
+                    let iconBg = 'bg-surface-100', iconColor = 'text-surface-500', icon = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>`;
+                    if(act.type === 'alert') { iconBg = 'bg-red-100'; iconColor = 'text-status-danger'; icon = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>`;}
+                    if(act.type === 'money') { iconBg = 'bg-emerald-100'; iconColor = 'text-status-success'; icon = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>`;}
+                    if(act.type === 'new') { iconBg = 'bg-blue-100'; iconColor = 'text-brand-600'; icon = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>`;}
 
                     feed.innerHTML += `
-                        <div class="flex items-start gap-4">
-                            <div class="w-8 h-8 rounded-full ${iconColor} flex items-center justify-center shrink-0 mt-1">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">${iconSvg}</svg>
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-full ${iconBg} flex items-center justify-center mt-0.5 shrink-0">
+                                <svg class="w-4 h-4 ${iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24">${icon}</svg>
                             </div>
                             <div>
-                                <p class="text-sm text-white">${act.text}</p>
-                                <p class="text-xs text-slate-500 mt-1">${act.time}</p>
+                                <p class="text-sm text-surface-700">${act.text}</p>
+                                <p class="text-xs text-surface-400 mt-0.5">${act.time}</p>
                             </div>
                         </div>
                     `;
                 });
+
+                // Redraw chart
+                CanvasEngine.drawLineChart('chart-revenue', DB.stats.revenueHistory);
             },
 
-            // Render Kanban Board
             renderKanban: function() {
                 const cols = {
                     recepcion: document.getElementById('col-recepcion'),
@@ -722,301 +1072,497 @@
                     reparacion: document.getElementById('col-reparacion'),
                     terminado: document.getElementById('col-terminado')
                 };
-
-                // Limpiar columnas
                 Object.values(cols).forEach(col => col.innerHTML = '');
 
-                const counts = { recepcion: 0, diagnostico: 0, reparacion: 0, terminado: 0 };
+                let counts = { recepcion: 0, diagnostico: 0, reparacion: 0, terminado: 0, urgentes: 0 };
 
                 DB.vehicles.forEach(v => {
                     counts[v.status]++;
-                    
-                    // Priority Badge
-                    let badge = '';
-                    if(v.priority === 'high') badge = `<span class="bg-red-500/20 text-red-400 text-xs px-2 py-0.5 rounded border border-red-500/30">Urgente</span>`;
+                    if(v.priority === 'high') counts.urgentes++;
 
-                    // Image Layout
+                    let priorityBadge = '';
+                    if(v.priority === 'high') priorityBadge = `<span class="bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-md">URGENTE</span>`;
+
                     let imgHtml = '';
                     if(v.img) {
-                        imgHtml = `<div class="h-24 w-full mb-3 rounded-lg overflow-hidden border border-surface-border"><img src="${v.img}" alt="Car" class="img-cover"></div>`;
+                        imgHtml = `<div class="h-24 w-full mb-3 rounded-lg overflow-hidden bg-surface-100"><img src="${v.img}" alt="Car" class="w-full h-full object-cover"></div>`;
                     }
 
+                    const clientName = Utils.getClientName(v.clientId);
+                    const initials = Utils.initials(clientName);
+
                     const cardHTML = `
-                        <div class="kanban-card glass-card rounded-xl p-4 border border-surface-border hover:border-brand-500/50" draggable="true" data-id="${v.id}">
+                        <div class="kanban-card" draggable="true" data-id="${v.id}" onclick="Views.openVehicleDetails('${v.id}')">
                             ${imgHtml}
                             <div class="flex justify-between items-start mb-2">
-                                <span class="text-xs font-mono text-slate-400 bg-surface-darker px-2 py-1 rounded">${v.plate}</span>
-                                ${badge}
+                                <span class="text-xs font-mono font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-md border border-brand-100">${v.plate}</span>
+                                ${priorityBadge}
                             </div>
-                            <h4 class="font-bold text-white text-sm mb-1">${v.car}</h4>
-                            <p class="text-xs text-slate-400 line-clamp-2 mb-3">${v.desc}</p>
-                            <div class="flex items-center justify-between mt-auto pt-3 border-t border-surface-border/50">
+                            <h4 class="font-bold text-surface-900 text-sm mb-1">${v.car}</h4>
+                            <p class="text-xs text-surface-500 line-clamp-2 mb-3 leading-relaxed">${v.desc}</p>
+                            
+                            <div class="flex items-center justify-between mt-3 pt-3 border-t border-surface-100">
                                 <div class="flex items-center gap-2">
-                                    <div class="w-6 h-6 rounded-full bg-gradient-to-tr from-brand-600 to-blue-600 flex items-center justify-center text-[10px] font-bold text-white shadow-inner">
-                                        ${Utils.getInitials(v.client)}
+                                    <div class="w-6 h-6 rounded-full bg-surface-200 flex items-center justify-center text-[10px] font-bold text-surface-600">
+                                        ${initials}
                                     </div>
-                                    <span class="text-xs text-slate-300 truncate w-24">${v.client}</span>
+                                    <span class="text-xs font-medium text-surface-600 truncate w-24">${clientName}</span>
                                 </div>
-                                <button class="text-slate-500 hover:text-brand-400" title="Ver Detalles">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                </button>
+                                <div class="flex items-center text-surface-400 text-xs">
+                                    <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    3d
+                                </div>
                             </div>
                         </div>
                     `;
                     if(cols[v.status]) cols[v.status].insertAdjacentHTML('beforeend', cardHTML);
                 });
 
-                // Actualizar contadores
-                Object.keys(counts).forEach(key => {
-                    document.getElementById(`count-${key}`).innerText = counts[key];
-                });
+                document.getElementById('kb-count-recepcion').innerText = counts.recepcion;
+                document.getElementById('kb-count-diagnostico').innerText = counts.diagnostico;
+                document.getElementById('kb-count-reparacion').innerText = counts.reparacion;
+                document.getElementById('kb-count-terminado').innerText = counts.terminado;
+                document.getElementById('count-urgentes').innerText = counts.urgentes;
 
-                this.setupDragAndDrop();
+                DragAndDrop.init();
             },
 
-            // Lógica Drag & Drop
-            setupDragAndDrop: function() {
+            openVehicleDetails: function(id) {
+                // Prevenir que el click abra el drawer si se estaba arrastrando
+                if(DragAndDrop.isDragging) return; 
+
+                const v = DB.vehicles.find(v => v.id === id);
+                if(!v) return;
+                const client = DB.clients.find(c => c.id === v.clientId);
+
+                const statusMap = { recepcion: 'Recepción', diagnostico: 'Diagnóstico', reparacion: 'En Reparación', terminado: 'Terminado' };
+
+                let content = `
+                    <div class="space-y-6">
+                        <!-- Header info -->
+                        <div class="flex items-start gap-4">
+                            <div class="w-16 h-16 rounded-xl bg-brand-100 flex items-center justify-center shrink-0 border border-brand-200">
+                                <svg class="w-8 h-8 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                            </div>
+                            <div>
+                                <h2 class="text-xl font-bold text-surface-900">${v.car}</h2>
+                                <p class="text-sm font-mono text-brand-600 mt-1">${v.plate}</p>
+                                <span class="inline-block mt-2 px-2.5 py-1 rounded-md text-xs font-medium bg-surface-100 text-surface-600 border border-surface-200">Estado: ${statusMap[v.status]}</span>
+                            </div>
+                        </div>
+
+                        <!-- Cliente -->
+                        <div class="bg-surface-50 p-4 rounded-xl border border-surface-200">
+                            <h4 class="text-xs font-bold text-surface-400 uppercase tracking-wider mb-3">Información del Cliente</h4>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-brand-500 text-white flex items-center justify-center font-bold shadow-sm">
+                                        ${Utils.initials(client.name)}
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-bold text-surface-900">${client.name}</p>
+                                        <p class="text-xs text-surface-500">${client.phone}</p>
+                                    </div>
+                                </div>
+                                <button class="p-2 text-brand-600 hover:bg-brand-50 rounded-full transition-colors" title="Contactar">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Detalles Mecánicos -->
+                        <div>
+                            <h4 class="text-xs font-bold text-surface-400 uppercase tracking-wider mb-2">Motivo de Ingreso</h4>
+                            <p class="text-sm text-surface-700 bg-white p-3 rounded-lg border border-surface-200 leading-relaxed">${v.desc}</p>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-white p-3 rounded-lg border border-surface-200">
+                                <p class="text-xs text-surface-400 mb-1">Mecánico Asignado</p>
+                                <p class="text-sm font-medium text-surface-900">${v.mechanic}</p>
+                            </div>
+                            <div class="bg-white p-3 rounded-lg border border-surface-200">
+                                <p class="text-xs text-surface-400 mb-1">Fecha Ingreso</p>
+                                <p class="text-sm font-medium text-surface-900">${v.entryDate}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                let actions = `
+                    <button class="flex-1 bg-white border border-surface-300 text-surface-700 py-2.5 rounded-lg font-medium hover:bg-surface-50 transition-colors text-sm">Editar</button>
+                    <button class="flex-1 bg-brand-600 text-white py-2.5 rounded-lg font-medium hover:bg-brand-700 transition-colors shadow-sm text-sm" onclick="UI.showToast('Generando reporte PDF...')">Reporte</button>
+                `;
+
+                UI.openDrawer('Ficha Técnica', content, actions);
+            },
+
+            renderInventory: function(term = '') {
+                const tbody = document.getElementById('inv-table-body');
+                tbody.innerHTML = '';
+
+                let data = DB.inventory;
+                if(term) {
+                    const t = term.toLowerCase();
+                    data = data.filter(i => i.name.toLowerCase().includes(t) || i.code.toLowerCase().includes(t));
+                }
+
+                document.getElementById('inv-count').innerText = data.length;
+
+                data.forEach(item => {
+                    let stockUI = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">${item.stock} u.</span>`;
+                    if(item.stock === 0) stockUI = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Agotado</span>`;
+                    else if(item.stock <= item.minStock) stockUI = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">${item.stock} (Reordenar)</span>`;
+
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-surface-50 transition-colors group">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-surface-900">${item.name}</div>
+                                <div class="text-xs text-brand-600 font-mono mt-0.5">${item.code}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-500">${item.cat}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">${stockUI}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-surface-900">${Utils.money(item.price)}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <button class="text-brand-600 hover:text-brand-900 opacity-0 group-hover:opacity-100 transition-opacity">Editar</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                // Attach search listener (prevent duplicate binds)
+                const searchInput = document.getElementById('inv-search');
+                searchInput.oninput = (e) => this.renderInventory(e.target.value);
+            },
+
+            renderClients: function() {
+                const grid = document.getElementById('clientes-grid');
+                grid.innerHTML = '';
+
+                DB.clients.forEach(c => {
+                    const typeBadge = c.type === 'empresa' 
+                        ? `<span class="bg-blue-100 text-blue-800 text-[10px] uppercase font-bold px-2 py-0.5 rounded border border-blue-200">Empresa</span>`
+                        : `<span class="bg-surface-100 text-surface-600 text-[10px] uppercase font-bold px-2 py-0.5 rounded border border-surface-200">Particular</span>`;
+
+                    grid.innerHTML += `
+                        <div class="app-card p-5 hover:shadow-md cursor-pointer" onclick="UI.showToast('Abriendo perfil de ${c.name}')">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="w-12 h-12 rounded-full bg-brand-500 text-white flex items-center justify-center font-bold text-lg shadow-sm">
+                                    ${Utils.initials(c.name)}
+                                </div>
+                                ${typeBadge}
+                            </div>
+                            <h3 class="font-bold text-surface-900 text-lg line-clamp-1">${c.name}</h3>
+                            <p class="text-sm text-surface-500 mt-1 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                                ${c.phone}
+                            </p>
+                            <div class="mt-4 pt-4 border-t border-surface-100 flex justify-between items-center">
+                                <span class="text-xs text-surface-400">Total Gastado</span>
+                                <span class="text-sm font-bold text-brand-600">${Utils.money(c.totalSpent)}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+            },
+
+            renderFinances: function() {
+                const tbody = document.getElementById('finanzas-table-body');
+                tbody.innerHTML = '';
+
+                DB.invoices.forEach(inv => {
+                    let statusUI = `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-emerald-100 text-emerald-800">Pagada</span>`;
+                    if(inv.status === 'pendiente') statusUI = `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pendiente</span>`;
+                    else if(inv.status === 'cancelada') statusUI = `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-surface-100 text-surface-600">Cancelada</span>`;
+
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-surface-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-brand-600 font-bold">${inv.id}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-900">${Utils.getClientName(inv.clientId)}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-surface-900">${Utils.money(inv.amount)}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">${statusUI}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-surface-500">${inv.date}</td>
+                        </tr>
+                    `;
+                });
+
+                // Dibujar gráficas
+                CanvasEngine.drawDoughnutChart('chart-doughnut', [60, 25, 15], ['Servicios', 'Refacciones', 'Otros'], ['#3b82f6', '#10b981', '#f59e0b']);
+                CanvasEngine.drawBarChart('chart-bar', DB.stats.revenueHistory, DB.stats.expensesHistory);
+            }
+        };
+
+        const DragAndDrop = {
+            isDragging: false,
+            init: function() {
                 const cards = document.querySelectorAll('.kanban-card');
                 const dropzones = document.querySelectorAll('.kanban-column');
 
+                // Soporte Desktop (HTML5 Drag and Drop)
                 cards.forEach(card => {
                     card.addEventListener('dragstart', (e) => {
-                        this.draggedCard = card;
-                        card.classList.add('dragging');
-                        // Necesario para Firefox
+                        this.isDragging = true;
                         e.dataTransfer.setData('text/plain', card.dataset.id);
+                        setTimeout(() => card.classList.add('dragging'), 0);
                     });
-
                     card.addEventListener('dragend', () => {
-                        this.draggedCard.classList.remove('dragging');
-                        this.draggedCard = null;
+                        this.isDragging = false;
+                        card.classList.remove('dragging');
                         dropzones.forEach(dz => dz.classList.remove('drag-over'));
                     });
                 });
 
                 dropzones.forEach(zone => {
-                    zone.addEventListener('dragover', (e) => {
-                        e.preventDefault(); // Permitir drop
+                    zone.addEventListener('dragover', e => {
+                        e.preventDefault();
                         zone.classList.add('drag-over');
                     });
-
-                    zone.addEventListener('dragleave', () => {
-                        zone.classList.remove('drag-over');
-                    });
-
-                    zone.addEventListener('drop', (e) => {
+                    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+                    zone.addEventListener('drop', e => {
                         e.preventDefault();
                         zone.classList.remove('drag-over');
+                        const cardId = e.dataTransfer.getData('text/plain');
+                        this.handleDrop(cardId, zone.dataset.status);
+                    });
+                });
+
+                // Soporte Móvil (Touch Events Simulating Drag)
+                let activeCard = null;
+                let ghostCard = null;
+                let initialY = 0;
+                let initialX = 0;
+                let scrollContainer = document.getElementById('kanban-container');
+
+                cards.forEach(card => {
+                    card.addEventListener('touchstart', e => {
+                        this.isDragging = false; // Empezamos asumiendo que es un tap
+                        const touch = e.touches[0];
+                        initialX = touch.clientX;
+                        initialY = touch.clientY;
+                        activeCard = card;
+                    }, {passive: true});
+
+                    card.addEventListener('touchmove', e => {
+                        if (!activeCard) return;
+                        const touch = e.touches[0];
                         
-                        const newStatus = zone.dataset.status;
-                        const cardId = this.draggedCard.dataset.id;
-                        
-                        // Encontrar vehículo y actualizar DB simulada
-                        const vehicle = DB.vehicles.find(v => v.id === cardId);
-                        if(vehicle && vehicle.status !== newStatus) {
-                            vehicle.status = newStatus;
-                            this.renderKanban(); // Re-render rápido
-                            this.showToast(`Estatus de ${vehicle.plate} actualizado a ${newStatus.toUpperCase()}`, 'success');
+                        // Determinar si es scroll o drag
+                        const deltaX = Math.abs(touch.clientX - initialX);
+                        const deltaY = Math.abs(touch.clientY - initialY);
+
+                        if(!this.isDragging && (deltaX > 10 || deltaY > 10)) {
+                            this.isDragging = true;
+                            // Prevenir scroll de la pantalla si estamos arrastrando
+                            document.body.style.overflow = 'hidden'; 
                             
-                            // Forzar actualización Dashboard
-                            this.renderDashboard();
+                            // Crear clon visual
+                            ghostCard = activeCard.cloneNode(true);
+                            ghostCard.classList.add('touch-dragging');
+                            document.body.appendChild(ghostCard);
+                            activeCard.style.opacity = '0.3';
                         }
+
+                        if (this.isDragging && ghostCard) {
+                            e.preventDefault(); // Detener scroll nativo
+                            ghostCard.style.left = (touch.clientX - ghostCard.offsetWidth / 2) + 'px';
+                            ghostCard.style.top = (touch.clientY - ghostCard.offsetHeight / 2) + 'px';
+
+                            // Resaltar columna debajo
+                            dropzones.forEach(zone => zone.classList.remove('drag-over'));
+                            const elementsBelow = document.elementsFromPoint(touch.clientX, touch.clientY);
+                            const zoneBelow = elementsBelow.find(el => el.classList.contains('kanban-column'));
+                            if(zoneBelow) zoneBelow.classList.add('drag-over');
+                        }
+                    }, {passive: false});
+
+                    card.addEventListener('touchend', e => {
+                        document.body.style.overflow = ''; // Restaurar scroll
+                        if (this.isDragging && ghostCard && activeCard) {
+                            const touch = e.changedTouches[0];
+                            const elementsBelow = document.elementsFromPoint(touch.clientX, touch.clientY);
+                            const zoneBelow = elementsBelow.find(el => el.classList.contains('kanban-column'));
+                            
+                            if (zoneBelow) {
+                                this.handleDrop(activeCard.dataset.id, zoneBelow.dataset.status);
+                            }
+                            
+                            ghostCard.remove();
+                            ghostCard = null;
+                            activeCard.style.opacity = '1';
+                            dropzones.forEach(z => z.classList.remove('drag-over'));
+                        }
+                        
+                        setTimeout(() => { this.isDragging = false; activeCard = null; }, 50);
                     });
                 });
             },
 
-            // Render Inventory Table
-            renderInventory: function(searchTerm = '') {
-                const tbody = document.getElementById('inventory-table-body');
-                tbody.innerHTML = '';
-
-                let filtered = DB.inventory;
-                if(searchTerm) {
-                    const term = searchTerm.toLowerCase();
-                    filtered = DB.inventory.filter(i => 
-                        i.name.toLowerCase().includes(term) || 
-                        i.code.toLowerCase().includes(term) ||
-                        i.cat.toLowerCase().includes(term)
-                    );
+            handleDrop: function(cardId, newStatus) {
+                const vehicle = DB.vehicles.find(v => v.id === cardId);
+                if(vehicle && vehicle.status !== newStatus) {
+                    vehicle.status = newStatus;
+                    Views.renderKanban(); // Re-render rápido
+                    UI.showToast(`Estado de ${vehicle.plate} actualizado.`, 'success');
                 }
-
-                document.getElementById('inventory-count').innerText = `Mostrando ${filtered.length} de ${DB.inventory.length} resultados`;
-
-                filtered.forEach(item => {
-                    // Logica de Alertas
-                    let stockBadge = `<span class="bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-full text-xs border border-emerald-500/20">${item.stock} u. (Suficiente)</span>`;
-                    if(item.stock === 0) {
-                        stockBadge = `<span class="bg-red-500/10 text-red-400 px-2 py-1 rounded-full text-xs border border-red-500/20 animate-pulse">0 u. (Agotado)</span>`;
-                    } else if(item.stock <= item.minStock) {
-                        stockBadge = `<span class="bg-yellow-500/10 text-yellow-400 px-2 py-1 rounded-full text-xs border border-yellow-500/20">Solo ${item.stock} (Reordenar)</span>`;
-                    }
-
-                    const tr = `
-                        <tr class="hover:bg-surface-card transition-colors group">
-                            <td class="px-6 py-4">
-                                <div class="font-bold text-white text-sm">${item.name}</div>
-                                <div class="text-xs text-brand-400 font-mono mt-0.5">${item.code}</div>
-                            </td>
-                            <td class="px-6 py-4 text-slate-300">${item.cat}</td>
-                            <td class="px-6 py-4">${stockBadge}</td>
-                            <td class="px-6 py-4 text-slate-400">${Utils.formatMoney(item.cost)}</td>
-                            <td class="px-6 py-4 font-semibold text-emerald-400">${Utils.formatMoney(item.price)}</td>
-                            <td class="px-6 py-4 text-right opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button class="text-slate-400 hover:text-white p-1" title="Editar">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                    tbody.insertAdjacentHTML('beforeend', tr);
-                });
-
-                // Listener de Búsqueda
-                const searchInput = document.getElementById('search-inventory');
-                // Remover listener previo para evitar duplicados si se re-renderiza
-                const newSearchInput = searchInput.cloneNode(true);
-                searchInput.parentNode.replaceChild(newSearchInput, searchInput);
-                
-                newSearchInput.addEventListener('input', (e) => {
-                    this.renderInventory(e.target.value);
-                });
             }
         };
 
-        // ============================================================================
-        // 4. CANVAS GRAPHIC ENGINE (Cero dependencias)
-        // ============================================================================
         const CanvasEngine = {
-            canvas: null,
-            ctx: null,
-            data: [],
-            
-            drawChart: function(dataArray) {
-                this.canvas = document.getElementById('revenueChart');
-                if(!this.canvas) return;
-                
-                this.ctx = this.canvas.getContext('2d');
-                this.data = dataArray;
-                
-                // Ajustar resolución de canvas (Anti-aliasing)
-                const container = this.canvas.parentElement;
+            setupCtx: function(id) {
+                const canvas = document.getElementById(id);
+                if(!canvas) return null;
+                const ctx = canvas.getContext('2d');
                 const dpr = window.devicePixelRatio || 1;
-                this.canvas.width = container.clientWidth * dpr;
-                this.canvas.height = container.clientHeight * dpr;
-                this.ctx.scale(dpr, dpr);
-                
-                this.render();
-
-                // Hacer responsive
-                window.addEventListener('resize', () => {
-                    if(App.currentView === 'dashboard') {
-                        this.canvas.width = container.clientWidth * dpr;
-                        this.canvas.height = container.clientHeight * dpr;
-                        this.ctx.scale(dpr, dpr);
-                        this.render();
-                    }
-                });
+                const rect = canvas.parentElement.getBoundingClientRect();
+                canvas.width = rect.width * dpr;
+                canvas.height = rect.height * dpr;
+                ctx.scale(dpr, dpr);
+                return { ctx, width: rect.width, height: rect.height };
             },
 
-            render: function() {
-                const width = this.canvas.clientWidth;
-                const height = this.canvas.clientHeight;
-                const ctx = this.ctx;
-                
+            drawLineChart: function(id, dataArray) {
+                const env = this.setupCtx(id);
+                if(!env) return;
+                const {ctx, width, height} = env;
                 ctx.clearRect(0, 0, width, height);
 
-                // Configuración
-                const padding = { top: 20, right: 20, bottom: 30, left: 50 };
-                const graphWidth = width - padding.left - padding.right;
-                const graphHeight = height - padding.top - padding.bottom;
+                const padding = { top: 20, right: 10, bottom: 20, left: 40 };
+                const w = width - padding.left - padding.right;
+                const h = height - padding.top - padding.bottom;
+                const max = Math.max(...dataArray) * 1.1;
                 
-                const maxData = Math.max(...this.data) * 1.1; // 10% margen arriba
-                
-                // Dibujar Grid (Líneas horizontales tenues)
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+                // Grid horizontal
+                ctx.strokeStyle = '#e2e8f0';
                 ctx.lineWidth = 1;
                 ctx.beginPath();
-                for(let i=0; i<=5; i++) {
-                    const y = padding.top + (graphHeight / 5) * i;
+                for(let i=0; i<=4; i++) {
+                    const y = padding.top + (h / 4) * i;
                     ctx.moveTo(padding.left, y);
                     ctx.lineTo(width - padding.right, y);
                 }
                 ctx.stroke();
 
-                // Dibujar Línea de Gráfica
+                // Linea
                 ctx.beginPath();
-                ctx.strokeStyle = '#14b8a6'; // Brand 500
-                ctx.lineWidth = 4;
+                ctx.strokeStyle = '#3b82f6';
+                ctx.lineWidth = 3;
                 ctx.lineJoin = 'round';
-                ctx.lineCap = 'round';
-
-                const points = [];
-                const stepX = graphWidth / (this.data.length - 1);
-
-                this.data.forEach((val, index) => {
-                    const x = padding.left + (index * stepX);
-                    // Invertir Y (Canvas 0,0 es arriba izquierda)
-                    const y = padding.top + graphHeight - ((val / maxData) * graphHeight); 
+                const stepX = w / (dataArray.length - 1);
+                
+                let points = [];
+                dataArray.forEach((val, i) => {
+                    const x = padding.left + (i * stepX);
+                    const y = padding.top + h - ((val / max) * h);
                     points.push({x, y});
-                    
-                    if(index === 0) ctx.moveTo(x, y);
+                    if(i === 0) ctx.moveTo(x, y);
                     else {
-                        // Curva suave (Bezier cuadrática aproximada)
-                        const prev = points[index-1];
+                        const prev = points[i-1];
                         const cpX = (prev.x + x) / 2;
                         ctx.bezierCurveTo(cpX, prev.y, cpX, y, x, y);
                     }
                 });
                 ctx.stroke();
 
-                // Relleno Gradiente debajo de la curva
-                const gradient = ctx.createLinearGradient(0, padding.top, 0, height - padding.bottom);
-                gradient.addColorStop(0, 'rgba(20, 184, 166, 0.3)');
-                gradient.addColorStop(1, 'rgba(20, 184, 166, 0)');
-                
-                ctx.lineTo(points[points.length-1].x, padding.top + graphHeight);
-                ctx.lineTo(points[0].x, padding.top + graphHeight);
-                ctx.fillStyle = gradient;
+                // Relleno suave (Gradient)
+                const grad = ctx.createLinearGradient(0, padding.top, 0, height - padding.bottom);
+                grad.addColorStop(0, 'rgba(59, 130, 246, 0.2)');
+                grad.addColorStop(1, 'rgba(59, 130, 246, 0)');
+                ctx.lineTo(points[points.length-1].x, padding.top + h);
+                ctx.lineTo(points[0].x, padding.top + h);
+                ctx.fillStyle = grad;
                 ctx.fill();
 
-                // Dibujar Puntos Reales (Nodos)
-                points.forEach(p => {
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
-                    ctx.fillStyle = '#020617'; // Fondo oscuro
-                    ctx.fill();
-                    ctx.lineWidth = 2;
-                    ctx.strokeStyle = '#38bdf8'; // Blue hover effect
-                    ctx.stroke();
-                });
-
-                // Eje X (Etiquetas)
-                ctx.fillStyle = '#64748b'; // Slate 500
-                ctx.font = '12px Inter';
-                ctx.textAlign = 'center';
-                const days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Hoy'];
-                points.forEach((p, i) => {
-                    ctx.fillText(days[i], p.x, height - 5);
-                });
-
-                // Eje Y (Cantidades)
+                // Labels Y
+                ctx.fillStyle = '#64748b';
+                ctx.font = '10px Inter';
                 ctx.textAlign = 'right';
                 ctx.textBaseline = 'middle';
-                for(let i=0; i<=5; i++) {
-                    const y = padding.top + (graphHeight / 5) * i;
-                    const val = maxData - ((maxData/5) * i);
-                    let text = `$${(val/1000).toFixed(0)}k`;
-                    if(val === 0) text = '0';
-                    ctx.fillText(text, padding.left - 10, y);
+                for(let i=0; i<=4; i++) {
+                    const y = padding.top + (h / 4) * i;
+                    const val = max - ((max/4) * i);
+                    ctx.fillText(`${(val/1000).toFixed(0)}k`, padding.left - 5, y);
                 }
+            },
+
+            drawBarChart: function(id, data1, data2) {
+                const env = this.setupCtx(id);
+                if(!env) return;
+                const {ctx, width, height} = env;
+                ctx.clearRect(0, 0, width, height);
+
+                const pad = { top: 10, right: 10, bottom: 20, left: 30 };
+                const w = width - pad.left - pad.right;
+                const h = height - pad.top - pad.bottom;
+                const max = Math.max(...data1, ...data2) * 1.1;
+                
+                const barWidth = (w / data1.length) * 0.35;
+                const gap = (w / data1.length);
+
+                data1.forEach((val, i) => {
+                    const x = pad.left + (i * gap) + (gap/2) - barWidth - 2;
+                    const barH = (val / max) * h;
+                    const y = pad.top + h - barH;
+                    
+                    ctx.fillStyle = '#3b82f6'; // Ingresos
+                    ctx.beginPath();
+                    ctx.roundRect(x, y, barWidth, barH, [4, 4, 0, 0]);
+                    ctx.fill();
+
+                    const val2 = data2[i];
+                    const barH2 = (val2 / max) * h;
+                    const y2 = pad.top + h - barH2;
+                    const x2 = pad.left + (i * gap) + (gap/2) + 2;
+
+                    ctx.fillStyle = '#f43f5e'; // Gastos
+                    ctx.beginPath();
+                    ctx.roundRect(x2, y2, barWidth, barH2, [4, 4, 0, 0]);
+                    ctx.fill();
+                });
+            },
+
+            drawDoughnutChart: function(id, data, labels, colors) {
+                const env = this.setupCtx(id);
+                if(!env) return;
+                const {ctx, width, height} = env;
+                ctx.clearRect(0, 0, width, height);
+
+                const cx = width / 2;
+                const cy = height / 2;
+                const radius = Math.min(width, height) / 2 - 10;
+                const innerRadius = radius * 0.6;
+                const total = data.reduce((a, b) => a + b, 0);
+                let startAngle = -Math.PI / 2;
+
+                data.forEach((val, i) => {
+                    const sliceAngle = (val / total) * 2 * Math.PI;
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, radius, startAngle, startAngle + sliceAngle);
+                    ctx.arc(cx, cy, innerRadius, startAngle + sliceAngle, startAngle, true);
+                    ctx.closePath();
+                    ctx.fillStyle = colors[i];
+                    ctx.fill();
+                    // Border for clean separation
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.stroke();
+                    startAngle += sliceAngle;
+                });
             }
         };
 
-        // ============================================================================
-        // 5. INICIALIZACIÓN
-        // ============================================================================
         window.addEventListener('DOMContentLoaded', () => {
-            App.init();
+            UI.init();
+            Router.navigate('dashboard');
+            
+            // Re-draw charts on resize (debounce para rendimiento)
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    if(Router.current === 'dashboard') Views.renderDashboard();
+                    if(Router.current === 'finanzas') Views.renderFinances();
+                }, 200);
+            });
         });
 
     </script>
