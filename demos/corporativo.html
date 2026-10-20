@@ -1,1 +1,693 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexCorp - Gestión Corporativa y Logística</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        corp: {
+                            400: '#38bdf8', // Light blue
+                            500: '#0ea5e9', // Primary blue
+                            600: '#0284c7', // Darker blue
+                            900: '#0c4a6e', // Deep blue
+                            950: '#082f49', // Very deep blue
+                        },
+                        accent: {
+                            500: '#10b981', // Emerald
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #020617; /* Slate 950 */
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+        
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Animaciones 3D y Flotación */
+        @keyframes float-slow {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(1deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+        .animate-float-slow { animation: float-slow 6s ease-in-out infinite; }
+
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.4); }
+            70% { box-shadow: 0 0 0 20px rgba(14, 165, 233, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0); }
+        }
+        .pulse-glow-anim { animation: pulse-glow 2.5s infinite; }
+
+        /* Clases para animación con Scroll (Intersection Observer) */
+        .reveal-up {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-up.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-left.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .reveal-scale {
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-scale.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Panel Carrito (Cotizador) */
+        #cart-panel {
+            transform: translateX(100%);
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        #cart-panel.open { transform: translateX(0); }
+        
+        #overlay {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+        #overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        /* Gradient Text */
+        .text-gradient {
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-corp-500 selection:text-white">
+
+    <nav class="fixed w-full top-0 z-50 glass-panel border-b border-white/10 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex items-center gap-3 hover:scale-105 transition-transform duration-300 cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <div class="bg-gradient-to-br from-corp-400 to-corp-600 text-white p-2.5 rounded-lg shadow-lg shadow-corp-500/20">
+                        <i class="fa-solid fa-building-shield text-xl"></i>
+                    </div>
+                    <span class="font-black text-2xl tracking-tight text-white">Nex<span class="text-corp-400">Corp</span></span>
+                </div>
+                
+                <div class="hidden md:flex space-x-8">
+                    <a href="#soluciones" class="text-gray-300 hover:text-white hover:text-shadow-sm font-semibold transition-colors">Soluciones</a>
+                    <a href="#demo" class="text-gray-300 hover:text-white font-semibold transition-colors">Configurador</a>
+                    <a href="#contacto" class="text-gray-300 hover:text-white font-semibold transition-colors">Contacto B2B</a>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleCart()" class="relative group p-3 glass-panel rounded-full hover:bg-white/10 transition-colors duration-300 border border-white/10">
+                        <i class="fa-solid fa-clipboard-list text-xl text-gray-300 group-hover:text-white transition-colors"></i>
+                        <span id="nav-cart-badge" class="absolute -top-1 -right-1 bg-accent-500 text-white text-xs font-black rounded-full w-6 h-6 flex items-center justify-center shadow-lg border-2 border-slate-900 transform scale-0 transition-transform duration-300">
+                            0
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="relative min-h-screen flex items-center pt-20 overflow-hidden">
+        <!-- Background Elements -->
+        <div class="absolute inset-0 z-0">
+            <div class="absolute top-0 right-0 w-[800px] h-[800px] bg-corp-600/20 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/3"></div>
+            <div class="absolute bottom-0 left-0 w-[600px] h-[600px] bg-indigo-600/20 rounded-full blur-[100px] translate-y-1/3 -translate-x-1/4"></div>
+            <!-- Grid pattern -->
+            <div class="absolute inset-0" style="background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px); background-size: 40px 40px; opacity: 0.3;"></div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 w-full">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div class="text-left reveal-left">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel border border-corp-500/30 text-corp-300 font-semibold text-sm mb-8">
+                        <span class="w-2 h-2 rounded-full bg-corp-400 pulse-glow-anim"></span>
+                        Gestión Empresarial 4.0
+                    </div>
+                    <h1 class="text-5xl tracking-tight font-black text-white sm:text-6xl md:text-7xl leading-[1.1]">
+                        Control total de tu <br/>
+                        <span class="text-gradient">operación global.</span>
+                    </h1>
+                    <p class="mt-6 text-lg text-gray-400 sm:text-xl font-light leading-relaxed max-w-xl">
+                        Plataforma SaaS diseñada para grandes corporativos, logística, distribución de autopartes y cadenas operativas. Centraliza procesos y reduce costos operativos.
+                    </p>
+                    <div class="mt-10 flex flex-col sm:flex-row gap-4">
+                        <a href="#demo" class="flex items-center justify-center gap-2 px-8 py-4 text-lg font-bold rounded-xl text-white bg-corp-600 hover:bg-corp-500 transition-all duration-300 shadow-[0_0_30px_rgba(14,165,233,0.3)] hover:shadow-[0_0_50px_rgba(14,165,233,0.5)] border border-corp-400/50 hover:-translate-y-1">
+                            Armar Cotización <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                        <a href="#contacto" class="flex items-center justify-center gap-2 px-8 py-4 text-lg font-bold rounded-xl text-white glass-panel hover:bg-white/10 transition-all duration-300">
+                            Hablar con un Asesor
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 3D Corporate Dashboard Mockup -->
+                <div class="hidden lg:block relative reveal-scale animate-float-slow">
+                    <div class="relative glass-panel p-6 rounded-2xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] border border-white/10 transform -rotate-2">
+                        
+                        <!-- Mockup Header -->
+                        <div class="flex justify-between items-center mb-6 pb-4 border-b border-white/10">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-corp-500/20 rounded-lg flex items-center justify-center border border-corp-500/30">
+                                    <i class="fa-solid fa-chart-pie text-corp-400"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-white text-sm">Dashboard Logístico</h4>
+                                    <p class="text-xs text-accent-500 flex items-center gap-1"><i class="fa-solid fa-circle text-[8px]"></i> Sistemas en línea</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <div class="w-3 h-3 rounded-full bg-slate-700"></div>
+                                <div class="w-3 h-3 rounded-full bg-slate-700"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Mockup Body (Stats) -->
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div class="bg-slate-900/50 rounded-xl p-4 border border-white/5">
+                                <p class="text-xs text-gray-400 mb-1">Envíos Activos</p>
+                                <p class="text-2xl font-black text-white">1,248</p>
+                                <div class="w-full h-1 bg-slate-800 rounded-full mt-2 overflow-hidden">
+                                    <div class="h-full bg-corp-500 w-[70%]"></div>
+                                </div>
+                            </div>
+                            <div class="bg-slate-900/50 rounded-xl p-4 border border-white/5">
+                                <p class="text-xs text-gray-400 mb-1">Eficiencia de Ruta</p>
+                                <p class="text-2xl font-black text-accent-500">94.2%</p>
+                                <div class="w-full h-1 bg-slate-800 rounded-full mt-2 overflow-hidden">
+                                    <div class="h-full bg-accent-500 w-[94%]"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mockup Image (Map/Logistics) -->
+                        <img src="https://images.unsplash.com/photo-1586528116311-ad8ed7c80a30?auto=format&fit=crop&w=600&q=80" class="w-full h-40 object-cover rounded-xl border border-white/10 opacity-80" alt="Logistics Map" />
+                        
+                    </div>
+                    
+                    <!-- Floating abstract element -->
+                    <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-indigo-500/20 rounded-2xl backdrop-blur-md border border-indigo-500/30 rotate-12 -z-10 animate-float-slow" style="animation-delay: 1s;"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="soluciones" class="py-24 relative border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center reveal-up">
+                <h2 class="text-sm text-corp-400 font-bold tracking-widest uppercase bg-corp-900/30 border border-corp-500/20 inline-block px-4 py-1.5 rounded-full mb-4">Arquitectura Empresarial</h2>
+                <p class="mt-2 text-3xl leading-8 font-black tracking-tight text-white sm:text-5xl">
+                    Escalabilidad sin fricción
+                </p>
+            </div>
+
+            <div class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Tarjeta 1 -->
+                <div class="glass-panel rounded-2xl p-8 hover:bg-white/5 transform hover:-translate-y-2 transition-all duration-300 reveal-up group border-t-2 border-t-transparent hover:border-t-corp-500">
+                    <div class="w-14 h-14 bg-slate-800 rounded-xl flex items-center justify-center text-corp-400 mb-6 group-hover:scale-110 transition-transform border border-white/10 shadow-lg">
+                        <i class="fa-solid fa-truck-fast text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">Logística Avanzada</h3>
+                    <p class="text-gray-400 leading-relaxed text-sm">Monitoreo de flotillas en tiempo real, optimización de rutas con IA y control de combustible para operaciones masivas.</p>
+                </div>
+
+                <!-- Tarjeta 2 -->
+                <div class="glass-panel rounded-2xl p-8 hover:bg-white/5 transform hover:-translate-y-2 transition-all duration-300 reveal-up group border-t-2 border-t-transparent hover:border-t-accent-500" style="transition-delay: 100ms;">
+                    <div class="w-14 h-14 bg-slate-800 rounded-xl flex items-center justify-center text-accent-400 mb-6 group-hover:scale-110 transition-transform border border-white/10 shadow-lg">
+                        <i class="fa-solid fa-boxes-stacked text-2xl text-accent-500"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">Gestión Multi-Almacén</h3>
+                    <p class="text-gray-400 leading-relaxed text-sm">Control de inventario centralizado para distribuidoras de llantas, retail y manufactura. Sincronización entre sucursales.</p>
+                </div>
+
+                <!-- Tarjeta 3 -->
+                <div class="glass-panel rounded-2xl p-8 hover:bg-white/5 transform hover:-translate-y-2 transition-all duration-300 reveal-up group border-t-2 border-t-transparent hover:border-t-indigo-500" style="transition-delay: 200ms;">
+                    <div class="w-14 h-14 bg-slate-800 rounded-xl flex items-center justify-center text-indigo-400 mb-6 group-hover:scale-110 transition-transform border border-white/10 shadow-lg">
+                        <i class="fa-solid fa-network-wired text-2xl text-indigo-400"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3">Integración ERP B2B</h3>
+                    <p class="text-gray-400 leading-relaxed text-sm">Conecta finanzas, recursos humanos y compras corporativas en un solo ecosistema seguro y en la nube.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="demo" class="py-24 relative bg-slate-900/50 border-y border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12 reveal-up">
+                <div>
+                    <h2 class="text-3xl font-black text-white sm:text-4xl">Configurador de Módulos</h2>
+                    <p class="mt-3 text-gray-400 max-w-2xl">Selecciona los módulos SaaS que requiere tu corporativo para armar una cotización base estimada mensual.</p>
+                </div>
+            </div>
+
+            <!-- Interfaz del Cotizador -->
+            <div class="glass-panel rounded-3xl overflow-hidden reveal-up border border-white/10 shadow-2xl">
+                
+                <!-- Mockup de Software Header -->
+                <div class="bg-slate-950 border-b border-white/10 px-6 py-4 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
+                        <span class="ml-4 text-xs font-mono text-gray-500">NexCorp / Deployment_Builder</span>
+                    </div>
+                    <div class="text-xs text-corp-400 font-semibold bg-corp-900/30 px-3 py-1 rounded-full border border-corp-500/20">
+                        Paso 1: Selección de Módulos
+                    </div>
+                </div>
+
+                <!-- Tabs de Departamentos -->
+                <div class="bg-slate-900/80 px-6 py-4 border-b border-white/5 flex space-x-3 overflow-x-auto hide-scrollbar sticky top-0 z-10" id="category-tabs">
+                    <!-- Tabs Inyectadas por JS -->
+                </div>
+
+                <!-- Grid de Módulos -->
+                <div class="p-6 md:p-8 bg-slate-900/30 min-h-[500px]">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="module-grid">
+                        <!-- Módulos Inyectados por JS -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Overlay -->
+    <div id="overlay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[60]" onclick="toggleCart()"></div>
+
+    <!-- Panel Lateral Cotización -->
+    <div id="cart-panel" class="fixed top-0 right-0 h-full w-full sm:w-[450px] bg-slate-900 shadow-2xl z-[70] flex flex-col border-l border-white/10">
+        <div class="p-6 border-b border-white/10 flex justify-between items-center bg-slate-950">
+            <h2 class="text-xl font-black text-white flex items-center gap-3">
+                <i class="fa-solid fa-file-invoice-dollar text-corp-500"></i> Resumen de Cotización
+            </h2>
+            <button onclick="toggleCart()" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto p-6 bg-slate-900/50" id="cart-items-container">
+            <!-- Items de Carrito Inyectados por JS -->
+            <div class="h-full flex flex-col items-center justify-center text-gray-500 text-center space-y-4" id="empty-cart-msg">
+                <i class="fa-solid fa-server text-6xl opacity-30"></i>
+                <p class="font-medium text-sm">No has seleccionado ningún módulo.<br>Agrega software al esquema operativo.</p>
+            </div>
+        </div>
+
+        <div class="p-6 bg-slate-950 border-t border-white/10">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-gray-400 font-medium text-sm">Implementación inicial</span>
+                <span class="text-white text-sm">Incluida</span>
+            </div>
+            <div class="flex justify-between items-center mb-6">
+                <span class="text-gray-300 font-medium">Costo Mensual Estimado (SaaS)</span>
+                <span class="text-3xl font-black text-corp-400" id="cart-total">$0 USD</span>
+            </div>
+            
+            <button onclick="checkoutWhatsApp()" id="checkout-btn" class="w-full bg-slate-800 text-slate-500 cursor-not-allowed font-black py-4 rounded-xl flex justify-center items-center gap-3 transition-all duration-300">
+                <i class="fa-brands fa-whatsapp text-2xl"></i>
+                Solicitar Cotización por WhatsApp
+            </button>
+        </div>
+    </div>
+
+    <section id="contacto" class="py-24 relative overflow-hidden border-t border-white/5">
+        <div class="absolute inset-0 z-0">
+            <div class="absolute inset-0 bg-slate-950 opacity-80 z-10"></div>
+            <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1920&q=80" alt="Corporate Office" class="w-full h-full object-cover opacity-20" />
+        </div>
+        
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 text-center reveal-up">
+            <div class="inline-block p-4 rounded-2xl glass-panel mb-6 border border-accent-500/30 pulse-glow-anim shadow-[0_0_30px_rgba(16,185,129,0.2)]">
+                <i class="fa-brands fa-whatsapp text-6xl text-accent-400"></i>
+            </div>
+            <h2 class="text-4xl font-black sm:text-5xl mb-6 tracking-tight text-white">
+                Inicia la Transformación
+            </h2>
+            <p class="text-lg text-gray-300 mb-12 max-w-2xl mx-auto font-light leading-relaxed">
+                Arma un esquema en el configurador o envía un mensaje directo para hablar con un especialista en soluciones Enterprise (B2B).
+            </p>
+            
+            <button 
+                onclick="checkoutGenericWhatsApp()"
+                class="inline-flex items-center justify-center gap-3 px-10 py-5 text-lg font-black rounded-xl text-slate-950 bg-accent-500 hover:bg-accent-400 transform hover:-translate-y-1 transition-all duration-300 shadow-[0_0_30px_rgba(16,185,129,0.3)] hover:shadow-[0_0_50px_rgba(16,185,129,0.6)]"
+            >
+                <i class="fa-brands fa-whatsapp text-2xl"></i>
+                Contactar a Ventas B2B
+            </button>
+
+            <div class="mt-20 p-8 glass-panel rounded-2xl border border-white/10 text-left relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-corp-500/10 rounded-bl-full -z-10"></div>
+                <h4 class="text-lg font-bold text-corp-400 mb-4 flex items-center gap-3">
+                    <i class="fa-solid fa-circle-info"></i>
+                    Nota sobre la Prueba
+                </h4>
+                <p class="text-gray-400 leading-relaxed text-sm">
+                    Al usar los botones de WhatsApp se abrirá tu aplicación de mensajería con el número <strong class="text-white">7777926013</strong>. El mensaje autogenerado incluirá los módulos corporativos seleccionados y una nota al final indicando: <br><br>
+                    <span class="inline-block bg-slate-900 p-4 rounded-lg border border-white/5 text-corp-200 shadow-inner italic font-medium">
+                        "Me gustaría recibir más información sobre los servicios de soluciones corporativas para mi negocio."
+                    </span>
+                    <br><br>Esto nos ayuda a brindarte asesoría especializada inmediata.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-slate-950 border-t border-white/5 py-12 text-center relative z-20">
+        <div class="flex items-center justify-center gap-2 text-gray-500 mb-4">
+            <i class="fa-solid fa-building-shield text-xl"></i>
+            <span class="font-black text-xl tracking-tight text-white opacity-80">NexCorp</span>
+        </div>
+        <p class="text-gray-500 text-sm">
+            &copy; 2026 NexCorp Enterprise Solutions. Demo B2B.
+        </p>
+    </footer>
+
+    <script>
+        // --- 1. Base de Datos Mock (Módulos Enterprise) ---
+        const MOCK_DB = {
+            categories: ['Logística y Operación', 'Inventario', 'Administrativo ERP'],
+            products: [
+                { id: 1, cat: 'Logística y Operación', name: 'NexTrack: Control de Flotillas', price: 850, img: 'https://images.unsplash.com/photo-1519003722824-194d4455a60c?auto=format&fit=crop&w=500&q=80', desc: 'Monitoreo GPS, telemetría de combustible y optimización de rutas con IA para +500 unidades.' },
+                { id: 2, cat: 'Logística y Operación', name: 'NexDispatch: Asignación Auto', price: 450, img: 'https://images.unsplash.com/photo-1580674684081-7617fbf3d745?auto=format&fit=crop&w=500&q=80', desc: 'Despacho automatizado de tareas a conductores basado en proximidad y carga de trabajo.' },
+                
+                { id: 3, cat: 'Inventario', name: 'NexStore: WMS Multi-Almacén', price: 1200, img: 'https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=500&q=80', desc: 'Gestión de ubicaciones, código de barras, picking y packing para centros de distribución (CEDIS).' },
+                { id: 4, cat: 'Inventario', name: 'NexPredict: Demanda IA', price: 900, img: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=500&q=80', desc: 'Proyección de compras e inventario basado en machine learning y estacionalidad.' },
+                
+                { id: 5, cat: 'Administrativo ERP', name: 'NexFinance: Facturación Global', price: 600, img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=500&q=80', desc: 'Emisión masiva de facturas, conciliación bancaria y reportes financieros multi-divisa.' },
+                { id: 6, cat: 'Administrativo ERP', name: 'NexHR: Control de Personal', price: 500, img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=500&q=80', desc: 'Gestión de nómina, reloj checador biométrico y evaluaciones de desempeño.' }
+            ]
+        };
+
+        // --- 2. Estado Global ---
+        let activeCategory = 'Logística y Operación';
+        let cart = []; // Estructura: { id, name, price, qty, img }
+        const WHATSAPP_NUMBER = "527777926013";
+
+        // --- 3. Renderizado de Interfaz ---
+        function renderCategories() {
+            const container = document.getElementById('category-tabs');
+            container.innerHTML = MOCK_DB.categories.map(cat => `
+                <button onclick="changeCategory('${cat}')" 
+                    class="px-6 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition-all duration-300 border ${
+                        activeCategory === cat 
+                        ? 'bg-corp-600 text-white border-corp-500 shadow-lg shadow-corp-500/20' 
+                        : 'bg-transparent text-gray-400 border-white/10 hover:bg-white/5 hover:text-white'
+                    }">
+                    ${cat}
+                </button>
+            `).join('');
+        }
+
+        function renderProducts() {
+            const container = document.getElementById('module-grid');
+            const items = MOCK_DB.products.filter(p => p.cat === activeCategory);
+            
+            container.style.opacity = 0;
+            
+            setTimeout(() => {
+                container.innerHTML = items.map(item => `
+                    <div class="glass-panel rounded-2xl overflow-hidden border border-white/10 transition-all duration-300 group hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(14,165,233,0.15)] hover:border-corp-500/50 flex flex-col">
+                        <div class="h-48 overflow-hidden relative bg-slate-900">
+                            <img src="${item.img}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-80 group-hover:opacity-100" loading="lazy">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 to-transparent"></div>
+                            <div class="absolute bottom-3 left-3 px-3 py-1 rounded-md bg-slate-900/80 backdrop-blur border border-white/10 text-xs font-bold text-white">
+                                SaaS Module
+                            </div>
+                        </div>
+                        <div class="p-5 flex flex-col flex-1">
+                            <h3 class="font-bold text-lg text-white mb-2 group-hover:text-corp-400 transition-colors">${item.name}</h3>
+                            <p class="text-sm text-gray-400 mb-4 line-clamp-3">${item.desc}</p>
+                            
+                            <div class="mt-auto flex items-center justify-between pt-4 border-t border-white/5">
+                                <div class="flex flex-col">
+                                    <span class="text-xs text-gray-500">Desde</span>
+                                    <span class="text-xl font-black text-white">$${item.price} <span class="text-xs font-normal text-gray-500">USD/mes</span></span>
+                                </div>
+                                <button onclick="addToCart(${item.id})" class="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white font-medium hover:bg-corp-600 hover:border-corp-500 transition-all duration-300 shadow-sm active:scale-95 text-sm">
+                                    Agregar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                container.style.opacity = 1;
+                container.style.transition = "opacity 0.4s ease-in-out";
+            }, 150);
+        }
+
+        // --- 4. Lógica del Carrito (Cotizador) ---
+        function addToCart(productId) {
+            const product = MOCK_DB.products.find(p => p.id === productId);
+            if(!product) return;
+
+            const existing = cart.find(item => item.id === productId);
+            if(existing) {
+                // In SaaS, qty could mean licenses or instances, we'll keep the qty logic for flexibility
+                existing.qty += 1; 
+            } else {
+                cart.push({ ...product, qty: 1 });
+            }
+            
+            updateCartUI();
+            showToast(`Módulo "${product.name}" agregado a la cotización`);
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            updateCartUI();
+        }
+
+        function updateQty(productId, delta) {
+            const item = cart.find(i => i.id === productId);
+            if(item) {
+                item.qty += delta;
+                if(item.qty <= 0) removeFromCart(productId);
+                else updateCartUI();
+            }
+        }
+
+        function updateCartUI() {
+            const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+            const badge = document.getElementById('nav-cart-badge');
+            
+            if(totalQty > 0) {
+                badge.textContent = totalQty;
+                badge.classList.remove('scale-0');
+                badge.classList.add('scale-100');
+            } else {
+                badge.classList.remove('scale-100');
+                badge.classList.add('scale-0');
+            }
+
+            const container = document.getElementById('cart-items-container');
+            const emptyMsg = document.getElementById('empty-cart-msg');
+            const checkoutBtn = document.getElementById('checkout-btn');
+            const totalEl = document.getElementById('cart-total');
+
+            if(cart.length === 0) {
+                emptyMsg.style.display = 'flex';
+                Array.from(container.children).forEach(child => {
+                    if(child.id !== 'empty-cart-msg') child.remove();
+                });
+                totalEl.textContent = '$0 USD';
+                
+                checkoutBtn.className = "w-full bg-slate-800 text-slate-500 cursor-not-allowed font-black py-4 rounded-xl flex justify-center items-center gap-3 transition-all duration-300";
+                checkoutBtn.onclick = null;
+                return;
+            }
+
+            emptyMsg.style.display = 'none';
+            let html = '';
+            let total = 0;
+
+            cart.forEach(item => {
+                const subtotal = item.price * item.qty;
+                total += subtotal;
+                html += `
+                    <div class="flex gap-4 items-center glass-panel p-4 rounded-xl border border-white/5 mb-3 hover:border-white/10 transition-colors">
+                        <img src="${item.img}" class="w-16 h-16 rounded-lg object-cover opacity-80 border border-white/10">
+                        <div class="flex-1">
+                            <h4 class="font-bold text-white text-sm line-clamp-1">${item.name}</h4>
+                            <p class="text-corp-400 font-semibold text-sm">$${item.price} USD <span class="text-gray-500 text-xs">/ licencia</span></p>
+                            
+                            <div class="flex items-center gap-3 mt-2">
+                                <button onclick="updateQty(${item.id}, -1)" class="w-7 h-7 rounded bg-white/5 border border-white/10 flex items-center justify-center text-gray-300 hover:bg-white/10 hover:text-white transition-colors"><i class="fa-solid fa-minus text-xs"></i></button>
+                                <span class="font-bold text-sm w-4 text-center text-white">${item.qty}</span>
+                                <button onclick="updateQty(${item.id}, 1)" class="w-7 h-7 rounded bg-white/5 border border-white/10 flex items-center justify-center text-gray-300 hover:bg-white/10 hover:text-white transition-colors"><i class="fa-solid fa-plus text-xs"></i></button>
+                            </div>
+                        </div>
+                        <button onclick="removeFromCart(${item.id})" class="text-gray-500 hover:text-red-400 transition-colors p-2">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+            });
+
+            const justEmptyMsg = emptyMsg.outerHTML;
+            container.innerHTML = justEmptyMsg + html;
+            
+            totalEl.textContent = `$${total.toLocaleString()} USD`;
+            checkoutBtn.className = "w-full bg-accent-500 text-slate-950 hover:bg-accent-400 shadow-[0_10px_20px_rgba(16,185,129,0.2)] hover:shadow-[0_15px_30px_rgba(16,185,129,0.4)] hover:-translate-y-1 cursor-pointer font-black py-4 rounded-xl flex justify-center items-center gap-3 transition-all duration-300";
+            checkoutBtn.onclick = window.checkoutWhatsApp; // Re-bind function
+        }
+
+        // --- 5. Lógica de Interfaz y WhatsApp ---
+        window.changeCategory = (cat) => {
+            activeCategory = cat;
+            renderCategories();
+            renderProducts();
+        };
+
+        window.toggleCart = () => {
+            document.getElementById('cart-panel').classList.toggle('open');
+            document.getElementById('overlay').classList.toggle('open');
+        };
+
+        // --- Toast System Robusto (Solución definitiva para no buguearse) ---
+        window.showToast = (message) => {
+            let container = document.getElementById('toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toast-container';
+                container.className = 'fixed bottom-6 left-6 z-[100] flex flex-col gap-3 pointer-events-none';
+                document.body.appendChild(container);
+            }
+
+            const toast = document.createElement('div');
+            // Inicio: estado invisible (opacity-0 y movido abajo)
+            toast.className = 'glass-panel text-white px-6 py-4 rounded-xl shadow-xl flex items-center gap-3 border border-corp-500/30 transform translate-y-full opacity-0 transition-all duration-300 ease-out pointer-events-auto';
+            
+            toast.innerHTML = `
+                <div class="w-8 h-8 rounded-full bg-corp-500/20 border border-corp-500/50 text-corp-400 flex items-center justify-center shadow-[0_0_10px_rgba(14,165,233,0.3)]">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <span class="font-medium text-sm">${message}</span>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Reflow crítico para que el navegador registre el estado inicial antes de transicionar
+            void toast.offsetWidth;
+            
+            // Animación de entrada
+            toast.classList.remove('translate-y-full', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            // Autodestrucción segura
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-full', 'opacity-0');
+                
+                setTimeout(() => {
+                    if (toast && toast.parentNode) toast.remove();
+                }, 300); // Tiempo que dura la transición CSS
+            }, 3000);
+        };
+
+        // --- WhatsApp Logic ---
+        window.checkoutWhatsApp = () => {
+            if(cart.length === 0) return;
+
+            let orderText = "🏢 *NUEVA SOLICITUD DE PRUEBA (CORPORATIVO)*\n\nMódulos seleccionados:\n\n";
+            let total = 0;
+
+            cart.forEach((item, index) => {
+                const subtotal = item.price * item.qty;
+                total += subtotal;
+                orderText += `▪️ ${item.name} (x${item.qty}) - $${subtotal.toLocaleString()} USD/mes\n`;
+            });
+
+            orderText += `\n📊 *Total Estimado Mensual: $${total.toLocaleString()} USD*\n\n`;
+            orderText += "📝 *Nota del usuario:*\nMe gustaría recibir más información sobre los servicios de soluciones corporativas para mi negocio.";
+
+            const encodedText = encodeURIComponent(orderText);
+            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedText}`;
+            
+            window.open(whatsappUrl, '_blank');
+        };
+
+        window.checkoutGenericWhatsApp = () => {
+            const msg = "Me gustaría recibir más información sobre los servicios de soluciones corporativas para mi negocio.";
+            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+        };
+
+        // --- Scroll Animations ---
+        function initScrollAnimations() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        // Optional: observer.unobserve(entry.target); if you only want it to animate once
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.reveal-up, .reveal-left, .reveal-scale').forEach((el) => {
+                observer.observe(el);
+            });
+        }
+
+        // --- Initialize App ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCategories();
+            renderProducts();
+            updateCartUI();
+            initScrollAnimations();
+        });
+
+    </script>
+</body>
+</html>
