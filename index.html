@@ -2,37 +2,82 @@
 <html lang="es" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Catálogo de Soluciones Tecnológicas de Alto Rendimiento. Desarrollo web, sistemas LMS, gestión corporativa.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Catálogo de Soluciones Tecnológicas de Alto Rendimiento. Desarrollo web, sistemas corporativos y aplicaciones a medida por Netrators.">
     <meta name="author" content="Netrators">
-    <title>Netrators | Catálogo de Soluciones Premium</title>
+    <meta name="theme-color" content="#ffffff">
+    <title>Netrators | Catálogo de Arquitecturas y Soluciones Premium</title>
     
-    <!-- Tailwind CSS (CDN para despliegue rápido sin Node.js) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
+                        mono: ['"Fira Code"', 'monospace'],
+                        inter: ['Inter', 'sans-serif'],
+                    },
                     colors: {
                         brand: {
-                            dark: '#030712', // Gris súper oscuro casi negro
-                            surface: 'rgba(17, 24, 39, 0.7)',
-                            primary: '#06b6d4', // Cyan
-                            secondary: '#3b82f6', // Blue
-                            accent: '#8b5cf6', // Purple
-                            success: '#10b981', // Emerald
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9', // Primary Cyan/Blue
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e', // Deep Dark Blue
+                            950: '#082f49',
+                            accent: '#6366f1', // Indigo accent
+                            surface: '#ffffff',
+                            background: '#f8fafc',
                         }
                     },
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
-                        mono: ['Fira Code', 'monospace'],
-                    },
                     boxShadow: {
-                        'neon-cyan': '0 0 20px rgba(6, 182, 212, 0.5)',
-                        'neon-blue': '0 0 20px rgba(59, 130, 246, 0.5)',
-                        'neon-purple': '0 0 20px rgba(139, 92, 246, 0.5)',
-                        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'card': '0 20px 40px -5px rgba(12, 74, 110, 0.08)',
+                        'card-hover': '0 30px 60px -10px rgba(14, 165, 233, 0.2)',
+                        'glow': '0 0 40px rgba(14, 165, 233, 0.15)',
+                        'inner-light': 'inset 0 2px 4px 0 rgba(255, 255, 255, 0.3)',
+                    },
+                    backgroundImage: {
+                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                        'mesh-light': 'radial-gradient(at 40% 20%, hsla(199,89%,48%,0.1) 0px, transparent 50%), radial-gradient(at 80% 0%, hsla(239,84%,67%,0.1) 0px, transparent 50%), radial-gradient(at 0% 50%, hsla(199,89%,48%,0.05) 0px, transparent 50%)',
+                    },
+                    animation: {
+                        'blob': 'blob 7s infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'float-delayed': 'float 6s ease-in-out 3s infinite',
+                        'spin-slow': 'spin 12s linear infinite',
+                        'pulse-glow': 'pulseGlow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'marquee': 'marquee 25s linear infinite',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { opacity: 0.2, transform: 'scale(0.95)' },
+                            '50%': { opacity: 0.5, transform: 'scale(1.05)' },
+                        },
+                        marquee: {
+                            '0%': { transform: 'translateX(0%)' },
+                            '100%': { transform: 'translateX(-100%)' },
+                        }
                     }
                 }
             }
@@ -41,896 +86,1162 @@
 
     <style>
         /* ==========================================================================
-           BASE STYLES & RESET
+           BASE STYLES & OVERRIDES
            ========================================================================== */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;600&display=swap');
-
         * {
             box-sizing: border-box;
-            cursor: none; /* Ocultamos el cursor nativo para usar el custom */
+            cursor: none !important; /* Force hide native cursor for custom cursor */
         }
 
         body {
-            background-color: #030712;
-            color: #f3f4f6;
+            background-color: #f8fafc; /* brand-background */
+            color: #0f172a;
             overflow-x: hidden;
-            font-family: 'Inter', sans-serif;
             -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
-        /* Scrollbar Personalizado (Webkit) */
-        ::-webkit-scrollbar {
-            width: 10px;
+        ::selection {
+            background-color: #0ea5e9;
+            color: #ffffff;
         }
-        ::-webkit-scrollbar-track {
-            background: #030712;
+
+        /* Custom Scrollbar - Elegant Light Theme */
+        ::-webkit-scrollbar {
+            width: 12px;
+            background-color: #f1f5f9;
         }
         ::-webkit-scrollbar-thumb {
-            background: #1f2937;
-            border-radius: 5px;
+            background-color: #cbd5e1;
+            border-radius: 6px;
+            border: 3px solid #f1f5f9;
+            transition: background-color 0.3s;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #06b6d4;
+            background-color: #94a3b8;
         }
 
         /* ==========================================================================
-           CANVAS BACKGROUND
+           CUSTOM CURSOR SYSTEM
            ========================================================================== */
-        #particle-canvas {
+        .cursor-dot {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        /* ==========================================================================
-           CUSTOM CURSOR
-           ========================================================================== */
-        .custom-cursor {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #06b6d4;
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            z-index: 9999;
-            transition: width 0.2s, height 0.2s, background-color 0.2s;
-            mix-blend-mode: difference;
-        }
-        .custom-cursor.hovering {
-            width: 50px;
-            height: 50px;
-            background-color: rgba(6, 182, 212, 0.2);
-            border-color: transparent;
-        }
-
-        .custom-cursor-dot {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 4px;
-            background-color: #06b6d4;
+            top: 0; left: 0;
+            width: 8px; height: 8px;
+            background-color: #0ea5e9;
             border-radius: 50%;
             transform: translate(-50%, -50%);
             pointer-events: none;
             z-index: 10000;
+            transition: opacity 0.2s;
+        }
+
+        .cursor-ring {
+            position: fixed;
+            top: 0; left: 0;
+            width: 40px; height: 40px;
+            border: 2px solid rgba(14, 165, 233, 0.5);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 9999;
+            transition: width 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                        height 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                        background-color 0.3s, border-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: transparent;
+            overflow: hidden;
+            backdrop-filter: blur(0px);
+        }
+
+        /* Cursor Hover States */
+        .cursor-hovering-btn .cursor-ring {
+            width: 60px; height: 60px;
+            background-color: rgba(14, 165, 233, 0.1);
+            border-color: #0ea5e9;
+        }
+
+        .cursor-hovering-card .cursor-ring {
+            width: 100px; height: 100px;
+            background-color: #0ea5e9;
+            border-color: #0ea5e9;
+            color: white;
+            backdrop-filter: blur(4px);
+            mix-blend-mode: normal;
+        }
+        
+        .cursor-hovering-card .cursor-ring::after {
+            content: 'VER DEMO';
+            position: absolute;
+            animation: fadeIn 0.3s forwards;
+        }
+
+        .cursor-hovering-card .cursor-dot {
+            opacity: 0; /* Hide dot when over card */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         /* ==========================================================================
-           GLASSMORPHISM & UI COMPONENTS
+           3D CARD TILT & GLARE SYSTEM
            ========================================================================== */
-        .glass-panel {
-            background: rgba(17, 24, 39, 0.4);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 1.5rem;
+        .tilt-container {
+            perspective: 1500px;
+            transform-style: preserve-3d;
         }
 
-        .demo-card {
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        .tilt-card {
             position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.1s; /* Fast transition for physics feel */
+            will-change: transform;
+            border-radius: 1.5rem;
+            background: #ffffff;
+            box-shadow: 0 10px 30px -5px rgba(0,0,0,0.05);
+            border: 1px solid rgba(226, 232, 240, 0.8);
             overflow: hidden;
         }
 
-        .demo-card::before {
-            content: '';
+        .tilt-card-content {
+            transform: translateZ(50px); /* Pops content out in 3D space */
+        }
+
+        .tilt-image-wrapper {
+            transform: translateZ(30px);
+        }
+
+        .tilt-badge {
+            transform: translateZ(70px);
+        }
+
+        /* Glare Effect Layer */
+        .glare-wrapper {
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
-            transform: scale(0);
-            transition: transform 0.6s ease-out;
+            top: 0; left: 0; width: 100%; height: 100%;
+            overflow: hidden;
+            border-radius: 1.5rem;
             pointer-events: none;
+            z-index: 10;
         }
 
-        .demo-card:hover::before {
-            transform: scale(1);
+        .glare {
+            position: absolute;
+            top: 50%; left: 50%;
+            pointer-events: none;
+            background-image: linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%);
+            width: 200%; height: 200%;
+            transform: translate(-50%, -50%) rotate(45deg);
+            opacity: 0;
+            transition: opacity 0.3s;
+            mix-blend-mode: soft-light;
         }
 
-        .demo-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            border-color: rgba(6, 182, 212, 0.4);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(6, 182, 212, 0.1);
+        /* Hover Resets for Card */
+        .tilt-container:hover .tilt-card {
+            box-shadow: 0 30px 60px -10px rgba(14, 165, 233, 0.15), 0 0 20px rgba(14, 165, 233, 0.05);
+            border-color: rgba(14, 165, 233, 0.3);
         }
 
-        /* Tipografía con gradiente */
+        /* ==========================================================================
+           SCROLL REVEAL ANIMATIONS
+           ========================================================================== */
+        .reveal-up {
+            opacity: 0;
+            transform: translateY(60px);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-60px);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+        .reveal-right {
+            opacity: 0;
+            transform: translateX(60px);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+        .reveal-scale {
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+        
+        /* Active States */
+        .reveal-active {
+            opacity: 1;
+            transform: translate(0) scale(1);
+        }
+
+        /* Stagger Delays */
+        .delay-100 { transition-delay: 100ms; }
+        .delay-200 { transition-delay: 200ms; }
+        .delay-300 { transition-delay: 300ms; }
+        .delay-400 { transition-delay: 400ms; }
+        .delay-500 { transition-delay: 500ms; }
+
+        /* ==========================================================================
+           UTILITIES & DECORATIONS
+           ========================================================================== */
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
         .text-gradient {
             background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-image: linear-gradient(90deg, #06b6d4, #3b82f6, #8b5cf6);
+            background-image: linear-gradient(135deg, #0ea5e9, #38bdf8, #6366f1);
             background-size: 200% auto;
-            animation: gradientMove 5s linear infinite;
+            animation: gradientMove 5s ease infinite;
         }
 
         @keyframes gradientMove {
-            0% { background-position: 0% center; }
-            100% { background-position: 200% center; }
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        /* ==========================================================================
-           ANIMACIONES REUTILIZABLES
-           ========================================================================== */
-        .reveal {
-            opacity: 0;
-            transform: translateY(50px);
-            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
-        }
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
+        #particle-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: -1;
+            pointer-events: none;
         }
 
-        /* Botones Neón */
-        .btn-neon {
+        /* Image Card Setup */
+        .card-image-bg {
             position: relative;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+            width: 100%;
+            height: 240px;
             overflow: hidden;
-            transition: all 0.3s ease;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .card-image-bg img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tilt-container:hover .card-image-bg img {
+            transform: scale(1.1);
+        }
+
+        /* Gradient Overlay for Images */
+        .card-image-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0.2) 60%, rgba(255,255,255,0) 100%);
             z-index: 1;
         }
-        .btn-neon::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: all 0.5s ease;
-            z-index: -1;
-        }
-        .btn-neon:hover::before {
-            left: 100%;
-        }
-
-        /* ==========================================================================
-           SISTEMA DE TOAST (NOTIFICACIONES)
-           ========================================================================== */
-        #toast-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 99999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .toast {
-            background: rgba(17, 24, 39, 0.9);
-            backdrop-filter: blur(10px);
-            border-left: 4px solid #06b6d4;
-            color: #fff;
-            padding: 16px 24px;
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            transform: translateX(120%);
-            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .toast.show {
-            transform: translateX(0);
-        }
-        .toast.error { border-color: #ef4444; }
-        .toast.success { border-color: #10b981; }
-
-        /* Loader para verificación de archivos */
-        .spinner {
-            border: 3px solid rgba(255,255,255,0.1);
-            border-radius: 50%;
-            border-top: 3px solid #06b6d4;
-            width: 16px;
-            height: 16px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
     </style>
 </head>
-<body class="relative">
+<body class="relative bg-brand-background text-slate-800 antialiased">
 
-    <!-- Custom Cursor DOM Elements -->
-    <div class="custom-cursor" id="custom-cursor"></div>
-    <div class="custom-cursor-dot" id="custom-cursor-dot"></div>
+    <div class="cursor-dot" id="cursor-dot"></div>
+    <div class="cursor-ring" id="cursor-ring"></div>
 
-    <!-- WebGL/2D Canvas Background -->
     <canvas id="particle-canvas"></canvas>
 
-    <!-- Contenedor de Notificaciones -->
-    <div id="toast-container"></div>
+    <!-- Background Ambient Blobs -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-[-1] opacity-60">
+        <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-brand-200 rounded-full mix-blend-multiply filter blur-[100px] animate-blob"></div>
+        <div class="absolute top-[20%] right-[-10%] w-96 h-96 bg-brand-300 rounded-full mix-blend-multiply filter blur-[100px] animate-blob animation-delay-2000"></div>
+        <div class="absolute bottom-[-20%] left-[20%] w-[30rem] h-[30rem] bg-indigo-200 rounded-full mix-blend-multiply filter blur-[120px] animate-blob animation-delay-4000"></div>
+    </div>
 
-    <!-- Navigation -->
-    <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 py-4">
+    <nav id="navbar" class="fixed w-full z-50 transition-all duration-500 py-4 top-0">
         <div class="max-w-7xl mx-auto px-6 lg:px-8">
-            <div class="glass-panel rounded-full px-6 py-3 flex justify-between items-center border border-white/10 shadow-glass">
-                <div class="flex items-center gap-3 interactive-element">
-                    <!-- Logo Vectorial Nativo (Escalable infinitamente) -->
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-primary to-brand-accent p-[1px]">
-                        <div class="w-full h-full bg-brand-dark rounded-xl flex items-center justify-center">
-                            <svg class="w-6 h-6 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
-                            </svg>
-                        </div>
+            <div class="glass-nav rounded-2xl px-6 py-3 flex justify-between items-center shadow-soft transition-all duration-300" id="nav-container">
+                <!-- Logo area strictly matching 2:1 ratio handling -->
+                <a href="#inicio" class="flex items-center gap-3 interactive-btn group">
+                    <div class="relative w-28 h-14 overflow-hidden">
+                        <!-- Ensure aspect-[2/1] constraint for logo -->
+                        <img src="media/logo.png" alt="Netrators Logo" class="w-full h-full object-contain aspect-[2/1] transition-transform duration-300 group-hover:scale-105" onerror="this.src='https://placehold.co/1774x887/0ea5e9/ffffff?text=Netrators'">
                     </div>
-                    <span class="text-xl font-extrabold tracking-widest uppercase font-mono">Netrators<span class="text-brand-primary">.</span></span>
-                </div>
+                </a>
                 
                 <div class="hidden md:flex items-center gap-8 text-sm font-semibold tracking-wide">
-                    <a href="#inicio" class="text-gray-300 hover:text-brand-primary transition-colors interactive-element">Inicio</a>
-                    <a href="#catalogo" class="text-gray-300 hover:text-brand-primary transition-colors interactive-element">Catálogo</a>
-                    <a href="#tecnologias" class="text-gray-300 hover:text-brand-primary transition-colors interactive-element">Tecnología</a>
+                    <a href="#inicio" class="text-slate-600 hover:text-brand-500 transition-colors interactive-btn relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-brand-500 after:transition-all hover:after:w-full">Inicio</a>
+                    <a href="#catalogo" class="text-slate-600 hover:text-brand-500 transition-colors interactive-btn relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-brand-500 after:transition-all hover:after:w-full">Arquitecturas</a>
+                    <a href="#proceso" class="text-slate-600 hover:text-brand-500 transition-colors interactive-btn relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-brand-500 after:transition-all hover:after:w-full">Proceso</a>
                 </div>
 
-                <a href="#contacto" class="btn-neon bg-white/5 hover:bg-brand-primary/20 border border-brand-primary/50 text-brand-primary px-6 py-2 rounded-full font-bold text-sm transition-all interactive-element shadow-[0_0_15px_rgba(6,182,212,0.2)] hover:shadow-neon-cyan">
-                    Iniciar Proyecto
+                <a href="#contacto" class="interactive-btn group relative inline-flex items-center justify-center px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 bg-brand-500 border border-transparent rounded-full shadow-lg hover:bg-brand-600 hover:shadow-glow focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 overflow-hidden">
+                    <span class="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent to-black"></span>
+                    <span class="relative">Cotizar Proyecto</span>
                 </a>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <header id="inicio" class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-b from-brand-dark/0 via-brand-dark/50 to-brand-dark z-0 pointer-events-none"></div>
-        
-        <div class="relative z-10 max-w-7xl mx-auto px-6 text-center reveal active">
-            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-brand-primary/30 bg-brand-primary/10 text-brand-primary text-xs font-mono mb-8 uppercase tracking-widest backdrop-blur-sm">
-                <span class="relative flex h-2 w-2">
-                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-primary opacity-75"></span>
-                  <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-primary"></span>
-                </span>
-                Desarrollo de Software Premium
+    <header id="inicio" class="relative min-h-screen flex items-center justify-center pt-24 pb-12 overflow-hidden bg-mesh-light">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 w-full">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                
+                <!-- Left Content -->
+                <div class="relative z-10 flex flex-col items-start text-left reveal-left">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-brand-200 bg-brand-50 text-brand-600 text-xs font-bold uppercase tracking-widest mb-8 shadow-sm">
+                        <span class="relative flex h-2.5 w-2.5">
+                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+                          <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-brand-500"></span>
+                        </span>
+                        Software & Experiencias Premium
+                    </div>
+                    
+                    <h1 class="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight mb-6 text-slate-900 leading-[1.1]">
+                        Escala tu negocio con <br>
+                        <span class="text-gradient">Tecnología Inteligente</span>
+                    </h1>
+                    
+                    <p class="mt-4 text-lg md:text-xl text-slate-600 max-w-xl font-medium leading-relaxed">
+                        No somos una agencia tradicional. Construimos ecosistemas digitales, aplicaciones web y arquitecturas empresariales diseñadas para dominar tu mercado.
+                    </p>
+                    
+                    <div class="mt-10 flex flex-col sm:flex-row gap-5 w-full sm:w-auto">
+                        <a href="#catalogo" class="interactive-btn group relative inline-flex items-center justify-center px-8 py-4 font-bold text-white transition-all duration-300 bg-slate-900 rounded-2xl hover:bg-slate-800 hover:shadow-card hover:-translate-y-1 overflow-hidden">
+                            <span class="absolute right-0 w-8 h-32 -mt-12 transition-all duration-1000 transform translate-x-12 bg-white opacity-10 rotate-12 group-hover:-translate-x-40 ease"></span>
+                            <span class="relative flex items-center gap-2">
+                                Explorar Catálogo
+                                <svg class="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                            </span>
+                        </a>
+                        <a href="#contacto" class="interactive-btn inline-flex items-center justify-center px-8 py-4 font-bold text-slate-700 transition-all duration-300 bg-white border-2 border-slate-200 rounded-2xl hover:border-brand-500 hover:text-brand-500 hover:shadow-soft hover:-translate-y-1 bg-opacity-80 backdrop-blur-sm">
+                            Agendar Consultoría
+                        </a>
+                    </div>
+
+                    <!-- Trust indicators -->
+                    <div class="mt-12 pt-8 border-t border-slate-200 w-full flex items-center gap-6 opacity-70">
+                        <div class="flex flex-col">
+                            <span class="text-3xl font-black text-brand-600">99.9%</span>
+                            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Uptime Server</span>
+                        </div>
+                        <div class="w-px h-10 bg-slate-300"></div>
+                        <div class="flex flex-col">
+                            <span class="text-3xl font-black text-brand-600">100/100</span>
+                            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Lighthouse SEO</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Visual (Floating 2:1 Logo with UI elements) -->
+                <div class="relative z-10 w-full flex justify-center lg:justify-end reveal-right delay-200 perspective-1000">
+                    <div class="relative w-full max-w-lg aspect-square flex items-center justify-center">
+                        <!-- Glowing backdrop -->
+                        <div class="absolute inset-0 bg-brand-400 rounded-full blur-[100px] opacity-20 animate-pulse-glow"></div>
+                        
+                        <!-- Floating Container -->
+                        <div class="relative w-full z-20 animate-float flex flex-col items-center justify-center">
+                            
+                            <!-- The Main Logo ensuring exact 2:1 aspect ratio mapping -->
+                            <div class="relative w-full max-w-[450px] aspect-[2/1] bg-white/40 backdrop-blur-2xl rounded-3xl p-8 border border-white/60 shadow-2xl flex items-center justify-center transform rotate-y-[-10deg] rotate-x-[5deg]">
+                                <!-- Subtle reflection -->
+                                <div class="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/40 to-white/0 rounded-3xl pointer-events-none"></div>
+                                
+                                <img src="media/logo.png" alt="Netrators Premium" class="w-full h-full object-contain filter drop-shadow-xl" onerror="this.src='https://placehold.co/1774x887/0ea5e9/ffffff?text=Netrators'">
+                                
+                                <!-- Floating UI Badges around logo -->
+                                <div class="absolute -top-6 -right-6 bg-white py-2 px-4 rounded-xl shadow-xl border border-slate-100 flex items-center gap-2 animate-float-delayed">
+                                    <div class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
+                                    <span class="text-xs font-bold text-slate-700">Sistema en línea</span>
+                                </div>
+                                <div class="absolute -bottom-8 -left-8 bg-slate-900 py-3 px-5 rounded-2xl shadow-2xl border border-slate-700 flex items-center gap-3 animate-float" style="animation-delay: 1.5s;">
+                                    <svg class="w-6 h-6 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                    <div class="flex flex-col">
+                                        <span class="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Rendimiento</span>
+                                        <span class="text-sm font-bold text-white">Ultra Rápido</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Decorative rings -->
+                        <div class="absolute w-[120%] h-[120%] border border-slate-200 rounded-full top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-spin-slow opacity-50"></div>
+                        <div class="absolute w-[140%] h-[140%] border border-brand-100 rounded-full top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-spin-slow opacity-30" style="animation-direction: reverse;"></div>
+                    </div>
+                </div>
             </div>
             
-            <h1 class="text-6xl md:text-8xl font-extrabold tracking-tight mb-6 leading-tight">
-                Construimos <br class="hidden md:block">
-                <span class="text-gradient inline-block" id="typing-text">Soluciones Digitales</span>
-            </h1>
-            
-            <p class="mt-6 text-lg md:text-xl text-gray-400 max-w-3xl mx-auto font-light leading-relaxed">
-                Transformamos modelos operativos tradicionales en ecosistemas digitales altamente escalables. 
-                Explora nuestras arquitecturas pre-diseñadas y experimenta el rendimiento en tiempo real.
-            </p>
-            
-            <div class="mt-12 flex flex-col sm:flex-row justify-center gap-6">
-                <a href="#catalogo" class="btn-neon bg-gradient-to-r from-brand-primary to-brand-secondary text-white px-8 py-4 rounded-xl font-bold text-lg hover:shadow-neon-blue transition-all transform hover:-translate-y-1 interactive-element">
-                    Explorar Catálogo Interactivo
-                </a>
-                <a href="https://github.com/netrators" target="_blank" class="btn-neon bg-white/5 border border-white/20 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-white/10 transition-all flex items-center justify-center gap-3 interactive-element">
-                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
-                    </svg>
-                    Ver Repositorio
-                </a>
-            </div>
-            
-            <!-- Mouse scroll indicator -->
-            <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce flex flex-col items-center opacity-50">
-                <span class="text-xs font-mono mb-2 uppercase">Descubre</span>
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+            <!-- Scroll Indicator -->
+            <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center opacity-40 hover:opacity-100 transition-opacity">
+                <span class="text-[10px] font-bold tracking-[0.2em] uppercase text-slate-500 mb-2">Descubre</span>
+                <div class="w-px h-12 bg-gradient-to-b from-slate-400 to-transparent"></div>
             </div>
         </div>
     </header>
 
-    <!-- Demos Grid Section -->
-    <section id="catalogo" class="py-24 relative z-10">
+    <section id="catalogo" class="py-32 relative z-10 bg-white">
         <div class="max-w-7xl mx-auto px-6 lg:px-8">
-            <div class="text-center mb-16 reveal">
-                <h2 class="text-4xl md:text-5xl font-bold mb-4">Catálogo de <span class="text-brand-primary">Arquitecturas</span></h2>
-                <p class="text-gray-400 max-w-2xl mx-auto text-lg">
-                    Cada módulo representa un sistema completamente funcional. Nuestro script verificará en tiempo real la disponibilidad de la demostración en el repositorio.
+            <div class="text-center mb-20 reveal-up">
+                <h2 class="text-brand-500 font-bold tracking-widest uppercase text-sm mb-3">Nuestras Arquitecturas</h2>
+                <h3 class="text-4xl md:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight">Catálogo de <span class="text-gradient">Demostraciones</span></h3>
+                <p class="text-slate-600 max-w-2xl mx-auto text-lg font-medium">
+                    Experimenta la fluidez de nuestros sistemas. Hemos desarrollado módulos base para diferentes industrias con las mejores prácticas de UI/UX.
                 </p>
             </div>
 
-            <!-- Contenedor dinámico de demos. La lógica de estado (Disponible/No disponible) se maneja en JS -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="demo-grid">
-                <!-- Se poblará vía JS para mantener el HTML limpio, pero inyectaremos los SVGs de alta calidad -->
+            <!-- Grid de Demos - Complejo y Detallado -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                
+                <!-- Demo Card 1: LMS -->
+                <div class="tilt-container reveal-up delay-100 cursor-interactive-card" onclick="window.location.href='demos/lms-core.html'">
+                    <div class="tilt-card h-full flex flex-col group">
+                        <div class="glare-wrapper"><div class="glare"></div></div>
+                        
+                        <!-- Image Header (Unsplash High Quality) -->
+                        <div class="card-image-bg tilt-image-wrapper">
+                            <img src="https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&q=80&w=800" alt="Plataforma LMS">
+                            <div class="card-image-overlay"></div>
+                            
+                            <!-- Floating Badge -->
+                            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-lg shadow-lg flex items-center gap-2 tilt-badge z-10">
+                                <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                                <span class="text-xs font-bold text-slate-700">Educación</span>
+                            </div>
+                        </div>
+
+                        <!-- Card Content -->
+                        <div class="p-8 flex flex-col flex-grow tilt-card-content relative z-10 bg-white">
+                            <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center mb-6 shadow-sm border border-purple-100">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"></path></svg>
+                            </div>
+                            <h4 class="text-2xl font-bold text-slate-900 mb-3">LMS Core Platform</h4>
+                            <p class="text-slate-600 text-sm mb-6 flex-grow leading-relaxed">Gestión académica integral. Simuladores de examen, control de alumnos, video-clases y panel de calificaciones en tiempo real.</p>
+                            
+                            <ul class="space-y-2 mb-8 border-t border-slate-100 pt-6">
+                                <li class="flex items-center text-xs text-slate-500 font-medium"><svg class="w-4 h-4 mr-2 text-purple-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Evaluaciones Automatizadas</li>
+                                <li class="flex items-center text-xs text-slate-500 font-medium"><svg class="w-4 h-4 mr-2 text-purple-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Dashboards para Profesores</li>
+                            </ul>
+                            
+                            <div class="mt-auto">
+                                <span class="inline-flex items-center text-brand-600 font-bold group-hover:text-brand-700 transition-colors">
+                                    Interactuar
+                                    <svg class="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7-7m7-7H3"></path></svg>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Demo Card 2: Taller -->
+                <div class="tilt-container reveal-up delay-200 cursor-interactive-card" onclick="window.location.href='demos/taller.html'">
+                    <div class="tilt-card h-full flex flex-col group">
+                        <div class="glare-wrapper"><div class="glare"></div></div>
+                        
+                        <div class="card-image-bg tilt-image-wrapper">
+                            <img src="https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?auto=format&fit=crop&q=80&w=800" alt="Software Taller Automotriz">
+                            <div class="card-image-overlay"></div>
+                            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-lg shadow-lg flex items-center gap-2 tilt-badge z-10">
+                                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                                <span class="text-xs font-bold text-slate-700">Automotriz</span>
+                            </div>
+                        </div>
+
+                        <div class="p-8 flex flex-col flex-grow tilt-card-content relative z-10 bg-white">
+                            <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-6 shadow-sm border border-blue-100">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            </div>
+                            <h4 class="text-2xl font-bold text-slate-900 mb-3">AutoManager Pro</h4>
+                            <p class="text-slate-600 text-sm mb-6 flex-grow leading-relaxed">Solución para talleres. Agenda de servicios, inventario de refacciones y portal para que clientes vean el estatus de su vehículo.</p>
+                            
+                            <ul class="space-y-2 mb-8 border-t border-slate-100 pt-6">
+                                <li class="flex items-center text-xs text-slate-500 font-medium"><svg class="w-4 h-4 mr-2 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Estatus Vehicular Online</li>
+                                <li class="flex items-center text-xs text-slate-500 font-medium"><svg class="w-4 h-4 mr-2 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Control de Refacciones</li>
+                            </ul>
+                            
+                            <div class="mt-auto">
+                                <span class="inline-flex items-center text-brand-600 font-bold group-hover:text-brand-700 transition-colors">
+                                    Interactuar
+                                    <svg class="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7-7m7-7H3"></path></svg>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Demo Card 3: Restaurante -->
+                <div class="tilt-container reveal-up delay-300 cursor-interactive-card" onclick="window.location.href='demos/restaurante.html'">
+                    <div class="tilt-card h-full flex flex-col group">
+                        <div class="glare-wrapper"><div class="glare"></div></div>
+                        
+                        <div class="card-image-bg tilt-image-wrapper">
+                            <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&q=80&w=800" alt="Menú Digital Restaurante">
+                            <div class="card-image-overlay"></div>
+                            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-lg shadow-lg flex items-center gap-2 tilt-badge z-10">
+                                <span class="w-2 h-2 rounded-full bg-orange-500"></span>
+                                <span class="text-xs font-bold text-slate-700">Gastronomía</span>
+                            </div>
+                        </div>
+
+                        <div class="p-8 flex flex-col flex-grow tilt-card-content relative z-10 bg-white">
+                            <div class="w-12 h-12 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center mb-6 shadow-sm border border-orange-100">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                            </div>
+                            <h4 class="text-2xl font-bold text-slate-900 mb-3">SmartMenu POS</h4>
+                            <p class="text-slate-600 text-sm mb-6 flex-grow leading-relaxed">Menú digital interactivo. Escaneo QR de mesas, envíos directos de comandas a cocina o pedidos por WhatsApp sin comisiones.</p>
+                            
+                            <ul class="space-y-2 mb-8 border-t border-slate-100 pt-6">
+                                <li class="flex items-center text-xs text-slate-500 font-medium"><svg class="w-4 h-4 mr-2 text-orange-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Comandas Digitales QR</li>
+                                <li class="flex items-center text-xs text-slate-500 font-medium"><svg class="w-4 h-4 mr-2 text-orange-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> 0% Comisiones a 3ros</li>
+                            </ul>
+                            
+                            <div class="mt-auto">
+                                <span class="inline-flex items-center text-brand-600 font-bold group-hover:text-brand-700 transition-colors">
+                                    Interactuar
+                                    <svg class="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7-7m7-7H3"></path></svg>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Demo Card 4: Citas Médicas / Spa -->
+                <div class="tilt-container reveal-up delay-100 cursor-interactive-card" onclick="window.location.href='demos/citas.html'">
+                    <div class="tilt-card h-full flex flex-col group">
+                        <div class="glare-wrapper"><div class="glare"></div></div>
+                        
+                        <div class="card-image-bg tilt-image-wrapper">
+                            <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=800" alt="Gestión de Citas Médicas y Spas">
+                            <div class="card-image-overlay"></div>
+                            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-lg shadow-lg flex items-center gap-2 tilt-badge z-10">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                <span class="text-xs font-bold text-slate-700">Salud & Belleza</span>
+                            </div>
+                        </div>
+
+                        <div class="p-8 flex flex-col flex-grow tilt-card-content relative z-10 bg-white">
+                            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-6 shadow-sm border border-emerald-100">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            </div>
+                            <h4 class="text-2xl font-bold text-slate-900 mb-3">MedBook Citas</h4>
+                            <p class="text-slate-600 text-sm mb-6 flex-grow leading-relaxed">Agendamiento inteligente para consultorios o spas. Recordatorios SMS, calendarios sincronizados y expedientes ligeros de clientes.</p>
+                            
+                            <ul class="space-y-2 mb-8 border-t border-slate-100 pt-6">
+                                <li class="flex items-center text-xs text-slate-500 font-medium"><svg class="w-4 h-4 mr-2 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Auto-agendamiento Web</li>
+                                <li class="flex items-center text-xs text-slate-500 font-medium"><svg class="w-4 h-4 mr-2 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Recordatorios Autmáticos</li>
+                            </ul>
+                            
+                            <div class="mt-auto">
+                                <span class="inline-flex items-center text-brand-600 font-bold group-hover:text-brand-700 transition-colors">
+                                    Interactuar
+                                    <svg class="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7-7m7-7H3"></path></svg>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Demo Card 5: Corporativo Landing -->
+                <div class="tilt-container reveal-up delay-200 cursor-interactive-card" onclick="window.location.href='demos/corporativo.html'">
+                    <div class="tilt-card h-full flex flex-col group">
+                        <div class="glare-wrapper"><div class="glare"></div></div>
+                        
+                        <div class="card-image-bg tilt-image-wrapper">
+                            <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=800" alt="Landing Page Corporativa Moderna">
+                            <div class="card-image-overlay"></div>
+                            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-lg shadow-lg flex items-center gap-2 tilt-badge z-10">
+                                <span class="w-2 h-2 rounded-full bg-slate-800"></span>
+                                <span class="text-xs font-bold text-slate-700">Corporativo</span>
+                            </div>
+                        </div>
+
+                        <div class="p-8 flex flex-col flex-grow tilt-card-content relative z-10 bg-white">
+                            <div class="w-12 h-12 rounded-xl bg-slate-100 text-slate-800 flex items-center justify-center mb-6 shadow-sm border border-slate-200">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
+                            </div>
+                            <h4 class="text-2xl font-bold text-slate-900 mb-3">LeadGen Landing</h4>
+                            <p class="text-slate-600 text-sm mb-6 flex-grow leading-relaxed">Páginas web corporativas de alto impacto. Optimizadas para SEO, velocidad extrema y embudos de captura de prospectos.</p>
+                            
+                            <ul class="space-y-2 mb-8 border-t border-slate-100 pt-6">
+                                <li class="flex items-center text-xs text-slate-500 font-medium"><svg class="w-4 h-4 mr-2 text-slate-800" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> SEO Técnico Perfecto</li>
+                                <li class="flex items-center text-xs text-slate-500 font-medium"><svg class="w-4 h-4 mr-2 text-slate-800" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Formularios de Alta Conversión</li>
+                            </ul>
+                            
+                            <div class="mt-auto">
+                                <span class="inline-flex items-center text-brand-600 font-bold group-hover:text-brand-700 transition-colors">
+                                    Interactuar
+                                    <svg class="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7-7m7-7H3"></path></svg>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Demo Card 6: E-commerce -->
+                <!-- Nota: Mantiene el enlace .hmtl como lo solicitaste según la estructura de tu repo para evitar 404s -->
+                <div class="tilt-container reveal-up delay-300 cursor-interactive-card" onclick="window.location.href='demos/ecommerce.hmtl'">
+                    <div class="tilt-card h-full flex flex-col group">
+                        <div class="glare-wrapper"><div class="glare"></div></div>
+                        
+                        <div class="card-image-bg tilt-image-wrapper">
+                            <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&q=80&w=800" alt="Plataforma de E-commerce">
+                            <div class="card-image-overlay"></div>
+                            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-lg shadow-lg flex items-center gap-2 tilt-badge z-10">
+                                <span class="w-2 h-2 rounded-full bg-cyan-500"></span>
+                                <span class="text-xs font-bold text-slate-700">Retail & Ventas</span>
+                            </div>
+                        </div>
+
+                        <div class="p-8 flex flex-col flex-grow tilt-card-content relative z-10 bg-white">
+                            <div class="w-12 h-12 rounded-xl bg-cyan-50 text-cyan-500 flex items-center justify-center mb-6 shadow-sm border border-cyan-100">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                            </div>
+                            <h4 class="text-2xl font-bold text-slate-900 mb-3">StoreFront E-Commerce</h4>
+                            <p class="text-slate-600 text-sm mb-6 flex-grow leading-relaxed">Catálogo de productos escalable. Carrito de compras seguro, pasarelas de pago y panel de control de inventario y envíos.</p>
+                            
+                            <ul class="space-y-2 mb-8 border-t border-slate-100 pt-6">
+                                <li class="flex items-center text-xs text-slate-500 font-medium"><svg class="w-4 h-4 mr-2 text-cyan-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Pasarelas de Pago Globales</li>
+                                <li class="flex items-center text-xs text-slate-500 font-medium"><svg class="w-4 h-4 mr-2 text-cyan-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg> Gestión Completa de Pedidos</li>
+                            </ul>
+                            
+                            <div class="mt-auto">
+                                <span class="inline-flex items-center text-brand-600 font-bold group-hover:text-brand-700 transition-colors">
+                                    Interactuar
+                                    <svg class="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7-7m7-7H3"></path></svg>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
 
-    <!-- Tecnologías Section -->
-    <section id="tecnologias" class="py-24 relative z-10 bg-brand-dark/50 border-y border-white/5">
-        <div class="max-w-7xl mx-auto px-6 lg:px-8 text-center">
-            <div class="reveal">
-                <h2 class="text-3xl md:text-4xl font-bold mb-12">Stack Tecnológico <span class="text-brand-secondary">Moderno</span></h2>
+    <section id="proceso" class="py-32 bg-slate-900 relative z-10 overflow-hidden">
+        <!-- Decoration -->
+        <div class="absolute inset-0 opacity-10">
+            <svg class="absolute left-0 top-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <path d="M0,0 L100,0 L100,100 L0,100 Z M50,0 L100,50 L50,100 L0,50 Z" fill="none" stroke="#ffffff" stroke-width="0.5" />
+            </svg>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-20 reveal-up">
+                <h2 class="text-brand-400 font-bold tracking-widest uppercase text-sm mb-3">Metodología</h2>
+                <h3 class="text-3xl md:text-5xl font-extrabold text-white mb-6">De la Idea al <span class="text-brand-400">Lanzamiento</span></h3>
             </div>
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
-                <!-- React -->
-                <div class="flex flex-col items-center gap-2 interactive-element reveal">
-                    <svg class="w-16 h-16 text-[#61DAFB]" viewBox="0 0 118 118" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M59 15C29 15 5 25 5 37.5C5 50 29 60 59 60C89 60 113 50 113 37.5C113 25 89 15 59 15Z" stroke="currentColor" stroke-width="4"/><path d="M22 25C40 7 71 -2 88 15C105 32 101 64 83 82C65 100 34 109 17 92C0 75 4 43 22 25Z" stroke="currentColor" stroke-width="4"/><path d="M96 25C78 7 47 -2 30 15C13 32 17 64 35 82C53 100 84 109 101 92C118 75 114 43 96 25Z" stroke="currentColor" stroke-width="4"/><circle cx="59" cy="37.5" r="9.5" fill="currentColor"/></svg>
-                    <span class="text-sm font-mono font-bold">React.js</span>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Paso 1 -->
+                <div class="relative flex flex-col items-center text-center reveal-up delay-100">
+                    <div class="w-20 h-20 bg-brand-900/50 border border-brand-500/30 rounded-2xl flex items-center justify-center text-brand-400 mb-6 shadow-glow relative z-10 backdrop-blur-sm">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                    </div>
+                    <!-- Connector Line (Hidden on mobile) -->
+                    <div class="hidden md:block absolute top-10 left-[60%] w-[80%] h-px bg-gradient-to-r from-brand-500/50 to-transparent z-0"></div>
+                    
+                    <h4 class="text-xl font-bold text-white mb-2">1. Consultoría</h4>
+                    <p class="text-slate-400 text-sm">Analizamos a fondo los procesos de tu negocio y definimos requerimientos técnicos y visuales.</p>
                 </div>
-                <!-- Tailwind -->
-                <div class="flex flex-col items-center gap-2 interactive-element reveal" style="transition-delay: 100ms">
-                    <svg class="w-16 h-16 text-[#38B2AC]" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M64 12C35.2812 12 18.0625 31.625 18.0625 57C18.0625 82.375 35.2812 102 64 102C92.7188 102 109.938 82.375 109.938 57C109.938 31.625 92.7188 12 64 12ZM64 28C81.4062 28 91.5625 41 91.5625 57C91.5625 73 81.4062 86 64 86C46.5938 86 36.4375 73 36.4375 57C36.4375 41 46.5938 28 64 28Z" fill="currentColor"/><path d="M64 44C55.7188 44 49 50.7188 49 59C49 67.2812 55.7188 74 64 74C72.2812 74 79 67.2812 79 59C79 50.7188 72.2812 44 64 44Z" fill="currentColor"/></svg>
-                    <span class="text-sm font-mono font-bold">TailwindCSS</span>
+
+                <!-- Paso 2 -->
+                <div class="relative flex flex-col items-center text-center reveal-up delay-200">
+                    <div class="w-20 h-20 bg-brand-900/50 border border-brand-500/30 rounded-2xl flex items-center justify-center text-brand-400 mb-6 shadow-glow relative z-10 backdrop-blur-sm">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path></svg>
+                    </div>
+                    <div class="hidden md:block absolute top-10 left-[60%] w-[80%] h-px bg-gradient-to-r from-brand-500/50 to-transparent z-0"></div>
+                    
+                    <h4 class="text-xl font-bold text-white mb-2">2. Prototipado</h4>
+                    <p class="text-slate-400 text-sm">Diseñamos interfaces interactivas (UI/UX) para que visualices la solución antes de codificar.</p>
                 </div>
-                <!-- Supabase -->
-                <div class="flex flex-col items-center gap-2 interactive-element reveal" style="transition-delay: 200ms">
-                    <svg class="w-16 h-16 text-[#3ECF8E]" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M21.36 8.528A2.668 2.668 0 0019.2 7.2H4.8a2.668 2.668 0 00-2.16 1.328 2.585 2.585 0 00-.077 2.66l7.2 12.16a2.664 2.664 0 004.55 0l7.2-12.16a2.586 2.586 0 00-.153-2.66z" fill="currentColor"/><path d="M12 21.36l-7.2-12.16h14.4L12 21.36z" fill="#0f172a"/></svg>
-                    <span class="text-sm font-mono font-bold">Supabase</span>
+
+                <!-- Paso 3 -->
+                <div class="relative flex flex-col items-center text-center reveal-up delay-300">
+                    <div class="w-20 h-20 bg-brand-900/50 border border-brand-500/30 rounded-2xl flex items-center justify-center text-brand-400 mb-6 shadow-glow relative z-10 backdrop-blur-sm">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                    </div>
+                    <div class="hidden md:block absolute top-10 left-[60%] w-[80%] h-px bg-gradient-to-r from-brand-500/50 to-transparent z-0"></div>
+                    
+                    <h4 class="text-xl font-bold text-white mb-2">3. Desarrollo</h4>
+                    <p class="text-slate-400 text-sm">Programamos con React, Tailwind y arquitecturas modernas para máxima seguridad y velocidad.</p>
                 </div>
-                <!-- Node.js -->
-                <div class="flex flex-col items-center gap-2 interactive-element reveal" style="transition-delay: 300ms">
-                    <svg class="w-16 h-16 text-[#339933]" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M64 14.5L107.5 39.5V89.5L64 114.5L20.5 89.5V39.5L64 14.5ZM64 25.5L30.5 44.5V84.5L64 103.5L97.5 84.5V44.5L64 25.5Z" fill="currentColor"/><path d="M64 40.5L81 50.5V69.5L64 79.5L47 69.5V50.5L64 40.5Z" fill="currentColor"/></svg>
-                    <span class="text-sm font-mono font-bold">Node.js</span>
-                </div>
-                <!-- Vercel -->
-                <div class="flex flex-col items-center gap-2 interactive-element reveal" style="transition-delay: 400ms">
-                    <svg class="w-16 h-16 text-white" viewBox="0 0 1155 1000" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M577.3 0L1154.6 1000H0L577.3 0Z"/></svg>
-                    <span class="text-sm font-mono font-bold">Vercel</span>
-                </div>
-                <!-- AI / Cursor -->
-                <div class="flex flex-col items-center gap-2 interactive-element reveal" style="transition-delay: 500ms">
-                    <svg class="w-16 h-16 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
-                    <span class="text-sm font-mono font-bold">AI Driven</span>
+
+                <!-- Paso 4 -->
+                <div class="relative flex flex-col items-center text-center reveal-up delay-400">
+                    <div class="w-20 h-20 bg-brand-900/50 border border-brand-500/30 rounded-2xl flex items-center justify-center text-brand-400 mb-6 shadow-glow relative z-10 backdrop-blur-sm">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                    </div>
+                    
+                    <h4 class="text-xl font-bold text-white mb-2">4. Despliegue</h4>
+                    <p class="text-slate-400 text-sm">Lanzamos a producción en servidores premium (AWS/Vercel) con monitoreo continuo.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Contact Section -->
-    <section id="contacto" class="py-24 relative z-10">
-        <div class="max-w-4xl mx-auto px-6 lg:px-8">
-            <div class="glass-panel p-8 md:p-12 reveal">
-                <div class="text-center mb-10">
-                    <h2 class="text-3xl font-bold mb-4">¿Listo para <span class="text-brand-primary">escalar</span>?</h2>
-                    <p class="text-gray-400">Déjanos los requerimientos técnicos o de negocio y diseñaremos la arquitectura exacta que necesitas.</p>
+    <section class="py-20 bg-white relative z-10 border-b border-slate-100 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <h3 class="text-center text-sm font-bold tracking-widest text-slate-400 uppercase mb-12 reveal-up">Impulsados por tecnología líder</h3>
+            
+            <!-- Marquee Container -->
+            <div class="relative flex overflow-x-hidden">
+                <div class="animate-marquee whitespace-nowrap flex items-center gap-16 py-4 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+                    <!-- Tech Items -->
+                    <span class="text-2xl font-bold text-slate-800 flex items-center gap-2"><svg class="w-8 h-8 text-[#61DAFB]" viewBox="0 0 118 118" fill="currentColor"><circle cx="59" cy="37.5" r="9.5"/></svg> React.js</span>
+                    <span class="text-2xl font-bold text-slate-800 flex items-center gap-2"><svg class="w-8 h-8 text-[#38B2AC]" viewBox="0 0 128 128" fill="currentColor"><path d="M64 44C55.7188 44 49 50.7188 49 59C49 67.2812 55.7188 74 64 74C72.2812 74 79 67.2812 79 59C79 50.7188 72.2812 44 64 44Z"/></svg> TailwindCSS</span>
+                    <span class="text-2xl font-bold text-slate-800 flex items-center gap-2"><svg class="w-8 h-8 text-[#3ECF8E]" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.36l-7.2-12.16h14.4L12 21.36z"/></svg> Supabase</span>
+                    <span class="text-2xl font-bold text-slate-800 flex items-center gap-2"><svg class="w-8 h-8 text-black" viewBox="0 0 1155 1000" fill="currentColor"><path d="M577.3 0L1154.6 1000H0L577.3 0Z"/></svg> Vercel</span>
+                    <span class="text-2xl font-bold text-slate-800 flex items-center gap-2"><svg class="w-8 h-8 text-[#339933]" viewBox="0 0 128 128" fill="currentColor"><path d="M64 40.5L81 50.5V69.5L64 79.5L47 69.5V50.5L64 40.5Z"/></svg> Node.js</span>
+                    
+                    <!-- Duplicated for seamless loop -->
+                    <span class="text-2xl font-bold text-slate-800 flex items-center gap-2"><svg class="w-8 h-8 text-[#61DAFB]" viewBox="0 0 118 118" fill="currentColor"><circle cx="59" cy="37.5" r="9.5"/></svg> React.js</span>
+                    <span class="text-2xl font-bold text-slate-800 flex items-center gap-2"><svg class="w-8 h-8 text-[#38B2AC]" viewBox="0 0 128 128" fill="currentColor"><path d="M64 44C55.7188 44 49 50.7188 49 59C49 67.2812 55.7188 74 64 74C72.2812 74 79 67.2812 79 59C79 50.7188 72.2812 44 64 44Z"/></svg> TailwindCSS</span>
+                    <span class="text-2xl font-bold text-slate-800 flex items-center gap-2"><svg class="w-8 h-8 text-[#3ECF8E]" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.36l-7.2-12.16h14.4L12 21.36z"/></svg> Supabase</span>
+                    <span class="text-2xl font-bold text-slate-800 flex items-center gap-2"><svg class="w-8 h-8 text-black" viewBox="0 0 1155 1000" fill="currentColor"><path d="M577.3 0L1154.6 1000H0L577.3 0Z"/></svg> Vercel</span>
+                    <span class="text-2xl font-bold text-slate-800 flex items-center gap-2"><svg class="w-8 h-8 text-[#339933]" viewBox="0 0 128 128" fill="currentColor"><path d="M64 40.5L81 50.5V69.5L64 79.5L47 69.5V50.5L64 40.5Z"/></svg> Node.js</span>
+                </div>
+            </div>
+            
+            <!-- Fade edges for marquee -->
+            <div class="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-white to-transparent pointer-events-none"></div>
+            <div class="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-white to-transparent pointer-events-none"></div>
+        </div>
+    </section>
+
+    <section id="contacto" class="py-32 relative z-10 bg-brand-50">
+        <div class="max-w-5xl mx-auto px-6 lg:px-8">
+            <div class="bg-white rounded-[2rem] shadow-card border border-slate-100 p-8 md:p-14 reveal-scale relative overflow-hidden">
+                <!-- Abstract BG inside card -->
+                <div class="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 bg-brand-400 rounded-full mix-blend-multiply filter blur-[80px] opacity-30"></div>
+                
+                <div class="text-center mb-12 relative z-10">
+                    <h2 class="text-3xl md:text-4xl font-extrabold mb-4 text-slate-900">Inicia tu <span class="text-brand-500">Transformación</span></h2>
+                    <p class="text-slate-600">Completa el formulario y un arquitecto de software se pondrá en contacto contigo en menos de 24 horas.</p>
                 </div>
                 
-                <form id="contact-form" class="space-y-6" novalidate>
+                <form id="contact-form" class="space-y-6 relative z-10">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="relative">
-                            <input type="text" id="name" required class="w-full bg-brand-dark/50 border border-white/10 rounded-xl px-4 py-4 text-white placeholder-transparent focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary peer transition-all">
-                            <label for="name" class="absolute left-4 top-1.5 text-xs text-brand-primary transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-placeholder-shown:top-4 peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-brand-primary">Nombre / Empresa</label>
+                        <div class="flex flex-col">
+                            <label class="text-sm font-bold text-slate-700 mb-2">Nombre completo o Empresa <span class="text-brand-500">*</span></label>
+                            <input type="text" required class="interactive-input w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-slate-800 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200 transition-all shadow-sm">
                         </div>
-                        <div class="relative">
-                            <input type="email" id="email" required class="w-full bg-brand-dark/50 border border-white/10 rounded-xl px-4 py-4 text-white placeholder-transparent focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary peer transition-all">
-                            <label for="email" class="absolute left-4 top-1.5 text-xs text-brand-primary transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-placeholder-shown:top-4 peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-brand-primary">Correo Electrónico</label>
+                        <div class="flex flex-col">
+                            <label class="text-sm font-bold text-slate-700 mb-2">Correo Electrónico <span class="text-brand-500">*</span></label>
+                            <input type="email" required class="interactive-input w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-slate-800 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200 transition-all shadow-sm">
                         </div>
                     </div>
                     
-                    <div class="relative">
-                        <select id="service" required class="w-full bg-brand-dark/50 border border-white/10 rounded-xl px-4 py-4 text-white focus:outline-none focus:border-brand-primary appearance-none cursor-pointer">
-                            <option value="" disabled selected>Selecciona el tipo de solución...</option>
-                            <option value="lms">Plataforma Educativa (LMS)</option>
-                            <option value="ecommerce">E-Commerce / Menú Digital</option>
-                            <option value="management">Sistema de Gestión (ERP/CRM ligero)</option>
-                            <option value="landing">Landing Page Corporativa</option>
-                            <option value="other">Desarrollo a la Medida (IA / Backend)</option>
-                        </select>
-                        <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
-                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    <div class="flex flex-col">
+                        <label class="text-sm font-bold text-slate-700 mb-2">Tipo de Solución Deseada <span class="text-brand-500">*</span></label>
+                        <div class="relative">
+                            <select required class="interactive-input w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-slate-800 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200 appearance-none shadow-sm cursor-pointer">
+                                <option value="" disabled selected>Selecciona una opción del catálogo...</option>
+                                <option value="lms">Plataforma Educativa (LMS)</option>
+                                <option value="taller">Gestión Automotriz</option>
+                                <option value="restaurante">Menú Digital / POS Restaurante</option>
+                                <option value="citas">Agendamiento Clínico / Spa</option>
+                                <option value="corporativo">Landing Page Corporativa</option>
+                                <option value="ecommerce">Tienda en Línea (E-Commerce)</option>
+                                <option value="other">Desarrollo a la Medida</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 flex items-center px-5 pointer-events-none text-slate-400">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="relative">
-                        <textarea id="message" rows="4" required class="w-full bg-brand-dark/50 border border-white/10 rounded-xl px-4 py-4 text-white placeholder-transparent focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary peer transition-all"></textarea>
-                        <label for="message" class="absolute left-4 top-1.5 text-xs text-brand-primary transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-placeholder-shown:top-4 peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-brand-primary">Describe el problema que deseas resolver</label>
+                    <div class="flex flex-col">
+                        <label class="text-sm font-bold text-slate-700 mb-2">Cuéntanos sobre tu proyecto</label>
+                        <textarea rows="4" class="interactive-input w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-slate-800 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200 transition-all shadow-sm resize-none" placeholder="¿Cuáles son los principales retos que quieres resolver?"></textarea>
                     </div>
 
-                    <button type="submit" class="w-full btn-neon bg-gradient-to-r from-brand-primary to-brand-secondary text-white font-bold py-4 rounded-xl shadow-lg transition-transform transform hover:-translate-y-1 interactive-element">
-                        Enviar Solicitud de Propuesta
-                    </button>
+                    <div class="pt-4">
+                        <button type="submit" id="submit-btn" class="interactive-btn group relative w-full flex justify-center py-4 px-4 border border-transparent text-lg font-extrabold rounded-xl text-white bg-brand-500 hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-all shadow-lg hover:shadow-glow overflow-hidden">
+                            <span class="absolute right-0 w-8 h-32 -mt-12 transition-all duration-1000 transform translate-x-12 bg-white opacity-20 rotate-12 group-hover:-translate-x-full ease"></span>
+                            <span id="btn-text">Enviar Solicitud</span>
+                            <span id="btn-loader" class="hidden absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                                <svg class="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            </span>
+                        </button>
+                    </div>
                 </form>
+
+                <!-- Success Message Overlay -->
+                <div id="success-overlay" class="absolute inset-0 bg-white/95 backdrop-blur-sm z-20 hidden flex-col items-center justify-center opacity-0 transition-opacity duration-500">
+                    <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6 text-green-500 scale-0 transition-transform duration-500" id="success-icon">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                    </div>
+                    <h3 class="text-3xl font-bold text-slate-900 mb-2">¡Solicitud Recibida!</h3>
+                    <p class="text-slate-600 text-center max-w-sm">Hemos recibido tus datos correctamente. Nuestro equipo revisará tu caso y te contactará a la brevedad.</p>
+                    <button onclick="resetForm()" class="mt-8 text-brand-500 font-bold hover:text-brand-700 underline underline-offset-4">Enviar otra solicitud</button>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="border-t border-white/10 bg-brand-dark/80 backdrop-blur-md relative z-10">
-        <div class="max-w-7xl mx-auto px-6 lg:px-8 py-12 flex flex-col md:flex-row justify-between items-center gap-6">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-primary to-brand-accent p-[1px]">
-                    <div class="w-full h-full bg-brand-dark rounded-lg flex items-center justify-center">
-                        <span class="text-brand-primary font-bold text-sm">N</span>
-                    </div>
+    <footer class="bg-white border-t border-slate-200 relative z-10 pb-20 md:pb-0">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 py-16">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8">
+                <div class="col-span-1 md:col-span-2">
+                    <a href="#inicio" class="flex items-center gap-3 mb-6">
+                        <!-- Logo in Footer - matching ratio -->
+                        <div class="w-24 h-12">
+                            <img src="media/logo.png" alt="Netrators" class="w-full h-full object-contain aspect-[2/1]" onerror="this.src='https://placehold.co/1774x887/0ea5e9/ffffff?text=Netrators'">
+                        </div>
+                    </a>
+                    <p class="text-slate-500 text-sm max-w-sm leading-relaxed">
+                        Desarrollamos ecosistemas digitales escalables y de alto rendimiento. Arquitecturas premium para negocios que buscan dominar su industria en la era digital.
+                    </p>
                 </div>
-                <span class="font-mono font-bold tracking-widest text-sm text-gray-400">NETRATORS &copy; 2026</span>
+                
+                <div>
+                    <h4 class="font-bold text-slate-900 mb-6 uppercase tracking-wider text-sm">Catálogo</h4>
+                    <ul class="space-y-4 text-sm text-slate-500">
+                        <li><a href="demos/lms-core.html" class="hover:text-brand-500 transition-colors interactive-btn">Plataforma LMS</a></li>
+                        <li><a href="demos/taller.html" class="hover:text-brand-500 transition-colors interactive-btn">AutoManager Pro</a></li>
+                        <li><a href="demos/restaurante.html" class="hover:text-brand-500 transition-colors interactive-btn">SmartMenu POS</a></li>
+                        <li><a href="demos/ecommerce.hmtl" class="hover:text-brand-500 transition-colors interactive-btn">E-Commerce</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-slate-900 mb-6 uppercase tracking-wider text-sm">Empresa</h4>
+                    <ul class="space-y-4 text-sm text-slate-500">
+                        <li><a href="#proceso" class="hover:text-brand-500 transition-colors interactive-btn">Nuestra Metodología</a></li>
+                        <li><a href="#contacto" class="hover:text-brand-500 transition-colors interactive-btn">Contacto Directo</a></li>
+                        <li><a href="#" class="hover:text-brand-500 transition-colors interactive-btn">Términos y Condiciones</a></li>
+                    </ul>
+                </div>
             </div>
             
-            <div class="flex gap-6">
-                <a href="https://github.com/netrators" target="_blank" class="text-gray-500 hover:text-brand-primary transition-colors interactive-element">
-                    <span class="sr-only">GitHub</span>
-                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" /></svg>
-                </a>
-                <a href="#" class="text-gray-500 hover:text-brand-secondary transition-colors interactive-element">
-                    <span class="sr-only">LinkedIn</span>
-                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" clip-rule="evenodd" /></svg>
-                </a>
+            <div class="mt-16 pt-8 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-sm text-slate-400 font-medium">
+                    &copy; 2026 NETRATORS. Todos los derechos reservados.
+                </p>
+                <div class="flex gap-6">
+                    <a href="#" class="text-slate-400 hover:text-brand-500 transition-colors interactive-btn">
+                        <span class="sr-only">LinkedIn</span>
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" clip-rule="evenodd" /></svg>
+                    </a>
+                    <a href="#" class="text-slate-400 hover:text-brand-500 transition-colors interactive-btn">
+                        <span class="sr-only">Twitter</span>
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
+                    </a>
+                </div>
             </div>
         </div>
     </footer>
 
     <script>
-        /* ==========================================================================
-           MOTOR GRÁFICO (CANVAS PARTICLE NETWORK)
-           ========================================================================== */
-        const canvas = document.getElementById('particle-canvas');
-        const ctx = canvas.getContext('2d', { alpha: false }); // Optimización de renderizado
+        document.addEventListener('DOMContentLoaded', () => {
 
-        let particlesArray;
-        let mouse = { x: null, y: null, radius: 150 };
+            /* ==========================================================================
+               CUSTOM CURSOR LOGIC (Vanilla JS Physics)
+               ========================================================================== */
+            const cursorDot = document.getElementById('cursor-dot');
+            const cursorRing = document.getElementById('cursor-ring');
+            
+            let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+            let ringPos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+            
+            // Linear interpolation for smooth trailing
+            const lerp = (start, end, amt) => (1 - amt) * start + amt * end;
 
-        // Ajuste de tamaño responsive
-        function initCanvasSize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', () => {
+            window.addEventListener('mousemove', (e) => {
+                mouse.x = e.clientX;
+                mouse.y = e.clientY;
+                // Dot follows immediately
+                cursorDot.style.left = mouse.x + 'px';
+                cursorDot.style.top = mouse.y + 'px';
+            });
+
+            // Render loop for smooth ring
+            const renderCursor = () => {
+                ringPos.x = lerp(ringPos.x, mouse.x, 0.15);
+                ringPos.y = lerp(ringPos.y, mouse.y, 0.15);
+                
+                cursorRing.style.left = ringPos.x + 'px';
+                cursorRing.style.top = ringPos.y + 'px';
+                
+                requestAnimationFrame(renderCursor);
+            };
+            requestAnimationFrame(renderCursor);
+
+            // Hover interactions mapping
+            const setupCursorInteractions = () => {
+                // Interactive Buttons
+                document.querySelectorAll('a, button, .interactive-btn, .interactive-input').forEach(el => {
+                    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hovering-btn'));
+                    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hovering-btn'));
+                });
+
+                // The Big Cards (Demos)
+                document.querySelectorAll('.cursor-interactive-card').forEach(el => {
+                    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hovering-card'));
+                    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hovering-card'));
+                });
+            };
+            setupCursorInteractions();
+
+            // Hide cursor when leaving window
+            document.addEventListener('mouseleave', () => {
+                cursorDot.style.opacity = '0';
+                cursorRing.style.opacity = '0';
+            });
+            document.addEventListener('mouseenter', () => {
+                cursorDot.style.opacity = '1';
+                cursorRing.style.opacity = '1';
+            });
+
+            /* ==========================================================================
+               3D CARD TILT & GLARE EFFECT (Vanilla JS Implementation)
+               ========================================================================== */
+            const tiltContainers = document.querySelectorAll('.tilt-container');
+
+            tiltContainers.forEach(container => {
+                const card = container.querySelector('.tilt-card');
+                const glare = container.querySelector('.glare');
+
+                container.addEventListener('mousemove', (e) => {
+                    const rect = container.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    
+                    // Calculate rotation (max 10 degrees)
+                    const rotateX = ((y - centerY) / centerY) * -10;
+                    const rotateY = ((x - centerX) / centerX) * 10;
+
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+
+                    // Calculate glare position
+                    if (glare) {
+                        glare.style.opacity = '1';
+                        glare.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px) rotate(45deg)`;
+                    }
+                });
+
+                container.addEventListener('mouseleave', () => {
+                    card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+                    if (glare) glare.style.opacity = '0';
+                });
+                
+                // Reset transition speed on enter for physics feel
+                container.addEventListener('mouseenter', () => {
+                    card.style.transition = 'none';
+                    if (glare) glare.style.transition = 'none';
+                });
+                container.addEventListener('mouseleave', () => {
+                    card.style.transition = 'transform 0.5s cubic-bezier(0.23, 1, 0.32, 1)';
+                    if (glare) glare.style.transition = 'opacity 0.5s ease';
+                });
+            });
+
+            /* ==========================================================================
+               SCROLL REVEAL OBSERVER
+               ========================================================================== */
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px 0px -100px 0px',
+                threshold: 0.1
+            };
+
+            const revealObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('reveal-active');
+                        observer.unobserve(entry.target); // Unobserve after animating once
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.reveal-up, .reveal-left, .reveal-right, .reveal-scale').forEach(el => {
+                revealObserver.observe(el);
+            });
+
+            /* ==========================================================================
+               NAVBAR SCROLL EFFECT
+               ========================================================================== */
+            const navContainer = document.getElementById('nav-container');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    navContainer.classList.remove('py-3');
+                    navContainer.classList.add('py-2', 'bg-white/95');
+                } else {
+                    navContainer.classList.remove('py-2', 'bg-white/95');
+                    navContainer.classList.add('py-3');
+                }
+            });
+
+            /* ==========================================================================
+               PARTICLE ENGINE (Light Theme Adapted)
+               ========================================================================== */
+            const canvas = document.getElementById('particle-canvas');
+            const ctx = canvas.getContext('2d', { alpha: false }); // Optimize performance
+            
+            let particlesArray = [];
+            
+            function initCanvasSize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', () => {
+                initCanvasSize();
+                initParticles();
+            });
+
+            class Particle {
+                constructor(x, y, dx, dy, size) {
+                    this.x = x;
+                    this.y = y;
+                    this.dx = dx;
+                    this.dy = dy;
+                    this.size = size;
+                    this.baseX = x;
+                    this.baseY = y;
+                }
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(14, 165, 233, 0.3)'; // Brand 500 with opacity
+                    ctx.fill();
+                }
+                update() {
+                    // Bounce off walls
+                    if (this.x > canvas.width || this.x < 0) this.dx = -this.dx;
+                    if (this.y > canvas.height || this.y < 0) this.dy = -this.dy;
+
+                    // Mouse interaction
+                    let mdx = mouse.x - this.x;
+                    let mdy = mouse.y - this.y;
+                    let distance = Math.sqrt(mdx * mdx + mdy * mdy);
+                    
+                    if (distance < 120) {
+                        // Repulse
+                        const force = (120 - distance) / 120;
+                        this.x -= (mdx / distance) * force * 2;
+                        this.y -= (mdy / distance) * force * 2;
+                    } else {
+                        // Slowly return to base speed/direction
+                        this.x += this.dx;
+                        this.y += this.dy;
+                    }
+
+                    this.draw();
+                }
+            }
+
+            function initParticles() {
+                particlesArray = [];
+                // Density based on screen size (not too crowded)
+                let numParticles = (canvas.width * canvas.height) / 15000;
+                for (let i = 0; i < numParticles; i++) {
+                    let size = (Math.random() * 2) + 0.5;
+                    let x = Math.random() * canvas.width;
+                    let y = Math.random() * canvas.height;
+                    let dx = (Math.random() - 0.5) * 0.5;
+                    let dy = (Math.random() - 0.5) * 0.5;
+                    particlesArray.push(new Particle(x, y, dx, dy, size));
+                }
+            }
+
+            function animateParticles() {
+                requestAnimationFrame(animateParticles);
+                ctx.fillStyle = '#f8fafc'; // Match brand-background
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                for (let i = 0; i < particlesArray.length; i++) {
+                    particlesArray[i].update();
+                }
+
+                // Connect particles
+                for (let a = 0; a < particlesArray.length; a++) {
+                    for (let b = a; b < particlesArray.length; b++) {
+                        let distance = Math.pow(particlesArray[a].x - particlesArray[b].x, 2) + 
+                                       Math.pow(particlesArray[a].y - particlesArray[b].y, 2);
+                        
+                        if (distance < 10000) { // Distance threshold
+                            let opacity = 1 - (distance / 10000);
+                            ctx.strokeStyle = `rgba(14, 165, 233, ${opacity * 0.15})`;
+                            ctx.lineWidth = 1;
+                            ctx.beginPath();
+                            ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                            ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+
+            // Start Particle Engine
             initCanvasSize();
             initParticles();
-        });
+            animateParticles();
 
-        // Eventos del Mouse para interacción con la red
-        window.addEventListener('mousemove', (event) => {
-            mouse.x = event.x;
-            mouse.y = event.y;
-        });
-        window.addEventListener('mouseout', () => {
-            mouse.x = undefined;
-            mouse.y = undefined;
-        });
+            /* ==========================================================================
+               CONTACT FORM SIMULATION
+               ========================================================================== */
+            const form = document.getElementById('contact-form');
+            const submitBtn = document.getElementById('submit-btn');
+            const btnText = document.getElementById('btn-text');
+            const btnLoader = document.getElementById('btn-loader');
+            const successOverlay = document.getElementById('success-overlay');
+            const successIcon = document.getElementById('success-icon');
 
-        // Clase Partícula
-        class Particle {
-            constructor(x, y, directionX, directionY, size, color) {
-                this.x = x;
-                this.y = y;
-                this.directionX = directionX;
-                this.directionY = directionY;
-                this.size = size;
-                this.color = color;
-                this.baseX = this.x;
-                this.baseY = this.y;
-                this.density = (Math.random() * 30) + 1;
-            }
-
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
-                ctx.fillStyle = this.color;
-                ctx.fill();
-            }
-
-            update() {
-                // Checar colisiones con bordes
-                if (this.x > canvas.width || this.x < 0) this.directionX = -this.directionX;
-                if (this.y > canvas.height || this.y < 0) this.directionY = -this.directionY;
-
-                // Interacción de evación con el mouse (Efecto magnético/repulsión)
-                if (mouse.x != null && mouse.y != null) {
-                    let dx = mouse.x - this.x;
-                    let dy = mouse.y - this.y;
-                    let distance = Math.sqrt(dx * dx + dy * dy);
-                    let forceDirectionX = dx / distance;
-                    let forceDirectionY = dy / distance;
-                    let maxDistance = mouse.radius;
-                    let force = (maxDistance - distance) / maxDistance;
-                    let directionX = forceDirectionX * force * this.density;
-                    let directionY = forceDirectionY * force * this.density;
-
-                    if (distance < mouse.radius) {
-                        this.x -= directionX;
-                        this.y -= directionY;
-                    } else {
-                        // Retorno lento a posición relativa si no hay mouse cerca
-                        if (this.x !== this.baseX) {
-                            let dx = this.x - this.baseX;
-                            this.x -= dx / 10;
-                        }
-                        if (this.y !== this.baseY) {
-                            let dy = this.y - this.baseY;
-                            this.y -= dy / 10;
-                        }
-                    }
-                }
-
-                this.x += this.directionX;
-                this.y += this.directionY;
-                this.draw();
-            }
-        }
-
-        // Inicializar conjunto de partículas
-        function initParticles() {
-            particlesArray = [];
-            let numberOfParticles = (canvas.height * canvas.width) / 9000; // Densidad adaptativa
-            for (let i = 0; i < numberOfParticles; i++) {
-                let size = (Math.random() * 2) + 0.5;
-                let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
-                let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
-                let directionX = (Math.random() * 2) - 1;
-                let directionY = (Math.random() * 2) - 1;
-                let color = 'rgba(6, 182, 212, 0.5)'; // Color base Cyan
-                particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
-            }
-        }
-
-        // Conectar partículas cercanas con líneas (Neuronal Effect)
-        function connectParticles() {
-            let opacityValue = 1;
-            for (let a = 0; a < particlesArray.length; a++) {
-                for (let b = a; b < particlesArray.length; b++) {
-                    let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x))
-                                 + ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
-                    
-                    if (distance < (canvas.width / 7) * (canvas.height / 7)) {
-                        opacityValue = 1 - (distance / 20000);
-                        ctx.strokeStyle = `rgba(59, 130, 246, ${opacityValue})`; // Color azulado para conexiones
-                        ctx.lineWidth = 1;
-                        ctx.beginPath();
-                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
-                        ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
-                        ctx.stroke();
-                    }
-                }
-            }
-        }
-
-        // Bucle de animación 60fps
-        function animateCanvas() {
-            requestAnimationFrame(animateCanvas);
-            ctx.fillStyle = '#030712'; // Fondo de limpieza
-            ctx.fillRect(0, 0, innerWidth, innerHeight);
-            
-            for (let i = 0; i < particlesArray.length; i++) {
-                particlesArray[i].update();
-            }
-            connectParticles();
-        }
-
-        // Arrancar Motor Canvas
-        initCanvasSize();
-        initParticles();
-        animateCanvas();
-
-        /* ==========================================================================
-           UI LOGIC & UTILITIES
-           ========================================================================== */
-
-        // Sistema de Notificaciones Custom (Toasts)
-        const toastContainer = document.getElementById('toast-container');
-        function showToast(message, type = 'success') {
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            
-            const icon = type === 'success' 
-                ? `<svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`
-                : `<svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
-
-            toast.innerHTML = `${icon} <span class="font-medium text-sm">${message}</span>`;
-            toastContainer.appendChild(toast);
-
-            // Animar entrada
-            setTimeout(() => toast.classList.add('show'), 10);
-
-            // Autodestrucción
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
-        // Custom Cursor Lógica Avanzada
-        const cursor = document.getElementById('custom-cursor');
-        const cursorDot = document.getElementById('custom-cursor-dot');
-        let cursorX = window.innerWidth / 2;
-        let cursorY = window.innerHeight / 2;
-        let targetX = cursorX;
-        let targetY = cursorY;
-
-        // Suavizado (Lerp)
-        function lerp(start, end, factor) {
-            return start + (end - start) * factor;
-        }
-
-        document.addEventListener('mousemove', (e) => {
-            targetX = e.clientX;
-            targetY = e.clientY;
-            // El punto central sigue exactamente al mouse
-            cursorDot.style.left = targetX + 'px';
-            cursorDot.style.top = targetY + 'px';
-        });
-
-        // Bucle de animación del cursor exterior
-        function renderCursor() {
-            cursorX = lerp(cursorX, targetX, 0.2);
-            cursorY = lerp(cursorY, targetY, 0.2);
-            cursor.style.left = cursorX + 'px';
-            cursor.style.top = cursorY + 'px';
-            requestAnimationFrame(renderCursor);
-        }
-        renderCursor();
-
-        // Detectar elementos interactivos para expandir el cursor
-        const applyCursorEffects = () => {
-            const interactives = document.querySelectorAll('a, button, .interactive-element');
-            interactives.forEach(el => {
-                el.addEventListener('mouseenter', () => cursor.classList.add('hovering'));
-                el.addEventListener('mouseleave', () => cursor.classList.remove('hovering'));
-            });
-        };
-
-        // Scroll Reveal Animations (Intersection Observer API)
-        const revealObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active');
-                    revealObserver.unobserve(entry.target); // Solo animar una vez
-                }
-            });
-        }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
-
-        const initReveals = () => {
-            document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
-        };
-
-        // Efecto de Texto Escribiéndose
-        const typingElement = document.getElementById('typing-text');
-        const words = ['Soluciones Digitales', 'Plataformas LMS', 'Sistemas de Gestión', 'Arquitecturas Web'];
-        let wordIndex = 0;
-        let charIndex = 0;
-        let isDeleting = false;
-
-        function typeEffect() {
-            const currentWord = words[wordIndex];
-            
-            if (isDeleting) {
-                typingElement.textContent = currentWord.substring(0, charIndex - 1);
-                charIndex--;
-            } else {
-                typingElement.textContent = currentWord.substring(0, charIndex + 1);
-                charIndex++;
-            }
-
-            let typeSpeed = isDeleting ? 50 : 100;
-
-            if (!isDeleting && charIndex === currentWord.length) {
-                typeSpeed = 2000; // Pausa antes de borrar
-                isDeleting = true;
-            } else if (isDeleting && charIndex === 0) {
-                isDeleting = false;
-                wordIndex = (wordIndex + 1) % words.length;
-                typeSpeed = 500; // Pausa antes de escribir nueva palabra
-            }
-
-            setTimeout(typeEffect, typeSpeed);
-        }
-
-        /* ==========================================================================
-           LÓGICA DEL CATÁLOGO DE DEMOS (CORE BUSINESS)
-           ========================================================================== */
-        
-        // Estructura de datos profunda para los módulos a vender
-        const demosDatabase = [
-            {
-                id: 'lms-core',
-                title: 'Educación: LMS Core',
-                description: 'Plataforma completa para escuelas. Gestión de alumnos, simuladores de exámenes (TOEFL/Cambridge) y calificaciones en tiempo real.',
-                path: 'demos/educacion.html',
-                theme: 'purple',
-                // SVGs dibujados en línea (Sin dependencias)
-                icon: `<svg class="w-10 h-10 text-purple-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"></path></svg>`
-            },
-            {
-                id: 'auto-manager',
-                title: 'Taller: AutoManager',
-                description: 'Digitalización automotriz. Agenda de servicios, estatus de reparación vehicular en vivo e inventario de refacciones.',
-                path: 'demos/taller.html',
-                theme: 'cyan',
-                icon: `<svg class="w-10 h-10 text-cyan-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>`
-            },
-            {
-                id: 'food-pos',
-                title: 'Restaurante: SmartMenu',
-                description: 'Menú digital interactivo. Pedidos enviados directo a WhatsApp o cocina, sin pago de comisiones a terceros.',
-                path: 'demos/restaurante.html',
-                theme: 'emerald',
-                icon: `<svg class="w-10 h-10 text-emerald-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>`
-            },
-            {
-                id: 'clinic-agenda',
-                title: 'Clínica: MedBook',
-                description: 'Sistema de agendamiento inteligente. Recordatorios por correo, expedientes ligeros e historial de citas médicas.',
-                path: 'demos/citas.html',
-                theme: 'blue',
-                icon: `<svg class="w-10 h-10 text-blue-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>`
-            },
-            {
-                id: 'corp-landing',
-                title: 'Corporativo: LeadGen',
-                description: 'Arquitectura frontend optimizada para SEO extremo (Lighthouse 100/100). Alta conversión y captura de leads comerciales.',
-                path: 'demos/corporativo.html',
-                theme: 'indigo',
-                icon: `<svg class="w-10 h-10 text-indigo-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>`
-            },
-            {
-                id: 'inventory-pro',
-                title: 'Stock: InventoryPro',
-                description: 'Control de almacenes y sucursales. Lectura de códigos, mínimos de inventario y reportes exportables a Excel/PDF.',
-                path: 'demos/inventario.html',
-                theme: 'yellow',
-                icon: `<svg class="w-10 h-10 text-yellow-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>`
-            }
-        ];
-
-        // Función para renderizar el HTML de las tarjetas
-        function renderDemos() {
-            const container = document.getElementById('demo-grid');
-            
-            demosDatabase.forEach((demo, index) => {
-                const delay = index * 100;
-                // Definir colores base para clases dinámicas
-                const colorMap = {
-                    purple: 'from-purple-500/10 to-transparent border-purple-500/20 text-purple-400',
-                    cyan: 'from-cyan-500/10 to-transparent border-cyan-500/20 text-cyan-400',
-                    emerald: 'from-emerald-500/10 to-transparent border-emerald-500/20 text-emerald-400',
-                    blue: 'from-blue-500/10 to-transparent border-blue-500/20 text-blue-400',
-                    indigo: 'from-indigo-500/10 to-transparent border-indigo-500/20 text-indigo-400',
-                    yellow: 'from-yellow-500/10 to-transparent border-yellow-500/20 text-yellow-400'
-                };
-
-                const cardHTML = `
-                    <div class="demo-card glass-panel p-8 flex flex-col h-full reveal group" style="transition-delay: ${delay}ms">
-                        <div class="mb-6 w-16 h-16 rounded-2xl bg-gradient-to-br ${colorMap[demo.theme]} border flex items-center justify-center interactive-element">
-                            ${demo.icon}
-                        </div>
-                        <h3 class="text-2xl font-bold mb-3 text-white tracking-tight">${demo.title}</h3>
-                        <p class="text-gray-400 text-sm leading-relaxed flex-grow mb-8">${demo.description}</p>
-                        
-                        <div class="mt-auto">
-                            <button id="btn-${demo.id}" class="w-full relative inline-flex items-center justify-center px-6 py-3 overflow-hidden font-medium rounded-xl border border-white/10 bg-white/5 text-gray-400 cursor-not-allowed group-hover:border-white/20 transition-all">
-                                <span class="absolute inset-0 flex items-center justify-center w-full h-full text-white duration-300 -translate-x-full bg-brand-primary group-hover:translate-x-0 ease" id="hover-effect-${demo.id}">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                                </span>
-                                <span class="absolute flex items-center justify-center w-full h-full transition-all duration-300 transform group-hover:translate-x-full ease" id="text-${demo.id}">
-                                    <span class="spinner mr-2"></span> Analizando repo...
-                                </span>
-                                <span class="relative invisible">Text Placeholder</span>
-                            </button>
-                        </div>
-                    </div>
-                `;
-                container.insertAdjacentHTML('beforeend', cardHTML);
-            });
-        }
-
-        // Sistema Asíncrono Robusto para checar archivos
-        async function verifyDemosAvailability() {
-            // Promesas en paralelo para mayor velocidad
-            const checks = demosDatabase.map(async (demo) => {
-                const btn = document.getElementById(`btn-${demo.id}`);
-                const textSpan = document.getElementById(`text-${demo.id}`);
-                const hoverEffect = document.getElementById(`hover-effect-${demo.id}`);
-                
-                try {
-                    // Petición HEAD: Solo pide cabeceras, ahorra ancho de banda (No descarga el HTML)
-                    const res = await fetch(demo.path, { method: 'HEAD', cache: 'no-store' });
-                    
-                    if (res.ok) {
-                        // El archivo existe (Código HTTP 200-299)
-                        enableDemoButton(btn, textSpan, hoverEffect, demo);
-                    } else {
-                        // El archivo no existe (Ej. 404)
-                        disableDemoButton(btn, textSpan, hoverEffect, 'En Desarrollo');
-                    }
-                } catch (e) {
-                    // Si ocurre un error de red o CORS (común probando en local sin servidor)
-                    // Hacemos un fallback gracioso: lo marcamos como no disponible
-                    console.warn(`No se pudo verificar ${demo.path}. Asumiendo no disponible. Error: ${e}`);
-                    disableDemoButton(btn, textSpan, hoverEffect, 'Próximamente');
-                }
-            });
-
-            await Promise.all(checks);
-            applyCursorEffects(); // Reaplicar efectos a los nuevos botones
-        }
-
-        function enableDemoButton(btn, textSpan, hoverEffect, demo) {
-            btn.classList.remove('cursor-not-allowed', 'bg-white/5', 'text-gray-400');
-            btn.classList.add('bg-brand-primary/10', 'border-brand-primary/50', 'text-brand-primary', 'cursor-pointer', 'shadow-neon-cyan');
-            
-            textSpan.innerHTML = `<span class="font-bold tracking-wide">Acceder a Demo</span>`;
-            
-            // Asignar evento de navegación real
-            btn.addEventListener('click', () => {
-                showToast(`Inicializando arquitectura: ${demo.title}`, 'success');
-                // Efecto de transición antes de cambiar de página
-                document.body.style.opacity = '0';
-                document.body.style.transition = 'opacity 0.5s ease';
-                setTimeout(() => {
-                    window.location.href = demo.path;
-                }, 500);
-            });
-        }
-
-        function disableDemoButton(btn, textSpan, hoverEffect, message) {
-            textSpan.innerHTML = `<span class="text-sm tracking-wide opacity-75"><svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>${message}</span>`;
-            // Remover efecto hover
-            hoverEffect.style.display = 'none';
-            btn.classList.add('cursor-not-allowed', 'opacity-60');
-            btn.addEventListener('click', (e) => {
+            form.addEventListener('submit', (e) => {
                 e.preventDefault();
-                showToast(`El módulo "${message}" está siendo compilado. Contacta a Netrators para acceso temprano.`, 'error');
+                
+                // Visual Loading State
+                btnText.classList.add('invisible');
+                btnLoader.classList.remove('hidden');
+                submitBtn.disabled = true;
+                submitBtn.classList.add('cursor-not-allowed', 'opacity-80');
+
+                // Simulate Network Request (1.5s)
+                setTimeout(() => {
+                    // Show Success Overlay
+                    successOverlay.classList.remove('hidden');
+                    // Tiny delay to allow display:block to apply before opacity transition
+                    setTimeout(() => {
+                        successOverlay.classList.remove('opacity-0');
+                        successIcon.classList.remove('scale-0');
+                    }, 50);
+
+                }, 1500);
             });
-        }
 
-        /* ==========================================================================
-           FORMULARIO Y EVENTOS FINALES
-           ========================================================================== */
-        
-        const contactForm = document.getElementById('contact-form');
-        contactForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            // Simulación de envío Ajax
-            const btn = contactForm.querySelector('button');
-            const originalText = btn.innerText;
-            btn.innerHTML = `<span class="spinner"></span> Procesando Solicitud...`;
-            btn.disabled = true;
+            // Attach reset globally so the button inside overlay can call it
+            window.resetForm = function() {
+                form.reset();
+                
+                // Hide overlay
+                successOverlay.classList.add('opacity-0');
+                successIcon.classList.add('scale-0');
+                
+                setTimeout(() => {
+                    successOverlay.classList.add('hidden');
+                    
+                    // Reset Button
+                    btnText.classList.remove('invisible');
+                    btnLoader.classList.add('hidden');
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('cursor-not-allowed', 'opacity-80');
+                }, 500); // Wait for fade out
+            };
 
-            setTimeout(() => {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-                showToast('Solicitud recibida correctamente. Nos contactaremos en menos de 24 horas.', 'success');
-                contactForm.reset();
-            }, 1500);
         });
-
-        // Sticky Navbar Effect
-        window.addEventListener('scroll', () => {
-            const nav = document.getElementById('navbar');
-            if (window.scrollY > 50) {
-                nav.classList.add('backdrop-blur-xl', 'bg-brand-dark/80', 'border-b', 'border-white/5');
-            } else {
-                nav.classList.remove('backdrop-blur-xl', 'bg-brand-dark/80', 'border-b', 'border-white/5');
-            }
-        });
-
-        // Bootstrap App
-        window.addEventListener('DOMContentLoaded', () => {
-            typeEffect();
-            renderDemos();
-            // Retrasar ligeramente la verificación para que el usuario vea el estado "Analizando..."
-            setTimeout(verifyDemosAvailability, 800);
-            initReveals();
-            applyCursorEffects();
-        });
-
     </script>
 </body>
 </html>
