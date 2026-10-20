@@ -1,1 +1,1236 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Demostración avanzada de Plataforma LMS Educativa Premium por Netrators.">
+    <meta name="author" content="Netrators">
+    <meta name="theme-color" content="#0f172a">
+    <title>Netrators | Arquitectura Educativa LMS Premium</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1', // Indigo Primary
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                            950: '#1e1b4b',
+                            dark: '#020617', // Very deep slate
+                            accent: '#06b6d4', // Cyan
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'card': '0 20px 40px -5px rgba(0, 0, 0, 0.1)',
+                        'card-hover': '0 30px 60px -10px rgba(99, 102, 241, 0.25)',
+                        'glow-brand': '0 0 30px rgba(99, 102, 241, 0.4)',
+                        'glow-emerald': '0 0 30px rgba(16, 185, 129, 0.4)',
+                        'glass': 'inset 0 2px 4px 0 rgba(255, 255, 255, 0.3)',
+                    },
+                    animation: {
+                        'blob': 'blob 10s infinite alternate',
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'slide-right': 'slideRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                        'shimmer': 'shimmer 2s infinite linear',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '100%': { transform: 'translate(50px, -50px) scale(1.1)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-15px)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { opacity: 0.5, transform: 'scale(0.98)' },
+                            '50%': { opacity: 1, transform: 'scale(1.02)' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: 0, transform: 'translateY(40px)' },
+                            '100%': { opacity: 1, transform: 'translateY(0)' },
+                        },
+                        slideRight: {
+                            '0%': { opacity: 0, transform: 'translateX(-40px)' },
+                            '100%': { opacity: 1, transform: 'translateX(0)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: 0 },
+                            '100%': { opacity: 1 },
+                        },
+                        shimmer: {
+                            '0%': { backgroundPosition: '-1000px 0' },
+                            '100%': { backgroundPosition: '1000px 0' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 
+    <style>
+        /* ==========================================================================
+           BASE STYLES & RESET
+           ========================================================================== */
+        * { box-sizing: border-box; cursor: none !important; }
+        body { 
+            background-color: #f8fafc; 
+            color: #0f172a; 
+            overflow-x: hidden; 
+            -webkit-font-smoothing: antialiased; 
+        }
+        ::selection { background-color: #6366f1; color: #ffffff; }
+        
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 10px; background-color: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background-color: #94a3b8; }
+
+        /* ==========================================================================
+           CUSTOM PHYSICS CURSOR
+           ========================================================================== */
+        .cursor-dot {
+            position: fixed; top: 0; left: 0; width: 6px; height: 6px;
+            background-color: #6366f1; border-radius: 50%;
+            transform: translate(-50%, -50%); pointer-events: none; z-index: 10000;
+        }
+        .cursor-ring {
+            position: fixed; top: 0; left: 0; width: 36px; height: 36px;
+            border: 2px solid rgba(99, 102, 241, 0.4); border-radius: 50%;
+            transform: translate(-50%, -50%); pointer-events: none; z-index: 9999;
+            transition: width 0.3s ease, height 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px; font-weight: 800; letter-spacing: 1px; color: transparent;
+        }
+        /* Hover States */
+        .cursor-hovering-btn .cursor-ring { 
+            width: 50px; height: 50px; 
+            background-color: rgba(99, 102, 241, 0.1); 
+            border-color: #6366f1; 
+        }
+        .cursor-hovering-card .cursor-ring { 
+            width: 90px; height: 90px; 
+            background-color: #6366f1; 
+            border-color: #6366f1; 
+            color: white; 
+            backdrop-filter: blur(2px); 
+        }
+        .cursor-hovering-card .cursor-ring::after { 
+            content: 'INGRESAR'; 
+            position: absolute; 
+            animation: fadeIn 0.3s forwards; 
+        }
+        .cursor-hovering-card .cursor-dot { opacity: 0; }
+        .cursor-hovering-input .cursor-ring {
+            width: 20px; height: 40px; border-radius: 10px;
+            background-color: rgba(99, 102, 241, 0.2);
+        }
+
+        /* ==========================================================================
+           GLASSMORPHISM & UI UTILITIES
+           ========================================================================== */
+        .glass-panel { 
+            background: rgba(255, 255, 255, 0.85); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px); 
+            border: 1px solid rgba(226, 232, 240, 0.8); 
+        }
+        .glass-dark {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .text-gradient {
+            background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(135deg, #4f46e5, #0ea5e9, #10b981); 
+            background-size: 200% auto; animation: gradientMove 5s ease infinite;
+        }
+        @keyframes gradientMove { 
+            0% { background-position: 0% 50%; } 
+            50% { background-position: 100% 50%; } 
+            100% { background-position: 0% 50%; } 
+        }
+
+        /* ==========================================================================
+           3D CARD TILT SYSTEM (CSS Variables updated via JS)
+           ========================================================================== */
+        .tilt-card-container { perspective: 1000px; transform-style: preserve-3d; }
+        .tilt-card { 
+            transition: transform 0.1s ease, box-shadow 0.3s ease, border-color 0.3s ease; 
+            transform-style: preserve-3d; 
+            will-change: transform; 
+        }
+        .tilt-content { transform: translateZ(40px); }
+        .tilt-bg-image { transform: translateZ(20px) scale(1.05); transition: transform 0.5s ease; }
+        .tilt-card-container:hover .tilt-bg-image { transform: translateZ(30px) scale(1.1); filter: brightness(0.6); }
+        .tilt-card-container:hover .tilt-card { 
+            box-shadow: 0 30px 60px -10px rgba(99, 102, 241, 0.3); 
+            border-color: rgba(99, 102, 241, 0.5); 
+        }
+
+        /* ==========================================================================
+           DASHBOARD ROUTING VISUALS
+           ========================================================================== */
+        .dashboard-view { 
+            display: none; 
+            opacity: 0; 
+            transform: translateY(20px);
+        }
+        .dashboard-view.active { 
+            display: block; 
+            animation: dashEnter 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+        }
+        @keyframes dashEnter {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Staggered List Items */
+        .stagger-item { opacity: 0; transform: translateX(-20px); }
+        .active .stagger-item { animation: slideRight 0.5s forwards; }
+        .active .stagger-item:nth-child(1) { animation-delay: 0.1s; }
+        .active .stagger-item:nth-child(2) { animation-delay: 0.2s; }
+        .active .stagger-item:nth-child(3) { animation-delay: 0.3s; }
+        .active .stagger-item:nth-child(4) { animation-delay: 0.4s; }
+
+        /* ==========================================================================
+           SCROLL REVEALS
+           ========================================================================== */
+        .reveal-up { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal-scale { opacity: 0; transform: scale(0.95); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal-active { opacity: 1; transform: translate(0) scale(1); }
+        .delay-100 { transition-delay: 100ms; } .delay-200 { transition-delay: 200ms; } .delay-300 { transition-delay: 300ms; }
+
+        /* MESH BACKGROUND */
+        .bg-mesh-light {
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,0.03) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(225,39%,30%,0.03) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,0.03) 0, transparent 50%);
+        }
+
+        /* CUSTOM PROGRESS & TOGGLES */
+        .progress-bar { width: 100%; background-color: #e2e8f0; border-radius: 9999px; height: 8px; overflow: hidden; }
+        .progress-fill { height: 100%; border-radius: 9999px; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        .custom-checkbox:checked + div { background-color: #10b981; border-color: #10b981; }
+        .custom-checkbox:checked + div svg { display: block; }
+        
+        .task-row.completed p { text-decoration: line-through; color: #94a3b8; }
+        .task-row.completed .badge { background-color: #d1fae5; color: #059669; }
+
+    </style>
+</head>
+
+<body class="relative bg-slate-50 text-slate-800 antialiased font-sans">
+
+    <!-- Cursor Elements -->
+    <div class="cursor-dot" id="cursor-dot"></div>
+    <div class="cursor-ring" id="cursor-ring"></div>
+
+    <!-- Ambient Floating Blobs -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-[-1] bg-mesh-light">
+        <div class="absolute top-[-10%] left-[-10%] w-[50rem] h-[50rem] bg-indigo-200/40 rounded-full mix-blend-multiply filter blur-[120px] animate-blob"></div>
+        <div class="absolute top-[20%] right-[-10%] w-[40rem] h-[40rem] bg-cyan-200/40 rounded-full mix-blend-multiply filter blur-[120px] animate-blob" style="animation-delay: -5s; animation-direction: reverse;"></div>
+    </div>
+
+    <nav class="fixed w-full z-50 transition-all duration-500 py-4 top-0" id="navbar">
+        <div class="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="glass-panel rounded-2xl px-6 py-3 flex justify-between items-center shadow-soft border border-white/50">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-slate-900 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-slate-900/20">
+                        N.
+                    </div>
+                    <div>
+                        <span class="block text-[10px] font-black text-brand-600 uppercase tracking-[0.2em] mb-0.5">Entorno Seguro</span>
+                        <span class="block text-sm font-extrabold text-slate-900 tracking-tight">Arquitectura LMS Premium</span>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-6">
+                    <div class="hidden lg:flex items-center gap-2 text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Servidores Activos
+                    </div>
+                    <a href="#contacto-ventas" class="interactive-btn group relative inline-flex items-center justify-center px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 bg-slate-900 rounded-xl shadow-lg hover:bg-slate-800 hover:shadow-card hover:-translate-y-0.5 overflow-hidden">
+                        <span class="absolute right-0 w-8 h-32 -mt-12 transition-all duration-1000 transform translate-x-12 bg-white opacity-10 rotate-12 group-hover:-translate-x-40 ease"></span>
+                        <span class="relative flex items-center gap-2">
+                            Implementar en mi Escuela
+                            <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7-7m7-7H3"></path></svg>
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="relative pt-32 pb-20 overflow-hidden flex flex-col items-center border-b border-slate-200/60 bg-white/50">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 w-full text-center z-10">
+            
+            <div class="reveal-up mb-16">
+                <h1 class="text-5xl md:text-7xl font-black tracking-tight mb-6 text-slate-900 leading-[1.1]">
+                    Ecosistema Educativo <br class="hidden md:block">
+                    <span class="text-gradient">Altamente Escalable</span>
+                </h1>
+                <p class="mt-6 text-lg md:text-xl text-slate-600 max-w-3xl mx-auto font-medium leading-relaxed">
+                    Nuestras arquitecturas no son plantillas genéricas. Desarrollamos software robusto capaz de manejar miles de usuarios simultáneos. <strong class="text-slate-900">Selecciona un perfil para experimentar la interfaz en tiempo real.</strong>
+                </p>
+            </div>
+
+            <!-- Role Cards Grid (3D Tilt) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 max-w-6xl mx-auto mt-8 perspective-1000">
+                
+                <!-- Director Card -->
+                <div class="tilt-card-container interactive-card group" onclick="switchDashboard('director')">
+                    <div class="tilt-card h-[280px] rounded-3xl bg-slate-900 border-2 border-slate-800 relative overflow-hidden flex flex-col justify-end p-6 shadow-xl cursor-pointer">
+                        <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=600" class="absolute inset-0 w-full h-full object-cover opacity-40 tilt-bg-image" alt="Director">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent"></div>
+                        <div class="tilt-content relative z-10 text-left">
+                            <div class="w-12 h-12 rounded-xl bg-indigo-500/20 backdrop-blur-md border border-indigo-500/30 text-indigo-300 flex items-center justify-center mb-4">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                            </div>
+                            <h3 class="text-2xl font-black text-white mb-1">Directivo</h3>
+                            <p class="text-sm text-slate-300 font-medium">KPIs, Finanzas y Matrícula</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Teacher Card -->
+                <div class="tilt-card-container interactive-card group" onclick="switchDashboard('teacher')">
+                    <div class="tilt-card h-[280px] rounded-3xl bg-slate-900 border-2 border-slate-800 relative overflow-hidden flex flex-col justify-end p-6 shadow-xl cursor-pointer">
+                        <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&q=80&w=600" class="absolute inset-0 w-full h-full object-cover opacity-40 tilt-bg-image" alt="Docente">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent"></div>
+                        <div class="tilt-content relative z-10 text-left">
+                            <div class="w-12 h-12 rounded-xl bg-emerald-500/20 backdrop-blur-md border border-emerald-500/30 text-emerald-300 flex items-center justify-center mb-4">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                            </div>
+                            <h3 class="text-2xl font-black text-white mb-1">Docente</h3>
+                            <p class="text-sm text-slate-300 font-medium">Gestión Académica y Notas</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Parent Card -->
+                <div class="tilt-card-container interactive-card group" onclick="switchDashboard('parent')">
+                    <div class="tilt-card h-[280px] rounded-3xl bg-slate-900 border-2 border-slate-800 relative overflow-hidden flex flex-col justify-end p-6 shadow-xl cursor-pointer">
+                        <img src="https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&q=80&w=600" class="absolute inset-0 w-full h-full object-cover opacity-40 tilt-bg-image" alt="Padre de Familia">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent"></div>
+                        <div class="tilt-content relative z-10 text-left">
+                            <div class="w-12 h-12 rounded-xl bg-orange-500/20 backdrop-blur-md border border-orange-500/30 text-orange-300 flex items-center justify-center mb-4">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                            </div>
+                            <h3 class="text-2xl font-black text-white mb-1">Familiar</h3>
+                            <p class="text-sm text-slate-300 font-medium">Pagos y Rendimiento</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Student Card -->
+                <div class="tilt-card-container interactive-card group" onclick="switchDashboard('student')">
+                    <div class="tilt-card h-[280px] rounded-3xl bg-slate-900 border-2 border-slate-800 relative overflow-hidden flex flex-col justify-end p-6 shadow-xl cursor-pointer">
+                        <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=600" class="absolute inset-0 w-full h-full object-cover opacity-40 tilt-bg-image" alt="Estudiante">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent"></div>
+                        <div class="tilt-content relative z-10 text-left">
+                            <div class="w-12 h-12 rounded-xl bg-cyan-500/20 backdrop-blur-md border border-cyan-500/30 text-cyan-300 flex items-center justify-center mb-4">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"></path></svg>
+                            </div>
+                            <h3 class="text-2xl font-black text-white mb-1">Estudiante</h3>
+                            <p class="text-sm text-slate-300 font-medium">Aulas, Tareas y Avances</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="system-container" class="py-12 bg-slate-100 relative z-20 min-h-[900px]">
+        <div class="max-w-[95rem] mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- Dashboard Shell (High contrast dark outer, light inner depending on panel) -->
+            <div class="w-full bg-white rounded-[2rem] border border-slate-200 shadow-2xl overflow-hidden relative">
+                
+                <!-- 0. EMPTY STATE -->
+                <div id="view-empty" class="dashboard-view active p-24 flex flex-col items-center justify-center min-h-[700px] bg-slate-50">
+                    <div class="w-32 h-32 mb-8 text-slate-200 animate-float">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                    </div>
+                    <h2 class="text-3xl font-black text-slate-300 mb-3 tracking-tight">Sistema en Espera</h2>
+                    <p class="text-slate-400 text-lg max-w-lg text-center font-medium">Seleccione un perfil en la parte superior para cargar el módulo correspondiente y visualizar la información.</p>
+                </div>
+
+                <!-- 1. DIRECTOR DASHBOARD -->
+                <div id="view-director" class="dashboard-view min-h-[800px] bg-slate-50">
+                    <!-- Topbar -->
+                    <div class="flex flex-wrap justify-between items-center px-8 py-5 bg-white border-b border-slate-200 shadow-sm">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 border border-indigo-100">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-black text-slate-900">Panel Directivo</h2>
+                                <p class="text-sm text-slate-500 font-semibold">Resumen General • Ciclo 2026-2027</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-6 mt-4 sm:mt-0">
+                            <div class="relative interactive-input hidden md:block">
+                                <input type="text" placeholder="Buscar alumno, profesor..." class="bg-slate-100 border-none rounded-full py-2.5 pl-10 pr-4 text-sm font-medium w-64 focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <svg class="w-4 h-4 text-slate-400 absolute left-4 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            </div>
+                            <div class="flex items-center gap-3 pl-6 border-l border-slate-200">
+                                <div class="text-right">
+                                    <p class="text-sm font-bold text-slate-900">Dr. Roberto Mendoza</p>
+                                    <p class="text-xs text-indigo-600 font-bold">Director General</p>
+                                </div>
+                                <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=150" class="w-12 h-12 rounded-full border-2 border-white shadow-md object-cover">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Content Grid -->
+                    <div class="p-8">
+                        <!-- KPI Cards -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                            <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-card transition-shadow stagger-item">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg></div>
+                                    <span class="text-xs font-bold text-emerald-500 bg-emerald-50 px-2 py-1 rounded-md">+4.5%</span>
+                                </div>
+                                <p class="text-sm text-slate-500 font-bold uppercase tracking-wider mb-1">Matrícula Activa</p>
+                                <p class="text-3xl font-black text-slate-900">1,245 <span class="text-sm font-semibold text-slate-400">alumnos</span></p>
+                            </div>
+                            
+                            <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-card transition-shadow stagger-item">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
+                                    <span class="text-xs font-bold text-emerald-500 bg-emerald-50 px-2 py-1 rounded-md">+12.2%</span>
+                                </div>
+                                <p class="text-sm text-slate-500 font-bold uppercase tracking-wider mb-1">Ingresos (Mes)</p>
+                                <p class="text-3xl font-black text-slate-900">$1.2M <span class="text-sm font-semibold text-slate-400">MXN</span></p>
+                            </div>
+
+                            <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-card transition-shadow stagger-item">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="w-12 h-12 rounded-full bg-cyan-50 text-cyan-600 flex items-center justify-center"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
+                                    <span class="text-xs font-bold text-red-500 bg-red-50 px-2 py-1 rounded-md">-1.2%</span>
+                                </div>
+                                <p class="text-sm text-slate-500 font-bold uppercase tracking-wider mb-1">Asistencia Promedio</p>
+                                <p class="text-3xl font-black text-slate-900">96.5%</p>
+                            </div>
+
+                            <div class="bg-slate-900 rounded-2xl p-6 border border-slate-800 shadow-xl hover:shadow-card transition-shadow stagger-item relative overflow-hidden">
+                                <div class="absolute right-0 top-0 w-32 h-32 bg-indigo-500 rounded-full mix-blend-screen filter blur-[50px] opacity-30"></div>
+                                <div class="relative z-10">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <div class="w-12 h-12 rounded-full bg-slate-800 text-white flex items-center justify-center"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg></div>
+                                    </div>
+                                    <p class="text-sm text-slate-400 font-bold uppercase tracking-wider mb-1">Estado del Servidor</p>
+                                    <p class="text-3xl font-black text-white">Óptimo</p>
+                                    <p class="text-xs text-emerald-400 font-bold mt-2 flex items-center"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse mr-2"></span> 99.9% Uptime</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Charts Area -->
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <div class="lg:col-span-2 bg-white rounded-2xl p-8 border border-slate-200 shadow-sm">
+                                <div class="flex justify-between items-center mb-6">
+                                    <h3 class="text-xl font-bold text-slate-900">Evolución Financiera vs Matrícula</h3>
+                                    <select class="bg-slate-50 border border-slate-200 text-sm font-bold rounded-lg px-3 py-1.5 outline-none interactive-input">
+                                        <option>Semestre Actual</option>
+                                        <option>Semestre Anterior</option>
+                                    </select>
+                                </div>
+                                <div class="relative h-72 w-full">
+                                    <canvas id="directorMainChart"></canvas>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm flex flex-col">
+                                <h3 class="text-xl font-bold text-slate-900 mb-6">Estado de Cobranza (Mensual)</h3>
+                                <div class="relative h-48 w-full mb-6">
+                                    <canvas id="directorDoughnutChart"></canvas>
+                                </div>
+                                <div class="space-y-4 mt-auto">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-emerald-500"></span><span class="text-sm font-bold text-slate-700">Pagado</span></div>
+                                        <span class="text-sm font-black text-slate-900">75%</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-yellow-400"></span><span class="text-sm font-bold text-slate-700">Pendiente</span></div>
+                                        <span class="text-sm font-black text-slate-900">15%</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-500"></span><span class="text-sm font-bold text-slate-700">Vencido</span></div>
+                                        <span class="text-sm font-black text-slate-900">10%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. TEACHER DASHBOARD -->
+                <div id="view-teacher" class="dashboard-view min-h-[800px] bg-slate-50">
+                    <div class="flex flex-wrap justify-between items-center px-8 py-5 bg-white border-b border-slate-200 shadow-sm">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 border border-emerald-100">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-black text-slate-900">Panel Docente</h2>
+                                <p class="text-sm text-slate-500 font-semibold">Gestión Académica • Perfil de Profesor</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-6 mt-4 sm:mt-0">
+                            <div class="flex items-center gap-3 pl-6 border-l border-slate-200">
+                                <div class="text-right">
+                                    <p class="text-sm font-bold text-slate-900">Mtra. Laura García</p>
+                                    <p class="text-xs text-emerald-600 font-bold">Titular Física y Matemáticas</p>
+                                </div>
+                                <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&q=80&w=150" class="w-12 h-12 rounded-full border-2 border-white shadow-md object-cover">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-8">
+                        <div class="grid grid-cols-1 xl:grid-cols-4 gap-8">
+                            <!-- Sidebar: Classes -->
+                            <div class="xl:col-span-1 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-full">
+                                <div class="p-6 border-b border-slate-100 bg-slate-50">
+                                    <h3 class="text-lg font-bold text-slate-900">Mis Grupos</h3>
+                                </div>
+                                <div class="p-4 space-y-3 flex-grow">
+                                    <!-- Active Class -->
+                                    <div class="p-4 bg-indigo-50 border-2 border-indigo-500 rounded-xl cursor-pointer">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <span class="text-xs font-black bg-indigo-200 text-indigo-800 px-2 py-1 rounded-md">M-101</span>
+                                            <span class="text-xs font-bold text-slate-500">32 Alumnos</span>
+                                        </div>
+                                        <h4 class="font-bold text-slate-900">Matemáticas Avanzadas</h4>
+                                        <p class="text-xs text-slate-500">3° Bachillerato</p>
+                                    </div>
+                                    <!-- Inactive Classes -->
+                                    <div class="p-4 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-300 transition-colors interactive-btn">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <span class="text-xs font-black bg-slate-100 text-slate-600 px-2 py-1 rounded-md">F-201</span>
+                                            <span class="text-xs font-bold text-slate-500">28 Alumnos</span>
+                                        </div>
+                                        <h4 class="font-bold text-slate-900">Física Cuántica Básica</h4>
+                                        <p class="text-xs text-slate-500">3° Bachillerato</p>
+                                    </div>
+                                </div>
+                                <div class="p-4 border-t border-slate-100">
+                                    <button class="w-full interactive-btn py-3 border-2 border-dashed border-slate-300 text-slate-500 font-bold rounded-xl hover:border-indigo-500 hover:text-indigo-600 transition-colors text-sm">+ Nueva Asignatura</button>
+                                </div>
+                            </div>
+
+                            <!-- Main Content: Interactive Grading Table -->
+                            <div class="xl:col-span-3 bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col overflow-hidden">
+                                <div class="p-6 border-b border-slate-200 bg-white flex flex-wrap justify-between items-center gap-4">
+                                    <div>
+                                        <h3 class="text-xl font-bold text-slate-900">Centro de Calificaciones</h3>
+                                        <p class="text-sm text-slate-500 font-medium">M-101 Matemáticas Avanzadas • Primer Parcial</p>
+                                    </div>
+                                    <div class="flex gap-3">
+                                        <button class="interactive-btn px-4 py-2 bg-slate-100 text-slate-700 font-bold text-sm rounded-lg hover:bg-slate-200 transition-colors flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> Exportar Excel</button>
+                                        <button class="interactive-btn px-6 py-2 bg-indigo-600 text-white font-bold text-sm rounded-lg hover:bg-indigo-700 shadow-md shadow-indigo-200 transition-colors">Guardar Notas</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-left border-collapse min-w-[600px]">
+                                        <thead>
+                                            <tr class="bg-slate-50 text-xs uppercase text-slate-500 font-black border-b border-slate-200">
+                                                <th class="px-6 py-4">Alumno</th>
+                                                <th class="px-4 py-4 text-center">Examen (40%)</th>
+                                                <th class="px-4 py-4 text-center">Tareas (40%)</th>
+                                                <th class="px-4 py-4 text-center">Proyecto (20%)</th>
+                                                <th class="px-6 py-4 text-right">Promedio Final</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="text-sm" id="grading-table-body">
+                                            <!-- Row 1 -->
+                                            <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors stagger-item">
+                                                <td class="px-6 py-4">
+                                                    <div class="flex items-center gap-3">
+                                                        <img src="https://placehold.co/100x100/e2e8f0/475569?text=AS" class="w-10 h-10 rounded-full font-bold"> 
+                                                        <div><p class="font-bold text-slate-900">Ana Sofía López</p><p class="text-xs text-slate-400">Matrícula: 2026001</p></div>
+                                                    </div>
+                                                </td>
+                                                <td class="px-4 py-4 text-center"><input type="number" value="9.5" step="0.1" max="10" class="grade-input w-20 text-center font-bold text-slate-700 border border-slate-300 rounded-lg py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none interactive-input"></td>
+                                                <td class="px-4 py-4 text-center"><input type="number" value="10" step="0.1" max="10" class="grade-input w-20 text-center font-bold text-slate-700 border border-slate-300 rounded-lg py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none interactive-input"></td>
+                                                <td class="px-4 py-4 text-center"><input type="number" value="9.0" step="0.1" max="10" class="grade-input w-20 text-center font-bold text-slate-700 border border-slate-300 rounded-lg py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none interactive-input"></td>
+                                                <td class="px-6 py-4 text-right"><span class="final-avg inline-block bg-emerald-100 text-emerald-700 font-black px-3 py-1.5 rounded-lg text-lg">9.6</span></td>
+                                            </tr>
+                                            <!-- Row 2 -->
+                                            <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors stagger-item">
+                                                <td class="px-6 py-4">
+                                                    <div class="flex items-center gap-3">
+                                                        <img src="https://placehold.co/100x100/e2e8f0/475569?text=CM" class="w-10 h-10 rounded-full font-bold"> 
+                                                        <div><p class="font-bold text-slate-900">Carlos Martínez</p><p class="text-xs text-slate-400">Matrícula: 2026002</p></div>
+                                                    </div>
+                                                </td>
+                                                <td class="px-4 py-4 text-center"><input type="number" value="5.0" step="0.1" max="10" class="grade-input w-20 text-center font-bold text-slate-700 border border-slate-300 rounded-lg py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none interactive-input"></td>
+                                                <td class="px-4 py-4 text-center"><input type="number" value="7.5" step="0.1" max="10" class="grade-input w-20 text-center font-bold text-slate-700 border border-slate-300 rounded-lg py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none interactive-input"></td>
+                                                <td class="px-4 py-4 text-center"><input type="number" value="6.0" step="0.1" max="10" class="grade-input w-20 text-center font-bold text-slate-700 border border-slate-300 rounded-lg py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none interactive-input"></td>
+                                                <td class="px-6 py-4 text-right"><span class="final-avg inline-block bg-red-100 text-red-700 font-black px-3 py-1.5 rounded-lg text-lg">6.2</span></td>
+                                            </tr>
+                                            <!-- Row 3 -->
+                                            <tr class="hover:bg-slate-50 transition-colors stagger-item">
+                                                <td class="px-6 py-4">
+                                                    <div class="flex items-center gap-3">
+                                                        <img src="https://placehold.co/100x100/e2e8f0/475569?text=MR" class="w-10 h-10 rounded-full font-bold"> 
+                                                        <div><p class="font-bold text-slate-900">María Rodríguez</p><p class="text-xs text-slate-400">Matrícula: 2026003</p></div>
+                                                    </div>
+                                                </td>
+                                                <td class="px-4 py-4 text-center"><input type="number" value="8.5" step="0.1" max="10" class="grade-input w-20 text-center font-bold text-slate-700 border border-slate-300 rounded-lg py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none interactive-input"></td>
+                                                <td class="px-4 py-4 text-center"><input type="number" value="9.0" step="0.1" max="10" class="grade-input w-20 text-center font-bold text-slate-700 border border-slate-300 rounded-lg py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none interactive-input"></td>
+                                                <td class="px-4 py-4 text-center"><input type="number" value="8.0" step="0.1" max="10" class="grade-input w-20 text-center font-bold text-slate-700 border border-slate-300 rounded-lg py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none interactive-input"></td>
+                                                <td class="px-6 py-4 text-right"><span class="final-avg inline-block bg-yellow-100 text-yellow-700 font-black px-3 py-1.5 rounded-lg text-lg">8.6</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="p-4 bg-slate-100 text-center text-sm text-slate-500 font-bold border-t border-slate-200 mt-auto">
+                                    <svg class="w-4 h-4 inline mr-1 text-slate-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+                                    Prueba cambiar los valores en las celdas para ver el cálculo dinámico en JavaScript.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. PARENT DASHBOARD -->
+                <div id="view-parent" class="dashboard-view min-h-[800px] bg-slate-50">
+                    <div class="flex flex-wrap justify-between items-center px-8 py-5 bg-white border-b border-slate-200 shadow-sm">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center text-orange-600 border border-orange-100">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-black text-slate-900">Portal Familiar</h2>
+                                <p class="text-sm text-slate-500 font-semibold">Reportes • Pagos • Comunicados</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-6 mt-4 sm:mt-0">
+                            <div class="flex items-center gap-3 pl-6 border-l border-slate-200">
+                                <div class="text-right">
+                                    <p class="text-sm font-bold text-slate-900">Familia López</p>
+                                    <p class="text-xs text-orange-600 font-bold">2 Alumnos Vinculados</p>
+                                </div>
+                                <img src="https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&q=80&w=150" class="w-12 h-12 rounded-full border-2 border-white shadow-md object-cover">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-8">
+                        <!-- Toggle Children -->
+                        <div class="flex justify-center mb-8">
+                            <div class="bg-slate-200 p-1 rounded-xl inline-flex shadow-inner">
+                                <button onclick="toggleChild('child1')" id="btn-child1" class="px-8 py-2.5 rounded-lg text-sm font-black bg-white text-slate-900 shadow-sm transition-all interactive-btn">Ana Sofía (3° Bachillerato)</button>
+                                <button onclick="toggleChild('child2')" id="btn-child2" class="px-8 py-2.5 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-700 transition-all interactive-btn">Diego (5° Primaria)</button>
+                            </div>
+                        </div>
+
+                        <!-- Data Container Child 1 -->
+                        <div id="data-child1" class="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-fade-in">
+                            <div class="lg:col-span-2 space-y-8">
+                                <div class="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm flex items-center justify-between">
+                                    <div class="flex items-center gap-6">
+                                        <div class="w-20 h-20 rounded-full border-4 border-emerald-100 flex items-center justify-center bg-emerald-50">
+                                            <span class="text-2xl font-black text-emerald-600">9.6</span>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-2xl font-black text-slate-900 mb-1">Rendimiento Excelente</h3>
+                                            <p class="text-slate-500 font-medium text-sm">Ana Sofía está en el 5% superior de su generación.</p>
+                                        </div>
+                                    </div>
+                                    <button class="interactive-btn px-6 py-3 bg-slate-900 text-white font-bold rounded-xl shadow-md hover:bg-slate-800 transition-colors">Descargar Boleta</button>
+                                </div>
+
+                                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                                    <h3 class="text-lg font-bold text-slate-900 mb-6 flex justify-between items-center">
+                                        Bandeja de Mensajes (Docentes)
+                                        <span class="bg-orange-100 text-orange-600 text-xs font-black px-3 py-1 rounded-full">1 No Leído</span>
+                                    </h3>
+                                    <div class="space-y-4">
+                                        <div class="p-5 bg-orange-50 border-l-4 border-orange-500 rounded-r-xl shadow-sm cursor-pointer interactive-btn">
+                                            <div class="flex justify-between items-center mb-2">
+                                                <h4 class="font-black text-slate-900">Mtra. Laura García</h4>
+                                                <span class="text-xs text-orange-600 font-bold">Hoy, 10:30 AM</span>
+                                            </div>
+                                            <p class="text-sm text-slate-700 font-medium">Estimada familia, les comparto que Ana Sofía sacó 10 perfecto en su proyecto final de física. ¡Felicidades!</p>
+                                        </div>
+                                        <div class="p-5 border border-slate-100 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors interactive-btn">
+                                            <div class="flex justify-between items-center mb-2">
+                                                <h4 class="font-bold text-slate-700">Coordinación</h4>
+                                                <span class="text-xs text-slate-400 font-bold">Ayer</span>
+                                            </div>
+                                            <p class="text-sm text-slate-500">Recordatorio de junta de entrega de calificaciones el próximo viernes a las 18:00 hrs.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Financial Module Mock -->
+                            <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm h-full">
+                                <h3 class="text-lg font-bold text-slate-900 mb-6">Estado de Cuenta</h3>
+                                <div class="space-y-4 mb-8">
+                                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 flex justify-between items-center">
+                                        <div>
+                                            <p class="font-bold text-slate-900">Colegiatura Noviembre</p>
+                                            <p class="text-xs text-slate-500">Vence: 10/11/2026</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="font-black text-slate-900">$4,500</p>
+                                            <span class="text-[10px] font-black uppercase text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded">Pagado</span>
+                                        </div>
+                                    </div>
+                                    <div class="p-4 rounded-xl bg-red-50 border border-red-100 flex justify-between items-center shadow-sm">
+                                        <div>
+                                            <p class="font-bold text-slate-900">Colegiatura Diciembre</p>
+                                            <p class="text-xs text-red-500 font-bold">Vence: Hoy</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="font-black text-red-600">$4,500</p>
+                                            <span class="text-[10px] font-black uppercase text-red-600 bg-red-100 px-2 py-0.5 rounded">Pendiente</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="w-full interactive-btn py-4 bg-gradient-to-r from-orange-500 to-rose-500 text-white font-black rounded-xl shadow-lg hover:shadow-xl transition-all hover:-translate-y-1">
+                                    Pagar con Tarjeta (Stripe)
+                                </button>
+                                <p class="text-center text-xs text-slate-400 mt-4 font-medium flex justify-center items-center gap-1">
+                                    <svg class="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg>
+                                    Transacción 100% cifrada
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Data Container Child 2 (Hidden by default) -->
+                        <div id="data-child2" class="hidden animate-fade-in text-center py-20 bg-white rounded-2xl border border-slate-200">
+                            <div class="w-20 h-20 bg-slate-100 rounded-full mx-auto flex items-center justify-center mb-4"><svg class="w-10 h-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg></div>
+                            <h3 class="text-2xl font-black text-slate-900 mb-2">Perfil de Diego López</h3>
+                            <p class="text-slate-500">Los datos cambian instantáneamente sin recargar la página. Pura arquitectura React/Vanilla moderna.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. STUDENT DASHBOARD -->
+                <div id="view-student" class="dashboard-view min-h-[800px] bg-slate-50">
+                    <!-- Topbar with Gamification -->
+                    <div class="flex flex-wrap justify-between items-center px-8 py-5 bg-white border-b border-slate-200 shadow-sm relative overflow-hidden">
+                        <!-- Subtle background decoration -->
+                        <div class="absolute right-0 top-0 w-64 h-full bg-gradient-to-l from-cyan-50 to-transparent pointer-events-none"></div>
+                        
+                        <div class="flex items-center gap-4 relative z-10">
+                            <div class="w-16 h-16 rounded-full border-4 border-cyan-500 p-1 bg-white relative">
+                                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=150" class="w-full h-full rounded-full object-cover">
+                                <div class="absolute -bottom-2 -right-2 bg-slate-900 text-white text-[10px] font-black px-2 py-0.5 rounded-full border-2 border-white">LVL 42</div>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-black text-slate-900">¡Hola, Ana Sofía! 🚀</h2>
+                                <p class="text-sm text-slate-500 font-semibold">Bachillerato • Semestre 5</p>
+                            </div>
+                        </div>
+                        
+                        <div class="relative z-10 w-full sm:w-auto mt-4 sm:mt-0 bg-slate-100 p-3 rounded-xl flex items-center gap-4 border border-slate-200">
+                            <div class="text-right">
+                                <p class="text-xs font-bold text-slate-500 uppercase">Experiencia (XP)</p>
+                                <p class="text-sm font-black text-cyan-600">4,250 / 5,000</p>
+                            </div>
+                            <div class="w-32 h-3 bg-slate-200 rounded-full overflow-hidden">
+                                <div class="h-full bg-gradient-to-r from-cyan-400 to-blue-500" style="width: 85%"></div>
+                            </div>
+                            <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center shadow-sm text-yellow-600 cursor-help" title="Medalla de Excelencia Activa"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path></svg></div>
+                        </div>
+                    </div>
+
+                    <div class="p-8">
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <!-- Left Col: Courses -->
+                            <div class="lg:col-span-2 space-y-8">
+                                <h3 class="text-xl font-black text-slate-900">Mis Aulas Virtuales</h3>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    <!-- Course 1 -->
+                                    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-card transition-all cursor-pointer interactive-card group relative overflow-hidden">
+                                        <div class="w-full h-1 bg-gradient-to-r from-indigo-500 to-cyan-500 absolute top-0 left-0"></div>
+                                        <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 mb-4 group-hover:scale-110 transition-transform"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg></div>
+                                        <h4 class="text-lg font-bold text-slate-900 mb-1">Matemáticas Avanzadas</h4>
+                                        <p class="text-sm text-slate-500 mb-6">Mtra. Laura García</p>
+                                        <div class="flex items-center justify-between text-xs font-bold">
+                                            <span class="text-indigo-600 bg-indigo-50 px-2 py-1 rounded">Progreso: 85%</span>
+                                            <span class="text-slate-400">Ver Módulo -></span>
+                                        </div>
+                                    </div>
+                                    <!-- Course 2 -->
+                                    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-card transition-all cursor-pointer interactive-card group relative overflow-hidden">
+                                        <div class="w-full h-1 bg-gradient-to-r from-emerald-500 to-teal-500 absolute top-0 left-0"></div>
+                                        <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 mb-4 group-hover:scale-110 transition-transform"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg></div>
+                                        <h4 class="text-lg font-bold text-slate-900 mb-1">Biología Celular</h4>
+                                        <p class="text-sm text-slate-500 mb-6">Dr. Ernesto Rivera</p>
+                                        <div class="flex items-center justify-between text-xs font-bold">
+                                            <span class="text-emerald-600 bg-emerald-50 px-2 py-1 rounded">Progreso: 60%</span>
+                                            <span class="text-slate-400">Ver Módulo -></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Col: Interactive To-Do List -->
+                            <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm h-full flex flex-col">
+                                <h3 class="text-xl font-black text-slate-900 mb-6">Tareas Semanales</h3>
+                                
+                                <div class="space-y-3 mb-6" id="student-task-list">
+                                    <!-- Interactive Checkbox Rows -->
+                                    <label class="task-row flex items-start gap-4 p-4 rounded-xl border border-slate-100 bg-slate-50 cursor-pointer hover:bg-slate-100 transition-colors interactive-btn">
+                                        <div class="relative flex items-center justify-center mt-0.5">
+                                            <input type="checkbox" class="custom-checkbox opacity-0 absolute h-0 w-0" onchange="toggleTask(this)">
+                                            <div class="w-6 h-6 border-2 border-slate-300 rounded-md bg-white transition-colors flex items-center justify-center">
+                                                <svg class="w-4 h-4 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow">
+                                            <p class="font-bold text-slate-900 text-sm mb-1 transition-colors">Ensayo Revolución Industrial</p>
+                                            <span class="badge text-[10px] font-black uppercase tracking-wider text-rose-600 bg-rose-100 px-2 py-0.5 rounded transition-colors">Vence Hoy 23:59</span>
+                                        </div>
+                                    </label>
+
+                                    <label class="task-row flex items-start gap-4 p-4 rounded-xl border border-slate-100 bg-slate-50 cursor-pointer hover:bg-slate-100 transition-colors interactive-btn">
+                                        <div class="relative flex items-center justify-center mt-0.5">
+                                            <input type="checkbox" class="custom-checkbox opacity-0 absolute h-0 w-0" onchange="toggleTask(this)">
+                                            <div class="w-6 h-6 border-2 border-slate-300 rounded-md bg-white transition-colors flex items-center justify-center">
+                                                <svg class="w-4 h-4 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow">
+                                            <p class="font-bold text-slate-900 text-sm mb-1 transition-colors">Problemario Álgebra (PDF)</p>
+                                            <span class="badge text-[10px] font-black uppercase tracking-wider text-orange-600 bg-orange-100 px-2 py-0.5 rounded transition-colors">Vence Viernes</span>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <div class="mt-auto pt-6 border-t border-slate-100">
+                                    <div class="flex justify-between items-center text-sm font-bold text-slate-500 mb-2">
+                                        <span>Progreso Semanal</span>
+                                        <span id="task-percentage" class="text-cyan-600">0%</span>
+                                    </div>
+                                    <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                                        <div id="task-progress-bar" class="h-full bg-cyan-500 transition-all duration-500" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Sales Pitch & Tech Specs -->
+    <section class="py-24 bg-slate-950 relative z-10 overflow-hidden" id="contacto-ventas">
+        <!-- Abstract BG Decoration -->
+        <div class="absolute inset-0 bg-mesh-light opacity-10"></div>
+        <div class="absolute right-[-10%] top-[-20%] w-[50rem] h-[50rem] bg-indigo-600 rounded-full filter blur-[150px] opacity-20 pointer-events-none"></div>
+        
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                
+                <div class="reveal-right">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded border border-white/10 bg-white/5 text-white/70 text-xs font-bold uppercase tracking-widest mb-6 backdrop-blur-md">
+                        Propuesta de Valor
+                    </div>
+                    <h3 class="text-4xl md:text-5xl font-black text-white mb-6 leading-tight">
+                        Software hecho a la medida de tu <span class="text-indigo-400 border-b-4 border-indigo-500">Institución.</span>
+                    </h3>
+                    <p class="text-slate-400 text-lg mb-8 leading-relaxed font-medium">
+                        Olvida los sistemas genéricos que limitan tu crecimiento. En <strong class="text-white">Netrators</strong> construimos plataformas web y aplicaciones (iOS/Android) con arquitecturas robustas. Control total, pagos integrados y velocidad extrema.
+                    </p>
+                    
+                    <ul class="space-y-6 mb-10">
+                        <li class="flex items-start bg-white/5 p-4 rounded-2xl border border-white/5 backdrop-blur-sm">
+                            <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center mr-4 border border-indigo-500/30">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-bold text-lg">Tecnología React & Node.js</h4>
+                                <p class="text-sm text-slate-400 mt-1">El mismo stack que usan las grandes empresas. Escalable a miles de usuarios simultáneos sin caídas de servidor.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start bg-white/5 p-4 rounded-2xl border border-white/5 backdrop-blur-sm">
+                            <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mr-4 border border-emerald-500/30">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-bold text-lg">Cobranza Automatizada</h4>
+                                <p class="text-sm text-slate-400 mt-1">Integramos pasarelas de pago (Stripe, MercadoPago) para que los padres paguen colegiaturas con tarjeta desde el portal.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Call To Action / WhatsApp Box -->
+                <div class="bg-slate-900 rounded-[2rem] p-8 md:p-12 border border-slate-800 shadow-2xl shadow-indigo-900/50 reveal-up relative tilt-card-container">
+                    <div class="tilt-card relative z-10 text-center">
+                        <div class="w-20 h-20 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-glow-emerald">
+                            <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1.042-5.594c1.196.866 2.502.581 2.923.402.421-.18.966-.665 1.157-1.393.19-.728.19-1.353.133-1.485-.057-.132-.21-.21-.592-.401-.382-.191-2.261-1.117-2.613-1.245-.351-.128-.607-.191-.863.191-.256.382-.992 1.245-1.218 1.5-.226.255-.452.287-.834.096-2.09-.947-3.666-2.23-4.72-3.837-.168-.255-.018-.393.173-.583.171-.17.382-.446.572-.67.19-.223.254-.382.381-.637.127-.255.064-.478-.032-.67-.096-.191-.863-2.08-1.181-2.846-.311-.748-.627-.646-.863-.658-.226-.01-.486-.012-.741-.012-.255 0-.67.095-1.02.478-.35.382-1.339 1.307-1.339 3.183s1.371 3.69 1.562 3.945c.191.255 2.69 4.108 6.516 5.759 2.529 1.09 3.42.92 4.105.772z" clip-rule="evenodd"></path></svg>
+                        </div>
+                        <h3 class="text-3xl font-black text-white mb-4">¿Te interesa digitalizar tu colegio?</h3>
+                        <p class="text-slate-400 text-base mb-8">
+                            Habla directamente con nuestros arquitectos de software. Cuéntanos cómo funciona tu institución y diseñaremos una propuesta técnica y económica sin compromiso.
+                        </p>
+                        
+                        <a href="https://wa.me/527777926013?text=Hola%20equipo%20de%20Netrators,%20estuve%20explorando%20el%20demo%20de%20su%20plataforma%20educativa%20LMS%20y%20me%20gustar%C3%ADa%20recibir%20m%C3%A1s%20informaci%C3%B3n%20sobre%20c%C3%B3mo%20pueden%20implementar%20estas%20soluciones%20(calificaciones,%20pagos,%20aulas%20virtuales)%20para%20mi%20instituci%C3%B3n." 
+                           target="_blank" 
+                           class="interactive-btn group relative w-full flex items-center justify-center gap-3 py-5 px-6 font-black text-slate-900 bg-emerald-400 rounded-xl hover:bg-emerald-300 transition-all shadow-glow-emerald overflow-hidden tilt-content">
+                            <span class="absolute right-0 w-8 h-40 -mt-12 transition-all duration-1000 transform translate-x-12 bg-white opacity-40 rotate-12 group-hover:-translate-x-[500px] ease"></span>
+                            <span class="relative">Solicitar Asesoría por WhatsApp</span>
+                            <svg class="w-5 h-5 relative transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7-7m7-7H3"></path></svg>
+                        </a>
+                        <p class="mt-5 text-sm text-slate-500 font-bold uppercase tracking-widest"><span class="w-2 h-2 inline-block rounded-full bg-emerald-500 mr-1 animate-pulse"></span> Respuesta Rápida</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-12 relative z-10">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-slate-900 text-white font-black flex items-center justify-center text-lg shadow-md">N.</div>
+                <span class="text-sm font-black text-slate-900 tracking-[0.2em] uppercase">Netrators LMS Demo</span>
+            </div>
+            <p class="text-sm text-slate-500 font-medium">
+                &copy; 2026 Desarrollado por <a href="#" class="font-black text-indigo-600 hover:text-indigo-800 transition-colors">Netrators</a>. Todos los derechos reservados.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            /* ==========================================================================
+               CUSTOM PHYSICS CURSOR LOGIC
+               ========================================================================== */
+            const cursorDot = document.getElementById('cursor-dot');
+            const cursorRing = document.getElementById('cursor-ring');
+            let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+            let ringPos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+            
+            // Linear interpolation for smooth trailing
+            const lerp = (start, end, amt) => (1 - amt) * start + amt * end;
+
+            window.addEventListener('mousemove', (e) => {
+                mouse.x = e.clientX;
+                mouse.y = e.clientY;
+                cursorDot.style.left = mouse.x + 'px';
+                cursorDot.style.top = mouse.y + 'px';
+            });
+
+            const renderCursor = () => {
+                ringPos.x = lerp(ringPos.x, mouse.x, 0.15);
+                ringPos.y = lerp(ringPos.y, mouse.y, 0.15);
+                cursorRing.style.left = ringPos.x + 'px';
+                cursorRing.style.top = ringPos.y + 'px';
+                requestAnimationFrame(renderCursor);
+            };
+            requestAnimationFrame(renderCursor);
+
+            // Re-apply cursor hover states globally
+            window.applyCursorEvents = () => {
+                // Remove existing to prevent duplicates if called multiple times
+                document.querySelectorAll('a, button, .interactive-btn').forEach(el => {
+                    el.removeEventListener('mouseenter', addBtnHover);
+                    el.removeEventListener('mouseleave', removeBtnHover);
+                    el.addEventListener('mouseenter', addBtnHover);
+                    el.addEventListener('mouseleave', removeBtnHover);
+                });
+                document.querySelectorAll('.interactive-card').forEach(el => {
+                    el.removeEventListener('mouseenter', addCardHover);
+                    el.removeEventListener('mouseleave', removeCardHover);
+                    el.addEventListener('mouseenter', addCardHover);
+                    el.addEventListener('mouseleave', removeCardHover);
+                });
+                document.querySelectorAll('.interactive-input').forEach(el => {
+                    el.removeEventListener('mouseenter', addInputHover);
+                    el.removeEventListener('mouseleave', removeInputHover);
+                    el.addEventListener('mouseenter', addInputHover);
+                    el.addEventListener('mouseleave', removeInputHover);
+                });
+            };
+
+            const addBtnHover = () => document.body.classList.add('cursor-hovering-btn');
+            const removeBtnHover = () => document.body.classList.remove('cursor-hovering-btn');
+            const addCardHover = () => document.body.classList.add('cursor-hovering-card');
+            const removeCardHover = () => document.body.classList.remove('cursor-hovering-card');
+            const addInputHover = () => document.body.classList.add('cursor-hovering-input');
+            const removeInputHover = () => document.body.classList.remove('cursor-hovering-input');
+
+            window.applyCursorEvents();
+
+            /* ==========================================================================
+               SCROLL REVEAL OBSERVER
+               ========================================================================== */
+            const observerOptions = { root: null, rootMargin: '0px 0px -50px 0px', threshold: 0.1 };
+            const revealObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('reveal-active');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.reveal-up, .reveal-scale, .reveal-right').forEach(el => {
+                revealObserver.observe(el);
+            });
+
+            /* ==========================================================================
+               3D CARD TILT LOGIC
+               ========================================================================== */
+            document.querySelectorAll('.tilt-card-container').forEach(container => {
+                const card = container.querySelector('.tilt-card');
+                container.addEventListener('mousemove', (e) => {
+                    const rect = container.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    const rotateX = ((y - centerY) / centerY) * -15; // Max 15 deg
+                    const rotateY = ((x - centerX) / centerX) * 15;
+                    card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                });
+                container.addEventListener('mouseleave', () => {
+                    card.style.transform = `rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+                });
+            });
+
+            /* ==========================================================================
+               DASHBOARD ROUTING & INITIALIZATION LOGIC
+               ========================================================================== */
+            let directorMainChartInstance = null;
+            let directorDoughnutChartInstance = null;
+
+            window.switchDashboard = (role) => {
+                // Scroll specifically to the system container
+                const container = document.getElementById('system-container');
+                const yOffset = -80; // Offset for sticky navbar
+                const y = container.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                window.scrollTo({top: y, behavior: 'smooth'});
+
+                // Hide all views
+                document.querySelectorAll('.dashboard-view').forEach(view => {
+                    view.classList.remove('active');
+                    view.style.display = 'none';
+                });
+
+                // Show targeted view
+                const targetView = document.getElementById(`view-${role}`);
+                if(targetView) {
+                    targetView.style.display = 'block';
+                    // Small timeout to allow display:block to render before triggering animation class
+                    setTimeout(() => {
+                        targetView.classList.add('active');
+                        window.applyCursorEvents(); // Re-bind dynamic elements
+                        
+                        // Role Specific Initializations
+                        if(role === 'director') initDirectorCharts();
+                        if(role === 'teacher') initTeacherLogic();
+                    }, 50);
+                }
+            };
+
+            /* ==========================================================================
+               ROLE: DIRECTOR - CHART.JS INITIALIZATION
+               ========================================================================== */
+            const initDirectorCharts = () => {
+                // Chart 1: Line Chart (Revenue vs Enrollment)
+                const ctxMain = document.getElementById('directorMainChart');
+                if(ctxMain) {
+                    if(directorMainChartInstance) directorMainChartInstance.destroy();
+                    directorMainChartInstance = new Chart(ctxMain.getContext('2d'), {
+                        type: 'line',
+                        data: {
+                            labels: ['Ago', 'Sep', 'Oct', 'Nov', 'Dic', 'Ene'],
+                            datasets: [{
+                                label: 'Ingresos (Miles MXN)',
+                                data: [950, 1050, 1100, 1150, 1180, 1200],
+                                borderColor: '#10b981', // Emerald
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                borderWidth: 4,
+                                tension: 0.4,
+                                fill: true,
+                                yAxisID: 'y'
+                            }, {
+                                label: 'Matrícula',
+                                data: [1100, 1150, 1200, 1220, 1230, 1245],
+                                borderColor: '#6366f1', // Indigo
+                                borderDash: [5, 5],
+                                borderWidth: 3,
+                                tension: 0.4,
+                                fill: false,
+                                yAxisID: 'y1'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: { mode: 'index', intersect: false },
+                            plugins: {
+                                legend: { position: 'bottom', labels: { usePointStyle: true, font: {family: 'Inter', weight: 'bold'} } },
+                                tooltip: { backgroundColor: 'rgba(15, 23, 42, 0.9)', titleFont: {size: 14}, bodyFont: {size: 14, weight: 'bold'}, padding: 12, cornerRadius: 8 }
+                            },
+                            scales: {
+                                y: { type: 'linear', display: true, position: 'left', grid: {color: '#f1f5f9'} },
+                                y1: { type: 'linear', display: true, position: 'right', grid: {drawOnChartArea: false} }
+                            }
+                        }
+                    });
+                }
+
+                // Chart 2: Doughnut (Payments)
+                const ctxDoughnut = document.getElementById('directorDoughnutChart');
+                if(ctxDoughnut) {
+                    if(directorDoughnutChartInstance) directorDoughnutChartInstance.destroy();
+                    directorDoughnutChartInstance = new Chart(ctxDoughnut.getContext('2d'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Pagado', 'Pendiente', 'Vencido'],
+                            datasets: [{
+                                data: [75, 15, 10],
+                                backgroundColor: ['#10b981', '#facc15', '#ef4444'],
+                                borderWidth: 0,
+                                hoverOffset: 10
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            cutout: '75%',
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: { backgroundColor: 'rgba(15, 23, 42, 0.9)', bodyFont: {size: 14, weight: 'bold'}, padding: 12 }
+                            }
+                        }
+                    });
+                }
+            };
+
+            /* ==========================================================================
+               ROLE: TEACHER - INTERACTIVE GRADING LOGIC
+               ========================================================================== */
+            const initTeacherLogic = () => {
+                const gradeInputs = document.querySelectorAll('.grade-input');
+                
+                gradeInputs.forEach(input => {
+                    // Prevent binding multiple times
+                    input.removeEventListener('input', calculateRowAverage);
+                    input.addEventListener('input', calculateRowAverage);
+                });
+            };
+
+            function calculateRowAverage(e) {
+                const row = e.target.closest('tr');
+                const inputs = row.querySelectorAll('.grade-input');
+                // Weights: 40% Exam, 40% Tasks, 20% Project
+                const weights = [0.4, 0.4, 0.2];
+                let total = 0;
+                
+                inputs.forEach((input, index) => {
+                    let val = parseFloat(input.value) || 0;
+                    if(val > 10) { val = 10; input.value = 10; } // Max cap
+                    if(val < 0) { val = 0; input.value = 0; } // Min cap
+                    total += val * weights[index];
+                });
+
+                const avgSpan = row.querySelector('.final-avg');
+                const formattedAvg = total.toFixed(1);
+                avgSpan.innerText = formattedAvg;
+
+                // Dynamic coloring based on grade
+                avgSpan.className = 'final-avg inline-block font-black px-3 py-1.5 rounded-lg text-lg transition-colors duration-300 ';
+                if(total >= 9.0) avgSpan.className += 'bg-emerald-100 text-emerald-700';
+                else if(total >= 7.0) avgSpan.className += 'bg-yellow-100 text-yellow-700';
+                else avgSpan.className += 'bg-red-100 text-red-700';
+            }
+
+            /* ==========================================================================
+               ROLE: PARENT - TOGGLE CHILDREN LOGIC
+               ========================================================================== */
+            window.toggleChild = (childId) => {
+                // Update Buttons
+                const btn1 = document.getElementById('btn-child1');
+                const btn2 = document.getElementById('btn-child2');
+                
+                if(childId === 'child1') {
+                    btn1.className = "px-8 py-2.5 rounded-lg text-sm font-black bg-white text-slate-900 shadow-sm transition-all interactive-btn";
+                    btn2.className = "px-8 py-2.5 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-700 transition-all interactive-btn";
+                    document.getElementById('data-child1').style.display = 'grid';
+                    document.getElementById('data-child2').style.display = 'none';
+                } else {
+                    btn2.className = "px-8 py-2.5 rounded-lg text-sm font-black bg-white text-slate-900 shadow-sm transition-all interactive-btn";
+                    btn1.className = "px-8 py-2.5 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-700 transition-all interactive-btn";
+                    document.getElementById('data-child2').style.display = 'block';
+                    document.getElementById('data-child1').style.display = 'none';
+                }
+            };
+
+            /* ==========================================================================
+               ROLE: STUDENT - GAMIFICATION & TASKS LOGIC
+               ========================================================================== */
+            window.toggleTask = (checkbox) => {
+                const row = checkbox.closest('.task-row');
+                
+                if(checkbox.checked) {
+                    row.classList.add('completed');
+                } else {
+                    row.classList.remove('completed');
+                }
+                
+                updateStudentProgress();
+            };
+
+            function updateStudentProgress() {
+                const checkboxes = document.querySelectorAll('#student-task-list .custom-checkbox');
+                let checkedCount = 0;
+                checkboxes.forEach(cb => { if(cb.checked) checkedCount++; });
+                
+                const percentage = Math.round((checkedCount / checkboxes.length) * 100);
+                
+                document.getElementById('task-percentage').innerText = `${percentage}%`;
+                document.getElementById('task-progress-bar').style.width = `${percentage}%`;
+            }
+
+        });
+    </script>
+</body>
+</html>
