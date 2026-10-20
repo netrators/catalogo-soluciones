@@ -16,23 +16,33 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#4f46e5',
-                        secondary: '#10b981',
-                        dark: '#1e293b',
+                        primary: '#4f46e5',   // Indigo 600
+                        secondary: '#ec4899', // Pink 500
+                        accent: '#8b5cf6',    // Violet 500
+                        dark: '#0f172a',      // Slate 900 (Más contraste)
                     },
                     animation: {
-                        'float': 'float 3s ease-in-out infinite',
-                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
-                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 4s ease-in-out infinite',
+                        'float-fast': 'float 2.5s ease-in-out infinite',
+                        'fade-in-up': 'fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'blob': 'blob 7s infinite',
+                        'spin-slow': 'spin 8s linear infinite',
                     },
                     keyframes: {
                         float: {
                             '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-10px)' },
+                            '50%': { transform: 'translateY(-15px)' },
                         },
                         fadeInUp: {
-                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '0%': { opacity: '0', transform: 'translateY(40px)' },
                             '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
                         }
                     }
                 }
@@ -40,11 +50,36 @@
         }
     </script>
     <style>
-        body { font-family: 'Inter', -apple-system, sans-serif; background-color: #f8fafc; overflow-x: hidden; }
-        .glass-effect { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
+        body { 
+            font-family: 'Inter', -apple-system, sans-serif; 
+            background-color: #f8fafc; 
+            overflow-x: hidden; 
+            color: #334155;
+        }
+        .glass-effect { 
+            background: rgba(255, 255, 255, 0.7); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5); 
+        }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .gradient-text { background: linear-gradient(135deg, #4f46e5, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .gradient-text { 
+            background: linear-gradient(135deg, #4f46e5, #ec4899, #8b5cf6); 
+            background-size: 200% auto;
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            animation: gradient-shift 3s ease infinite;
+        }
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
     </style>
 </head>
 <body>
@@ -53,35 +88,36 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        // Datos simulados (Mock Data)
         const SERVICES = [
-            { id: 'medico', name: 'Consultorio Médico', icon: 'fa-user-doctor', img: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=400' },
-            { id: 'spa', name: 'Spa & Relajación', icon: 'fa-spa', img: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&q=80&w=400' },
-            { id: 'belleza', name: 'Salón de Belleza', icon: 'fa-scissors', img: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&q=80&w=400' },
-            { id: 'abogados', name: 'Despacho Legal', icon: 'fa-scale-balanced', img: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&q=80&w=400' },
-            { id: 'taller', name: 'Taller Automotriz', icon: 'fa-car', img: 'https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?auto=format&fit=crop&q=80&w=400' },
-            { id: 'psicologia', name: 'Terapia Psicológica', icon: 'fa-brain', img: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&q=80&w=400' }
+            { id: 'medico', name: 'Consultorio Médico', icon: 'fa-user-doctor', color: 'text-blue-500', img: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=600' },
+            { id: 'spa', name: 'Spa & Relajación', icon: 'fa-spa', color: 'text-teal-500', img: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&q=80&w=600' },
+            { id: 'belleza', name: 'Salón de Belleza', icon: 'fa-scissors', color: 'text-pink-500', img: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&q=80&w=600' },
+            { id: 'abogados', name: 'Despacho Legal', icon: 'fa-scale-balanced', color: 'text-amber-600', img: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&q=80&w=600' },
+            { id: 'taller', name: 'Taller Automotriz', icon: 'fa-car', color: 'text-red-500', img: 'https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?auto=format&fit=crop&q=80&w=600' },
+            { id: 'psicologia', name: 'Psicología', icon: 'fa-brain', color: 'text-purple-500', img: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&q=80&w=600' }
         ];
 
         const TIME_SLOTS = ['09:00 AM', '10:00 AM', '11:30 AM', '01:00 PM', '03:30 PM', '05:00 PM'];
 
         const Navbar = () => (
-            <nav className="fixed w-full z-50 glass-effect transition-all duration-300">
+            <nav className="fixed w-full z-50 glass-effect transition-all duration-300 shadow-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center h-16">
-                        <div className="flex items-center gap-2">
-                            <div className="bg-primary text-white p-2 rounded-lg">
-                                <i className="fa-solid fa-calendar-check text-xl"></i>
+                    <div className="flex justify-between items-center h-20">
+                        <div className="flex items-center gap-3 cursor-pointer hover:scale-105 transition-transform">
+                            <div className="bg-gradient-to-br from-primary to-secondary text-white p-2.5 rounded-xl shadow-lg shadow-primary/30">
+                                <i className="fa-solid fa-calendar-check text-2xl"></i>
                             </div>
-                            <span className="font-bold text-xl text-dark tracking-tight">Reserva<span className="text-primary">Pro</span></span>
+                            <span className="font-extrabold text-2xl text-dark tracking-tighter">
+                                Reserva<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Pro</span>
+                            </span>
                         </div>
                         <div className="hidden md:flex space-x-8">
-                            <a href="#inicio" className="text-gray-600 hover:text-primary transition-colors font-medium">Inicio</a>
-                            <a href="#industrias" className="text-gray-600 hover:text-primary transition-colors font-medium">Soluciones</a>
-                            <a href="#demo" className="text-gray-600 hover:text-primary transition-colors font-medium">Probar Demo</a>
+                            <a href="#inicio" className="text-slate-600 hover:text-primary transition-colors font-semibold">Inicio</a>
+                            <a href="#industrias" className="text-slate-600 hover:text-primary transition-colors font-semibold">Soluciones</a>
+                            <a href="#demo" className="text-slate-600 hover:text-primary transition-colors font-semibold">Probar Demo</a>
                         </div>
-                        <a href="#contacto-final" className="bg-dark hover:bg-gray-800 text-white px-5 py-2 rounded-full font-medium transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-                            Tu propia Web
+                        <a href="#contacto-final" className="bg-dark hover:bg-slate-800 text-white px-6 py-2.5 rounded-full font-bold transition-all shadow-[0_4px_14px_0_rgba(0,0,0,0.39)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.23)] hover:-translate-y-1">
+                            Crear mi Web
                         </a>
                     </div>
                 </div>
@@ -89,45 +125,49 @@
         );
 
         const Hero = () => (
-            <section id="inicio" className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-12">
-                <div className="lg:w-1/2 space-y-8 animate-fade-in-up">
-                    <div className="inline-block bg-indigo-100 text-primary px-4 py-1.5 rounded-full text-sm font-bold tracking-wide">
-                        🚀 SISTEMA DE RESERVAS INTELIGENTE
+            <section id="inicio" className="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16 min-h-screen">
+                {/* Elementos de fondo animados */}
+                <div className="absolute top-20 -left-4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob"></div>
+                <div className="absolute top-20 -right-4 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob animation-delay-2000"></div>
+                <div className="absolute -bottom-8 left-40 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob animation-delay-4000"></div>
+
+                <div className="lg:w-1/2 space-y-8 animate-fade-in-up relative z-10">
+                    <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm border border-indigo-100 text-primary px-5 py-2 rounded-full text-sm font-bold tracking-wide shadow-sm">
+                        <span className="relative flex h-3 w-3">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+                        </span>
+                        SISTEMA DE RESERVAS INTELIGENTE
                     </div>
-                    <h1 className="text-5xl lg:text-6xl font-extrabold text-dark leading-tight">
-                        Automatiza tus citas y <span className="gradient-text">multiplica tus clientes</span>
+                    <h1 className="text-5xl lg:text-7xl font-extrabold text-dark leading-[1.1] tracking-tight">
+                        Automatiza tus citas y <span className="gradient-text block mt-2">multiplica ventas</span>
                     </h1>
-                    <p className="text-lg text-gray-600 leading-relaxed max-w-xl">
-                        Olvídate del papel y lápiz o los interminables mensajes para agendar. Ofrece a tus clientes una experiencia moderna, 24/7 y sin complicaciones.
+                    <p className="text-xl text-slate-600 leading-relaxed max-w-xl font-medium">
+                        Eleva la imagen de tu negocio. Ofrece a tus clientes una experiencia premium para agendar 24/7 sin perder tiempo en mensajes.
                     </p>
-                    <div className="flex flex-col sm:flex-row gap-4">
-                        <a href="#demo" className="bg-primary hover:bg-indigo-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all shadow-lg hover:shadow-indigo-500/30 flex items-center justify-center gap-2">
-                            Probar Demo Ahora <i className="fa-solid fa-arrow-right"></i>
+                    <div className="flex flex-col sm:flex-row gap-5 pt-4">
+                        <a href="#demo" className="bg-gradient-to-r from-primary to-accent hover:from-indigo-600 hover:to-purple-600 text-white px-8 py-4 rounded-full font-bold text-lg transition-all shadow-[0_0_30px_rgba(79,70,229,0.5)] hover:shadow-[0_0_40px_rgba(79,70,229,0.7)] hover:-translate-y-1 flex items-center justify-center gap-3">
+                            Ver Demo en Acción <i className="fa-solid fa-play text-sm bg-white/20 p-2 rounded-full"></i>
                         </a>
-                        <div className="flex items-center gap-4 text-sm text-gray-500 font-medium">
-                            <div className="flex -space-x-2">
-                                <img className="w-8 h-8 rounded-full border-2 border-white" src="https://i.pravatar.cc/100?img=1" alt="User"/>
-                                <img className="w-8 h-8 rounded-full border-2 border-white" src="https://i.pravatar.cc/100?img=2" alt="User"/>
-                                <img className="w-8 h-8 rounded-full border-2 border-white" src="https://i.pravatar.cc/100?img=3" alt="User"/>
-                            </div>
-                            <span>+500 negocios lo usan</span>
-                        </div>
                     </div>
                 </div>
-                <div className="lg:w-1/2 relative animate-float">
-                    <div className="absolute inset-0 bg-gradient-to-r from-primary to-pink-500 blur-3xl opacity-20 rounded-full"></div>
-                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800" 
-                         alt="Dashboard Dashboard" 
-                         className="relative z-10 rounded-2xl shadow-2xl border border-gray-100 transform rotate-2 hover:rotate-0 transition-transform duration-500" />
-                    
-                    {/* Floating Widget Mock */}
-                    <div className="absolute -bottom-6 -left-6 bg-white p-4 rounded-xl shadow-xl z-20 flex items-center gap-4 animate-bounce" style={{animationDuration: '3s'}}>
-                        <div className="bg-green-100 text-green-600 p-3 rounded-full">
-                            <i className="fa-solid fa-check"></i>
-                        </div>
-                        <div>
-                            <p className="font-bold text-sm text-dark">Nueva cita agendada</p>
-                            <p className="text-xs text-gray-500">Hace 2 minutos</p>
+
+                <div className="lg:w-1/2 relative w-full mt-10 lg:mt-0 z-10">
+                    <div className="relative animate-float">
+                        <div className="absolute inset-0 bg-gradient-to-tr from-primary to-secondary rounded-[2rem] transform rotate-3 scale-105 opacity-20 blur-xl"></div>
+                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800" 
+                             alt="Dashboard" 
+                             className="relative z-10 rounded-[2rem] shadow-2xl border border-white/50 object-cover" />
+                        
+                        {/* Notificación flotante animada */}
+                        <div className="absolute -bottom-8 -left-8 bg-white/90 backdrop-blur-md p-5 rounded-2xl shadow-2xl border border-gray-100 z-20 flex items-center gap-4 animate-float-fast" style={{animationDelay: '1s'}}>
+                            <div className="bg-green-100 text-green-600 p-4 rounded-full shadow-inner">
+                                <i className="fa-solid fa-check text-xl"></i>
+                            </div>
+                            <div>
+                                <p className="font-extrabold text-dark">¡Nueva cita confirmada!</p>
+                                <p className="text-sm text-slate-500 font-medium">Hace 2 minutos • Carlos G.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -135,25 +175,34 @@
         );
 
         const IndustryGrid = () => (
-            <section id="industrias" className="py-20 bg-white">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <section id="industrias" className="py-24 bg-dark relative overflow-hidden">
+                {/* Decoración de fondo oscura */}
+                <div className="absolute top-0 right-0 w-full h-full overflow-hidden z-0 opacity-20">
+                    <div className="absolute top-[-10%] right-[-5%] w-96 h-96 bg-primary rounded-full mix-blend-screen filter blur-[100px]"></div>
+                    <div className="absolute bottom-[-10%] left-[-5%] w-96 h-96 bg-secondary rounded-full mix-blend-screen filter blur-[100px]"></div>
+                </div>
+
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                     <div className="text-center mb-16 animate-fade-in-up">
-                        <h2 className="text-3xl font-bold text-dark mb-4">Adaptable a cualquier tipo de negocio</h2>
-                        <p className="text-gray-600 max-w-2xl mx-auto">Nuestro sistema se configura a la medida de tus necesidades, sin importar la industria en la que te encuentres.</p>
+                        <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-tight">Diseñado para tu industria</h2>
+                        <p className="text-slate-400 max-w-2xl mx-auto text-lg">Soluciones digitales a medida. No importa a qué te dediques, creamos la plataforma perfecta para que tu negocio crezca.</p>
                     </div>
+                    
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {SERVICES.map((service, index) => (
-                            <div key={index} className="group relative overflow-hidden rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-300 border border-gray-100 cursor-pointer bg-white">
-                                <div className="h-48 overflow-hidden">
-                                    <img src={service.img} alt={service.name} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80"></div>
+                            <div key={index} className="group relative overflow-hidden rounded-3xl bg-slate-800 border border-slate-700 hover:border-primary transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_20px_50px_rgba(79,70,229,0.3)] cursor-pointer">
+                                <div className="h-56 overflow-hidden relative">
+                                    <img src={service.img} alt={service.name} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent opacity-90"></div>
                                 </div>
-                                <div className="absolute bottom-0 w-full p-6 text-white transform translate-y-2 group-hover:translate-y-0 transition-transform">
-                                    <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mb-4 shadow-lg group-hover:bg-white group-hover:text-primary transition-colors">
-                                        <i className={`fa-solid ${service.icon} text-xl`}></i>
+                                <div className="absolute bottom-0 w-full p-8 text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                    <div className="w-14 h-14 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center mb-4 border border-white/20 group-hover:bg-primary group-hover:border-primary transition-colors duration-300 shadow-lg">
+                                        <i className={`fa-solid ${service.icon} text-2xl ${service.color} group-hover:text-white transition-colors`}></i>
                                     </div>
-                                    <h3 className="text-xl font-bold mb-1">{service.name}</h3>
-                                    <p className="text-sm text-gray-200 opacity-0 group-hover:opacity-100 transition-opacity delay-100">Solución digital personalizada</p>
+                                    <h3 className="text-2xl font-bold mb-2">{service.name}</h3>
+                                    <p className="text-primary font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100 flex items-center gap-2">
+                                        Ver solución <i className="fa-solid fa-arrow-right text-sm"></i>
+                                    </p>
                                 </div>
                             </div>
                         ))}
@@ -169,7 +218,6 @@
             const [selectedTime, setSelectedTime] = useState('');
             const [customerName, setCustomerName] = useState('');
 
-            // Generar fechas próximas simuladas
             const today = new Date();
             const dates = Array.from({length: 5}, (_, i) => {
                 const d = new Date(today);
@@ -182,165 +230,167 @@
                 if(!selectedService || !selectedDate || !selectedTime || !customerName) return;
                 
                 const serviceName = SERVICES.find(s => s.id === selectedService)?.name || 'Servicio General';
-                
-                // Mensaje solicitado por el usuario
                 const mensaje = `Hola, soy ${customerName}. Acabo de probar la demostración de reservas en su página web.\n\nSimulé una cita para: *${serviceName}* el día *${selectedDate}* a las *${selectedTime}*.\n\nMe pareció excelente y quisiera más información sobre sus servicios para crear una solución digital (Página web/App) para mi negocio.`;
-                
                 const whatsappUrl = `https://wa.me/527777926013?text=${encodeURIComponent(mensaje)}`;
                 window.open(whatsappUrl, '_blank');
             };
 
             return (
-                <section id="demo" className="py-24 bg-gray-50">
-                    <div className="max-w-4xl mx-auto px-4 sm:px-6">
-                        <div className="text-center mb-12">
-                            <h2 className="text-4xl font-extrabold text-dark mb-4">Prueba el sistema ahora mismo</h2>
-                            <p className="text-gray-600">Simula cómo tus clientes agendarían una cita contigo.</p>
+                <section id="demo" className="py-24 relative bg-white">
+                    {/* Elementos decorativos bg */}
+                    <div className="absolute top-0 w-full h-64 bg-gradient-to-b from-slate-50 to-white"></div>
+                    
+                    <div className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10">
+                        <div className="text-center mb-16">
+                            <h2 className="text-4xl md:text-5xl font-extrabold text-dark mb-6 tracking-tight">Prueba el sistema en vivo</h2>
+                            <p className="text-slate-600 text-lg max-w-2xl mx-auto font-medium">Interactúa con el widget a continuación. Así de fácil, rápido y moderno será para tus clientes agendar contigo.</p>
                         </div>
 
-                        <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
-                            <div className="flex border-b border-gray-100 bg-gray-50">
-                                <div className={`flex-1 text-center py-4 font-semibold text-sm transition-colors ${step >= 1 ? 'text-primary border-b-2 border-primary' : 'text-gray-400'}`}>1. Servicio</div>
-                                <div className={`flex-1 text-center py-4 font-semibold text-sm transition-colors ${step >= 2 ? 'text-primary border-b-2 border-primary' : 'text-gray-400'}`}>2. Fecha y Hora</div>
-                                <div className={`flex-1 text-center py-4 font-semibold text-sm transition-colors ${step >= 3 ? 'text-primary border-b-2 border-primary' : 'text-gray-400'}`}>3. Confirmación</div>
-                            </div>
-
-                            <div className="p-8">
-                                {/* Paso 1 */}
-                                {step === 1 && (
-                                    <div className="animate-fade-in-up">
-                                        <h3 className="text-xl font-bold mb-6 text-dark">¿Qué servicio te interesa simular?</h3>
-                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                            {SERVICES.map(s => (
-                                                <button 
-                                                    key={s.id}
-                                                    onClick={() => setSelectedService(s.id)}
-                                                    className={`p-4 rounded-xl border-2 transition-all text-left flex flex-col items-center justify-center gap-3 hover:border-primary ${selectedService === s.id ? 'border-primary bg-indigo-50 text-primary' : 'border-gray-100 text-gray-600'}`}
-                                                >
-                                                    <i className={`fa-solid ${s.icon} text-2xl`}></i>
-                                                    <span className="font-medium text-sm text-center">{s.name}</span>
-                                                </button>
-                                            ))}
+                        {/* Contenedor principal con borde animado (Glow) */}
+                        <div className="p-[3px] rounded-[2rem] bg-gradient-to-r from-primary via-accent to-secondary shadow-[0_20px_50px_rgba(79,70,229,0.2)] hover:shadow-[0_20px_60px_rgba(236,72,153,0.3)] transition-shadow duration-500 mx-auto max-w-4xl">
+                            <div className="bg-white rounded-[30px] overflow-hidden">
+                                
+                                {/* Header de pasos */}
+                                <div className="flex bg-slate-50 p-4 gap-2 border-b border-slate-100">
+                                    {[1, 2, 3].map((num) => (
+                                        <div key={num} className={`flex-1 rounded-xl text-center py-4 font-bold text-sm transition-all duration-500 ${step === num ? 'bg-white shadow-md text-primary transform scale-105' : (step > num ? 'bg-indigo-50 text-indigo-400' : 'text-slate-400')}`}>
+                                            <span className={`inline-block w-6 h-6 rounded-full mr-2 ${step === num ? 'bg-primary text-white' : (step > num ? 'bg-indigo-200 text-indigo-600' : 'bg-slate-200')}`}>
+                                                {step > num ? '✓' : num}
+                                            </span>
+                                            {num === 1 ? 'Servicio' : num === 2 ? 'Fecha y Hora' : 'Confirmar'}
                                         </div>
-                                        <div className="mt-8 flex justify-end">
-                                            <button 
-                                                disabled={!selectedService}
-                                                onClick={() => setStep(2)}
-                                                className="bg-dark disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-8 py-3 rounded-xl font-bold transition-all hover:bg-gray-800"
-                                            >
-                                                Continuar <i className="fa-solid fa-arrow-right ml-2"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                )}
+                                    ))}
+                                </div>
 
-                                {/* Paso 2 */}
-                                {step === 2 && (
-                                    <div className="animate-fade-in-up">
-                                        <h3 className="text-xl font-bold mb-6 text-dark">Selecciona un día y horario</h3>
-                                        
-                                        <div className="mb-6">
-                                            <p className="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wider">Próximos días</p>
-                                            <div className="flex gap-3 overflow-x-auto pb-4 hide-scrollbar">
-                                                {dates.map((d, i) => {
-                                                    const dateStr = d.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
-                                                    return (
-                                                        <button 
-                                                            key={i}
-                                                            onClick={() => setSelectedDate(dateStr)}
-                                                            className={`flex-shrink-0 p-4 rounded-xl border-2 min-w-[100px] text-center transition-all ${selectedDate === dateStr ? 'border-primary bg-indigo-50 text-primary' : 'border-gray-100 hover:border-primary'}`}
-                                                        >
-                                                            <span className="block text-xs uppercase mb-1">{d.toLocaleDateString('es-ES', { weekday: 'short' })}</span>
-                                                            <span className="block text-xl font-bold">{d.getDate()}</span>
-                                                        </button>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-
-                                        <div className="mb-8">
-                                            <p className="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wider">Horarios Disponibles</p>
-                                            <div className="grid grid-cols-3 gap-3">
-                                                {TIME_SLOTS.map((time, i) => (
+                                <div className="p-8 md:p-12 min-h-[400px]">
+                                    {/* Paso 1 */}
+                                    {step === 1 && (
+                                        <div className="animate-fade-in-up">
+                                            <h3 className="text-2xl font-extrabold mb-8 text-dark text-center">¿Qué servicio deseas simular?</h3>
+                                            <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
+                                                {SERVICES.map(s => (
                                                     <button 
-                                                        key={i}
-                                                        onClick={() => setSelectedTime(time)}
-                                                        className={`p-3 rounded-lg border text-sm font-medium transition-all ${selectedTime === time ? 'border-primary bg-primary text-white shadow-md' : 'border-gray-200 text-gray-700 hover:border-primary hover:text-primary'}`}
+                                                        key={s.id}
+                                                        onClick={() => setSelectedService(s.id)}
+                                                        className={`p-6 rounded-2xl border-2 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg flex flex-col items-center justify-center gap-4 ${selectedService === s.id ? 'border-primary bg-indigo-50 shadow-[0_10px_20px_-10px_rgba(79,70,229,0.5)]' : 'border-slate-100 hover:border-indigo-200 bg-white'}`}
                                                     >
-                                                        {time}
+                                                        <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl ${selectedService === s.id ? 'bg-primary text-white shadow-inner' : 'bg-slate-50 ' + s.color}`}>
+                                                            <i className={`fa-solid ${s.icon}`}></i>
+                                                        </div>
+                                                        <span className={`font-bold text-sm text-center ${selectedService === s.id ? 'text-primary' : 'text-slate-700'}`}>{s.name}</span>
                                                     </button>
                                                 ))}
                                             </div>
-                                        </div>
-
-                                        <div className="flex justify-between">
-                                            <button onClick={() => setStep(1)} className="text-gray-500 hover:text-dark font-medium px-4 py-3">
-                                                <i className="fa-solid fa-arrow-left mr-2"></i> Volver
-                                            </button>
-                                            <button 
-                                                disabled={!selectedDate || !selectedTime}
-                                                onClick={() => setStep(3)}
-                                                className="bg-dark disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-8 py-3 rounded-xl font-bold transition-all hover:bg-gray-800"
-                                            >
-                                                Continuar <i className="fa-solid fa-arrow-right ml-2"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Paso 3 */}
-                                {step === 3 && (
-                                    <div className="animate-fade-in-up">
-                                        <h3 className="text-xl font-bold mb-6 text-dark">Confirma tus datos</h3>
-                                        
-                                        <div className="bg-gray-50 p-6 rounded-xl mb-6 border border-gray-100">
-                                            <div className="flex items-center gap-4 mb-4 pb-4 border-b border-gray-200">
-                                                <div className="bg-primary/10 p-3 rounded-lg text-primary">
-                                                    <i className={`fa-solid ${SERVICES.find(s=>s.id === selectedService)?.icon} text-xl`}></i>
-                                                </div>
-                                                <div>
-                                                    <p className="text-sm text-gray-500">Servicio seleccionado</p>
-                                                    <p className="font-bold text-dark">{SERVICES.find(s=>s.id === selectedService)?.name}</p>
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center gap-4">
-                                                <div className="bg-primary/10 p-3 rounded-lg text-primary">
-                                                    <i className="fa-regular fa-clock text-xl"></i>
-                                                </div>
-                                                <div>
-                                                    <p className="text-sm text-gray-500">Fecha y Hora</p>
-                                                    <p className="font-bold text-dark">{selectedDate} a las {selectedTime}</p>
-                                                </div>
+                                            <div className="mt-10 flex justify-end border-t border-slate-100 pt-6">
+                                                <button disabled={!selectedService} onClick={() => setStep(2)} className="bg-dark disabled:bg-slate-200 disabled:text-slate-400 text-white px-10 py-4 rounded-xl font-bold transition-all hover:bg-slate-800 hover:shadow-xl hover:-translate-y-1 flex items-center gap-2">
+                                                    Siguiente Paso <i className="fa-solid fa-arrow-right"></i>
+                                                </button>
                                             </div>
                                         </div>
+                                    )}
 
-                                        <form onSubmit={handleWhatsAppRedirect} className="space-y-4">
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">Tu Nombre (Para la prueba)</label>
-                                                <input 
-                                                    type="text" 
-                                                    required
-                                                    value={customerName}
-                                                    onChange={(e) => setCustomerName(e.target.value)}
-                                                    placeholder="Ej. Juan Pérez"
-                                                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
-                                                />
+                                    {}
+                                    {step === 2 && (
+                                        <div className="animate-fade-in-up">
+                                            <h3 className="text-2xl font-extrabold mb-8 text-dark text-center">Selecciona el mejor momento</h3>
+                                            
+                                            <div className="mb-8">
+                                                <p className="text-xs font-bold text-slate-400 mb-4 uppercase tracking-widest">Días Disponibles</p>
+                                                <div className="flex gap-4 overflow-x-auto pb-6 hide-scrollbar px-2 -mx-2">
+                                                    {dates.map((d, i) => {
+                                                        const dateStr = d.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
+                                                        const isSelected = selectedDate === dateStr;
+                                                        return (
+                                                            <button 
+                                                                key={i} onClick={() => setSelectedDate(dateStr)}
+                                                                className={`flex-shrink-0 p-5 rounded-2xl border-2 min-w-[110px] text-center transition-all duration-300 transform ${isSelected ? 'border-primary bg-primary text-white shadow-[0_10px_20px_-10px_rgba(79,70,229,0.6)] -translate-y-1' : 'border-slate-100 bg-white hover:border-primary/50 hover:shadow-md text-slate-600'}`}
+                                                            >
+                                                                <span className={`block text-xs uppercase mb-2 font-bold ${isSelected ? 'text-indigo-200' : 'text-slate-400'}`}>{d.toLocaleDateString('es-ES', { weekday: 'short' })}</span>
+                                                                <span className="block text-3xl font-extrabold">{d.getDate()}</span>
+                                                            </button>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+
+                                            <div className="mb-10">
+                                                <p className="text-xs font-bold text-slate-400 mb-4 uppercase tracking-widest">Horarios Libres</p>
+                                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                                    {TIME_SLOTS.map((time, i) => (
+                                                        <button 
+                                                            key={i} onClick={() => setSelectedTime(time)}
+                                                            className={`p-4 rounded-xl border-2 text-sm font-bold transition-all duration-300 ${selectedTime === time ? 'border-accent bg-accent text-white shadow-[0_8px_15px_-5px_rgba(139,92,246,0.5)] transform scale-105' : 'border-slate-100 text-slate-600 hover:border-accent hover:text-accent bg-slate-50'}`}
+                                                        >
+                                                            <i className="fa-regular fa-clock mr-2 opacity-70"></i>{time}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            <div className="flex justify-between items-center border-t border-slate-100 pt-6">
+                                                <button onClick={() => setStep(1)} className="text-slate-500 hover:text-dark font-bold px-4 py-3 transition-colors flex items-center gap-2">
+                                                    <i className="fa-solid fa-arrow-left"></i> Volver
+                                                </button>
+                                                <button disabled={!selectedDate || !selectedTime} onClick={() => setStep(3)} className="bg-dark disabled:bg-slate-200 disabled:text-slate-400 text-white px-10 py-4 rounded-xl font-bold transition-all hover:bg-slate-800 hover:shadow-xl hover:-translate-y-1 flex items-center gap-2">
+                                                    Continuar <i className="fa-solid fa-arrow-right"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {}
+                                    {step === 3 && (
+                                        <div className="animate-fade-in-up max-w-2xl mx-auto">
+                                            <div className="text-center mb-8">
+                                                <div className="w-20 h-20 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+                                                    <i className="fa-solid fa-check text-4xl"></i>
+                                                </div>
+                                                <h3 className="text-3xl font-extrabold text-dark">¡Casi listo!</h3>
+                                                <p className="text-slate-500 mt-2 font-medium">Revisa los datos antes de finalizar la prueba.</p>
                                             </div>
                                             
-                                            <div className="flex justify-between pt-6 border-t border-gray-100">
-                                                <button type="button" onClick={() => setStep(2)} className="text-gray-500 hover:text-dark font-medium px-4 py-3">
-                                                    <i className="fa-solid fa-arrow-left mr-2"></i> Volver
-                                                </button>
-                                                <button 
-                                                    type="submit"
-                                                    className="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg shadow-green-500/30 flex items-center gap-2"
-                                                >
-                                                    <i className="fa-brands fa-whatsapp text-xl"></i> Confirmar vía WhatsApp
-                                                </button>
+                                            <div className="bg-slate-50 p-6 rounded-2xl mb-8 border border-slate-200 shadow-inner">
+                                                <div className="flex items-center gap-5 mb-5 pb-5 border-b border-slate-200">
+                                                    <div className="bg-white p-4 rounded-xl shadow-sm">
+                                                        <i className={`fa-solid ${SERVICES.find(s=>s.id === selectedService)?.icon} text-2xl ${SERVICES.find(s=>s.id === selectedService)?.color}`}></i>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Servicio</p>
+                                                        <p className="text-lg font-extrabold text-dark">{SERVICES.find(s=>s.id === selectedService)?.name}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-5">
+                                                    <div className="bg-white p-4 rounded-xl shadow-sm text-primary">
+                                                        <i className="fa-regular fa-calendar-days text-2xl"></i>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Agendado para</p>
+                                                        <p className="text-lg font-extrabold text-dark">{selectedDate} <span className="text-primary mx-2">•</span> {selectedTime}</p>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </form>
-                                    </div>
-                                )}
+
+                                            <form onSubmit={handleWhatsAppRedirect} className="space-y-6">
+                                                <div>
+                                                    <label className="block text-sm font-bold text-slate-700 mb-2">Tu Nombre (Para la prueba real)</label>
+                                                    <input 
+                                                        type="text" required value={customerName} onChange={(e) => setCustomerName(e.target.value)} placeholder="Ej. Juan Pérez"
+                                                        className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl focus:ring-0 focus:border-green-500 outline-none transition-all font-medium text-lg shadow-sm"
+                                                    />
+                                                </div>
+                                                
+                                                <div className="flex justify-between items-center pt-6 border-t border-slate-100">
+                                                    <button type="button" onClick={() => setStep(2)} className="text-slate-500 hover:text-dark font-bold px-4 py-3 transition-colors">
+                                                        <i className="fa-solid fa-arrow-left mr-2"></i> Volver
+                                                    </button>
+                                                    <button type="submit" className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-[0_10px_20px_-10px_rgba(16,185,129,0.6)] hover:shadow-[0_15px_30px_-10px_rgba(16,185,129,0.8)] hover:-translate-y-1 flex items-center gap-3 text-lg">
+                                                        <i className="fa-brands fa-whatsapp text-2xl"></i> Finalizar vía WhatsApp
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -353,38 +403,39 @@
             const whatsappUrl = `https://wa.me/527777926013?text=${encodeURIComponent(defaultMessage)}`;
 
             return (
-                <section id="contacto-final" className="py-20 relative overflow-hidden bg-dark">
-                    <div className="absolute inset-0 opacity-10">
-                        <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse-slow"></div>
-                        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse-slow" style={{animationDelay: '1s'}}></div>
+                <section id="contacto-final" className="py-24 relative overflow-hidden bg-dark">
+                    {/* Elementos lumínicos de fondo */}
+                    <div className="absolute inset-0">
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-primary via-accent to-secondary rounded-full mix-blend-screen filter blur-[120px] opacity-30 animate-spin-slow"></div>
                     </div>
                     
                     <div className="relative max-w-4xl mx-auto px-4 sm:px-6 text-center z-10">
-                        <div className="inline-block bg-white/10 border border-white/20 text-white px-4 py-1.5 rounded-full text-sm font-bold tracking-wide mb-6 backdrop-blur-sm">
-                            💡 DISEÑAMOS EL FUTURO DE TU EMPRESA
+                        <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white px-5 py-2 rounded-full text-sm font-bold tracking-wide mb-8 backdrop-blur-md">
+                            <span className="text-yellow-400"><i className="fa-solid fa-bolt"></i></span> LLEVA TU NEGOCIO AL SIGUIENTE NIVEL
                         </div>
-                        <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight">
-                            ¿Te gustó esta experiencia interactiva?
+                        <h2 className="text-5xl md:text-6xl font-extrabold text-white mb-8 leading-[1.1] tracking-tight">
+                            ¿Listo para tener tu <br/>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-500">propia plataforma?</span>
                         </h2>
-                        <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto">
-                            Imagina tener un sistema igual o mejor, <strong className="text-white">creado exclusivamente para tu negocio</strong>. Desde páginas web corporativas, tiendas en línea, hasta aplicaciones móviles de control interno o reservas.
+                        <p className="text-xl text-slate-300 mb-12 max-w-2xl mx-auto font-medium">
+                            Diseñamos sistemas a la medida: Páginas web corporativas, tiendas online y aplicaciones para control de inventario o citas. Rápido, seguro y sin complicaciones técnicas para ti.
                         </p>
                         
                         <div className="flex flex-col sm:flex-row justify-center items-center gap-6">
                             <a 
-                                href={whatsappUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="bg-white text-dark px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition-all shadow-[0_0_40px_rgba(255,255,255,0.3)] hover:scale-105 flex items-center gap-3"
+                                href={whatsappUrl} target="_blank" rel="noopener noreferrer"
+                                className="bg-white text-dark px-10 py-5 rounded-full font-extrabold text-lg hover:bg-slate-50 transition-all shadow-[0_0_40px_rgba(255,255,255,0.3)] hover:shadow-[0_0_60px_rgba(255,255,255,0.5)] hover:scale-105 flex items-center gap-3"
                             >
-                                <i className="fa-brands fa-whatsapp text-green-500 text-2xl"></i>
+                                <i className="fa-brands fa-whatsapp text-green-500 text-3xl"></i>
                                 Solicitar Asesoría Gratuita
                             </a>
                         </div>
                         
-                        <p className="mt-8 text-sm text-gray-400">
-                            Diseño a medida • Soporte técnico • Integraciones con WhatsApp • Cero complicaciones
-                        </p>
+                        <div className="mt-12 flex flex-wrap justify-center gap-6 text-sm font-bold text-slate-400">
+                            <span className="flex items-center gap-2"><i className="fa-solid fa-check text-green-400"></i> Diseño a medida</span>
+                            <span className="flex items-center gap-2"><i className="fa-solid fa-check text-green-400"></i> Soporte 24/7</span>
+                            <span className="flex items-center gap-2"><i className="fa-solid fa-check text-green-400"></i> Integración WhatsApp</span>
+                        </div>
                     </div>
                 </section>
             );
@@ -392,7 +443,7 @@
 
         const App = () => {
             return (
-                <div className="min-h-screen flex flex-col">
+                <div className="min-h-screen flex flex-col selection:bg-primary selection:text-white">
                     <Navbar />
                     <main className="flex-grow">
                         <Hero />
@@ -400,20 +451,19 @@
                         <BookingDemo />
                         <FooterBanner />
                     </main>
-                    <footer className="bg-gray-900 py-8 text-center text-gray-500 text-sm border-t border-gray-800">
-                        <p>© 2024 Soluciones Digitales. Demo interactiva para presentación.</p>
+                    <footer className="bg-[#0b1120] py-10 text-center text-slate-500 text-sm border-t border-slate-800">
+                        <p className="font-medium">© 2026 Soluciones Digitales Pro. Demo interactiva protegida.</p>
                     </footer>
                     
                     {/* Botón Flotante de WhatsApp global */}
                     <a 
-                        href={`https://wa.me/527777926013?text=${encodeURIComponent("Hola, estoy viendo el demo de su página web y quiero hacerles una consulta general sobre sus servicios.")}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="fixed bottom-6 right-6 bg-green-500 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-2xl hover:bg-green-600 transition-transform transform hover:scale-110 z-50 group"
+                        href={`https://wa.me/527777926013?text=${encodeURIComponent("Hola, estoy viendo el demo de su página web y quiero hacerles una consulta general sobre sus servicios de desarrollo.")}`}
+                        target="_blank" rel="noopener noreferrer"
+                        className="fixed bottom-8 right-8 bg-green-500 text-white w-16 h-16 rounded-full flex items-center justify-center shadow-[0_10px_30px_rgba(34,197,94,0.5)] hover:bg-green-600 transition-all duration-300 transform hover:scale-110 hover:-translate-y-2 z-50 group"
                     >
-                        <i className="fa-brands fa-whatsapp text-3xl"></i>
-                        <span className="absolute right-16 bg-black text-white text-xs px-3 py-1.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                            ¡Escríbenos!
+                        <i className="fa-brands fa-whatsapp text-4xl"></i>
+                        <span className="absolute right-20 bg-dark text-white font-bold text-sm px-4 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-xl pointer-events-none border border-slate-700">
+                            ¡Conversemos!
                         </span>
                     </a>
                 </div>
