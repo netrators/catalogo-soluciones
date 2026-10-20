@@ -1,1 +1,631 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commercity - Demo Sistema E-commerce</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            900: '#312e81',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
+        }
+        
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Animaciones base */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float { animation: float 4s ease-in-out infinite; }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+        .pulse-ring-anim { animation: pulse-ring 2s infinite; }
+
+        /* Clases para animación con Scroll (Intersection Observer) */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-40px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal-left.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Panel Carrito */
+        #cart-panel {
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #cart-panel.open { transform: translateX(0); }
+        
+        /* Overlay */
+        #overlay {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        #overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased selection:bg-brand-500 selection:text-white">
+
+    <nav class="bg-white/90 backdrop-blur-lg border-b border-gray-100 shadow-sm fixed w-full top-0 z-50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex items-center gap-3 text-brand-600 hover:scale-105 transition-transform duration-300 cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <div class="bg-brand-500 text-white p-2 rounded-xl shadow-lg shadow-brand-500/30">
+                        <i class="fa-solid fa-store text-xl"></i>
+                    </div>
+                    <span class="font-black text-2xl tracking-tight">Commer<span class="text-gray-900">city</span></span>
+                </div>
+                
+                <div class="hidden md:flex space-x-8">
+                    <a href="#beneficios" class="text-gray-600 hover:text-brand-600 font-bold transition-colors">Beneficios</a>
+                    <a href="#demo" class="text-gray-600 hover:text-brand-600 font-bold transition-colors">Demo Tienda</a>
+                    <a href="#contacto" class="text-gray-600 hover:text-brand-600 font-bold transition-colors">Contacto</a>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleCart()" class="relative group p-2.5 bg-gray-100 rounded-full hover:bg-brand-100 transition-colors duration-300 border border-transparent hover:border-brand-300">
+                        <i class="fa-solid fa-bag-shopping text-xl text-gray-700 group-hover:text-brand-600 transition-colors"></i>
+                        <span id="nav-cart-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-black rounded-full w-6 h-6 flex items-center justify-center shadow-lg border-2 border-white transform scale-0 transition-transform duration-300">
+                            0
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="relative bg-gray-950 min-h-screen flex items-center pt-20 overflow-hidden">
+        <!-- Background Elements -->
+        <div class="absolute inset-0 z-0">
+            <div class="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-900 to-brand-900/40 z-10"></div>
+            <img class="w-full h-full object-cover opacity-30 mix-blend-overlay" src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1920&q=80" alt="Ecommerce Background" />
+            
+            <!-- Decoraciones flotantes -->
+            <div class="absolute top-1/4 right-10 w-64 h-64 bg-brand-500/20 rounded-full blur-[80px]"></div>
+            <div class="absolute bottom-1/4 left-10 w-80 h-80 bg-purple-500/20 rounded-full blur-[100px]"></div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 w-full">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="text-left reveal-left">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 font-bold text-sm mb-6 shadow-[0_0_20px_rgba(99,102,241,0.2)]">
+                        <span class="w-2 h-2 rounded-full bg-brand-400 animate-pulse"></span>
+                        Gestión Multi-Nicho
+                    </div>
+                    <h1 class="text-5xl tracking-tight font-black text-white sm:text-6xl md:text-7xl drop-shadow-lg leading-tight">
+                        Vende más, <br/>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-purple-400">esfuérzate menos.</span>
+                    </h1>
+                    <p class="mt-6 text-lg text-gray-300 sm:text-xl font-light leading-relaxed max-w-xl">
+                        Mueblerías, ropa, joyería, persianas y más. Crea tu catálogo digital interactivo y recibe pedidos automatizados directamente en tu WhatsApp.
+                    </p>
+                    <div class="mt-10 flex flex-col sm:flex-row gap-4">
+                        <a href="#demo" class="flex items-center justify-center gap-2 px-8 py-4 text-lg font-bold rounded-xl text-white bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-500 hover:to-brand-400 transition-all duration-300 shadow-[0_0_30px_rgba(99,102,241,0.4)] hover:shadow-[0_0_50px_rgba(99,102,241,0.6)] hover:-translate-y-1">
+                            Probar Demo Interactivo <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 3D Card Mockup Hero -->
+                <div class="hidden lg:block relative reveal animate-float">
+                    <div class="relative bg-white p-6 rounded-3xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] border border-gray-200 transform rotate-[-2deg] hover:rotate-0 transition-transform duration-500">
+                        <div class="flex justify-between items-center mb-6 border-b pb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center"><i class="fa-solid fa-gem text-brand-500"></i></div>
+                                <div>
+                                    <h4 class="font-black text-gray-900">Joyería Elegance</h4>
+                                    <p class="text-xs text-green-500 font-bold">● En línea</p>
+                                </div>
+                            </div>
+                        </div>
+                        <img src="https://images.unsplash.com/photo-1599643478514-4a11011d31ed?auto=format&fit=crop&w=400&q=80" class="w-full h-48 object-cover rounded-xl mb-4" alt="Anillo" />
+                        <h5 class="font-bold text-lg">Anillo de Compromiso Diamante</h5>
+                        <p class="text-brand-600 font-black text-xl mt-2">$12,500 MXN</p>
+                        <button class="w-full mt-4 bg-gray-900 text-white py-3 rounded-lg font-bold flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-bag-shopping"></i> Agregar al Carrito
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="beneficios" class="py-24 bg-white relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center reveal">
+                <h2 class="text-sm text-brand-600 font-black tracking-widest uppercase bg-brand-50 inline-block px-4 py-1 rounded-full mb-4">¿Por qué elegirnos?</h2>
+                <p class="mt-2 text-4xl leading-8 font-black tracking-tight text-gray-900 sm:text-5xl">
+                    Soluciones a tu medida
+                </p>
+            </div>
+
+            <div class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-10">
+                <!-- Tarjeta 1 -->
+                <div class="bg-gray-50 rounded-3xl p-8 border border-gray-100 shadow-xl hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 reveal group">
+                    <div class="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center text-brand-600 mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-layer-group text-3xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-black text-gray-900 mb-4">Catálogo Flexible</h3>
+                    <p class="text-gray-600 leading-relaxed">No importa si vendes ropa, cortinas, muebles o accesorios. Adapta categorías, tallas, colores y variaciones fácilmente.</p>
+                </div>
+
+                <!-- Tarjeta 2 -->
+                <div class="bg-gray-900 rounded-3xl p-8 border border-gray-800 shadow-xl shadow-brand-900/20 hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 reveal group">
+                    <div class="w-16 h-16 bg-gray-800 rounded-2xl shadow-sm flex items-center justify-center text-green-400 mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fa-brands fa-whatsapp text-3xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-black text-white mb-4">Checkout WhatsApp</h3>
+                    <p class="text-gray-400 leading-relaxed">Sin pasarelas complicadas. El cliente arma su carrito y el sistema te envía un resumen estructurado y limpio a tu WhatsApp.</p>
+                </div>
+
+                <!-- Tarjeta 3 -->
+                <div class="bg-gray-50 rounded-3xl p-8 border border-gray-100 shadow-xl hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 reveal group">
+                    <div class="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center text-brand-600 mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-chart-line text-3xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-black text-gray-900 mb-4">Gestión Simple</h3>
+                    <p class="text-gray-600 leading-relaxed">Panel de administración intuitivo. Cambia precios, oculta productos sin stock y revisa qué artículos son los más solicitados.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="demo" class="py-24 bg-gray-100 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12 reveal">
+                <div>
+                    <h2 class="text-3xl font-black text-gray-900 sm:text-4xl drop-shadow-sm">Demo: Tu Tienda</h2>
+                    <p class="mt-3 text-lg text-gray-600 max-w-2xl">Agrega productos al carrito y simula el proceso de compra. ¡Prueba diferentes nichos!</p>
+                </div>
+            </div>
+
+            <!-- Interfaz Principal del Demo -->
+            <div class="bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-gray-200 overflow-hidden reveal">
+                
+                <!-- Mockup de Navegador -->
+                <div class="bg-gray-100 border-b border-gray-200 px-4 py-3 flex items-center gap-2">
+                    <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                    <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+                    <div class="w-3 h-3 rounded-full bg-green-400"></div>
+                    <div class="ml-4 bg-white text-xs font-mono text-gray-400 py-1 px-4 rounded-md flex-1 text-center border border-gray-200">
+                        <i class="fa-solid fa-lock text-green-500 mr-2"></i> tutienda.commercity.mx
+                    </div>
+                </div>
+
+                <!-- Tabs de Categorías (Nichos) -->
+                <div class="bg-white px-6 py-4 border-b border-gray-100 flex space-x-3 overflow-x-auto hide-scrollbar sticky top-0 z-10" id="category-tabs">
+                    <!-- Tabs Inyectadas por JS -->
+                </div>
+
+                <!-- Grid de Productos -->
+                <div class="p-6 md:p-8 bg-gray-50 min-h-[500px]">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" id="product-grid">
+                        <!-- Productos Inyectados por JS -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Overlay -->
+    <div id="overlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60]" onclick="toggleCart()"></div>
+
+    <!-- Panel Lateral Carrito -->
+    <div id="cart-panel" class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white shadow-2xl z-[70] flex flex-col border-l border-gray-200">
+        <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+            <h2 class="text-2xl font-black text-gray-900 flex items-center gap-2">
+                <i class="fa-solid fa-bag-shopping text-brand-600"></i> Mi Carrito
+            </h2>
+            <button onclick="toggleCart()" class="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:bg-red-50 text-gray-500 hover:text-red-500 transition-colors">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto p-6" id="cart-items-container">
+            <!-- Items de Carrito Inyectados por JS -->
+            <div class="h-full flex flex-col items-center justify-center text-gray-400 text-center space-y-4" id="empty-cart-msg">
+                <i class="fa-solid fa-basket-shopping text-6xl opacity-50"></i>
+                <p class="font-medium">Tu carrito está vacío.<br>Agrega algunos productos para probar.</p>
+            </div>
+        </div>
+
+        <div class="p-6 bg-white border-t border-gray-100 shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
+            <div class="flex justify-between items-center mb-6">
+                <span class="text-gray-500 font-medium text-lg">Total estimado</span>
+                <span class="text-3xl font-black text-gray-900" id="cart-total">$0.00</span>
+            </div>
+            
+            <button onclick="checkoutWhatsApp()" id="checkout-btn" class="w-full bg-gray-300 text-gray-500 cursor-not-allowed font-black py-4 rounded-xl flex justify-center items-center gap-3 transition-all duration-300">
+                <i class="fa-brands fa-whatsapp text-2xl"></i>
+                Enviar Pedido por WhatsApp
+            </button>
+        </div>
+    </div>
+
+    <section id="contacto" class="py-24 bg-gray-950 text-white relative overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <div class="absolute inset-0 bg-gray-950 opacity-95 z-10"></div>
+            <img src="https://images.unsplash.com/photo-1556740758-90de374c12ad?auto=format&fit=crop&w=1920&q=80" alt="Contact background" class="w-full h-full object-cover grayscale opacity-20" />
+        </div>
+        
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 text-center reveal">
+            <div class="inline-block p-4 rounded-full bg-emerald-500/10 mb-6 backdrop-blur-sm border border-emerald-500/20 pulse-ring-anim">
+                <i class="fa-brands fa-whatsapp text-6xl text-emerald-400 drop-shadow-[0_0_20px_rgba(16,185,129,0.6)]"></i>
+            </div>
+            <h2 class="text-4xl font-black sm:text-5xl mb-6 tracking-tight drop-shadow-md">
+                Comprueba la Automatización
+            </h2>
+            <p class="text-xl text-gray-400 mb-12 max-w-2xl mx-auto font-light leading-relaxed">
+                Arma un carrito en el demo de arriba y envíalo. O si prefieres, envía un mensaje de prueba genérico para comunicarte directamente con nosotros.
+            </p>
+            
+            <button 
+                onclick="checkoutGenericWhatsApp()"
+                class="inline-flex items-center justify-center gap-3 px-10 py-5 text-lg font-black rounded-full text-gray-900 bg-emerald-400 hover:bg-emerald-300 transform hover:-translate-y-1 hover:scale-105 transition-all duration-300 shadow-[0_0_30px_rgba(16,185,129,0.3)] hover:shadow-[0_0_50px_rgba(16,185,129,0.6)]"
+            >
+                <i class="fa-brands fa-whatsapp text-2xl"></i>
+                Quiero más información ahora
+            </button>
+
+            <div class="mt-20 p-8 bg-gray-900/80 backdrop-blur-md rounded-3xl border border-gray-800 text-left shadow-2xl relative overflow-hidden group hover:border-brand-500/50 transition-colors">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-brand-500/10 rounded-bl-full -z-10 group-hover:scale-125 transition-transform duration-700"></div>
+                <h4 class="text-xl font-bold text-brand-400 mb-4 flex items-center gap-3">
+                    <i class="fa-solid fa-circle-info text-2xl"></i>
+                    Nota sobre la Prueba
+                </h4>
+                <p class="text-gray-300 leading-relaxed text-lg font-light">
+                    Al usar los botones de envío por WhatsApp (tanto en el carrito como aquí), se abrirá tu aplicación de mensajería con el número <strong class="text-white">7777926013</strong>. El mensaje generado incluirá el detalle de los productos simulados que hayas elegido, además de una nota final preescrita indicando que: <br><br>
+                    <span class="inline-block bg-gray-800 p-4 rounded-xl border border-gray-700 font-medium text-brand-300 shadow-inner">
+                        "Me gustaría recibir más información sobre los servicios de soluciones de e-commerce para mi negocio."
+                    </span>
+                    <br><br>Esto nos permite saber que interactuaste con el demo y que estás interesado en implementar esta solución real en tu empresa.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black border-t border-gray-900 py-12 text-center relative z-20">
+        <div class="flex items-center justify-center gap-2 text-gray-500 mb-4">
+            <i class="fa-solid fa-store text-xl"></i>
+            <span class="font-black text-xl tracking-tight text-white">Commer<span class="text-gray-500">city</span></span>
+        </div>
+        <p class="text-gray-600 text-sm font-medium">
+            &copy; 2023 Commercity Demo. Todos los derechos reservados.
+        </p>
+    </footer>
+
+    <script>
+        // --- 1. Base de Datos Mock ---
+        const MOCK_DB = {
+            categories: ['Mueblería', 'Ropa y Moda', 'Joyería'],
+            products: [
+                { id: 1, cat: 'Mueblería', name: 'Sofá Minimalista Oslo', price: 8500, img: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=500&q=80', desc: 'Tela premium repelente, diseño nórdico 3 plazas.' },
+                { id: 2, cat: 'Mueblería', name: 'Mesa de Centro Nogal', price: 3200, img: 'https://images.unsplash.com/photo-1533090481720-856c6e3c1fdc?auto=format&fit=crop&w=500&q=80', desc: 'Madera sólida de nogal con patas de acero mate.' },
+                { id: 3, cat: 'Mueblería', name: 'Sillón Ocasional Velvet', price: 4100, img: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=500&q=80', desc: 'Terciopelo esmeralda, súper cómodo para lectura.' },
+                
+                { id: 4, cat: 'Ropa y Moda', name: 'Chaqueta de Cuero Biker', price: 1850, img: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=500&q=80', desc: 'Cuero sintético de alta calidad, cierre asimétrico.' },
+                { id: 5, cat: 'Ropa y Moda', name: 'Vestido Verano Floral', price: 890, img: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=500&q=80', desc: 'Ligero, ideal para playa o eventos de día.' },
+                { id: 6, cat: 'Ropa y Moda', name: 'Sneakers Urban Pro', price: 1200, img: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=500&q=80', desc: 'Comodidad diaria con suela antideslizante.' },
+                
+                { id: 7, cat: 'Joyería', name: 'Collar Perlas Cultivadas', price: 4500, img: 'https://images.unsplash.com/photo-1599643477877-530eb83abc8e?auto=format&fit=crop&w=500&q=80', desc: 'Perlas de río de 8mm con broche de plata 925.' },
+                { id: 8, cat: 'Joyería', name: 'Reloj Cronógrafo Acero', price: 6200, img: 'https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&w=500&q=80', desc: 'Maquinaria de cuarzo suiza, resistente al agua 50m.' },
+                { id: 9, cat: 'Joyería', name: 'Anillo Promesa Oro Rosa', price: 3800, img: 'https://images.unsplash.com/photo-1605100804763-247f67b2548e?auto=format&fit=crop&w=500&q=80', desc: 'Oro rosa 14k con circonita central brillante.' }
+            ]
+        };
+
+        // --- 2. Estado Global ---
+        let activeCategory = 'Mueblería';
+        let cart = []; // Estructura: { id, name, price, qty, img }
+        const WHATSAPP_NUMBER = "527777926013";
+
+        // --- 3. Renderizado de Interfaz ---
+        function renderCategories() {
+            const container = document.getElementById('category-tabs');
+            container.innerHTML = MOCK_DB.categories.map(cat => `
+                <button onclick="changeCategory('${cat}')" 
+                    class="px-6 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all duration-300 shadow-sm border border-transparent ${
+                        activeCategory === cat 
+                        ? 'bg-gray-900 text-white scale-105 shadow-gray-400/30' 
+                        : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50 hover:text-brand-600 hover:border-brand-200'
+                    }">
+                    ${cat}
+                </button>
+            `).join('');
+        }
+
+        function renderProducts() {
+            const container = document.getElementById('product-grid');
+            const items = MOCK_DB.products.filter(p => p.cat === activeCategory);
+            
+            // Animación de entrada al cambiar categoría
+            container.style.opacity = 0;
+            
+            setTimeout(() => {
+                container.innerHTML = items.map(item => `
+                    <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl border border-gray-100 transition-all duration-300 group transform hover:-translate-y-1 flex flex-col">
+                        <div class="h-56 overflow-hidden relative bg-gray-100">
+                            <img src="${item.img}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy">
+                            <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-black text-gray-900 shadow-sm">
+                                Nuevo
+                            </div>
+                        </div>
+                        <div class="p-5 flex flex-col flex-1">
+                            <h3 class="font-black text-xl text-gray-900 mb-1 group-hover:text-brand-600 transition-colors">${item.name}</h3>
+                            <p class="text-sm text-gray-500 mb-4 line-clamp-2">${item.desc}</p>
+                            
+                            <div class="mt-auto flex items-center justify-between pt-4 border-t border-gray-100">
+                                <span class="text-2xl font-black text-gray-900">$${item.price.toLocaleString('es-MX')}</span>
+                                <button onclick="addToCart(${item.id})" class="w-10 h-10 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center hover:bg-brand-600 hover:text-white transition-all duration-300 shadow-sm hover:shadow-brand-500/40 active:scale-95">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                container.style.opacity = 1;
+                container.style.transition = "opacity 0.4s ease-in-out";
+            }, 150);
+        }
+
+        // --- 4. Lógica del Carrito ---
+        function addToCart(productId) {
+            const product = MOCK_DB.products.find(p => p.id === productId);
+            if(!product) return;
+
+            const existing = cart.find(item => item.id === productId);
+            if(existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ ...product, qty: 1 });
+            }
+            
+            updateCartUI();
+            showToast(`${product.name} agregado`);
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            updateCartUI();
+        }
+
+        function updateQty(productId, delta) {
+            const item = cart.find(i => i.id === productId);
+            if(item) {
+                item.qty += delta;
+                if(item.qty <= 0) removeFromCart(productId);
+                else updateCartUI();
+            }
+        }
+
+        function updateCartUI() {
+            // Badges
+            const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+            const badge = document.getElementById('nav-cart-badge');
+            
+            if(totalQty > 0) {
+                badge.textContent = totalQty;
+                badge.classList.remove('scale-0');
+                badge.classList.add('scale-100', 'pulse-ring-anim');
+                setTimeout(() => badge.classList.remove('pulse-ring-anim'), 1000);
+            } else {
+                badge.classList.remove('scale-100');
+                badge.classList.add('scale-0');
+            }
+
+            // Cart Panel Content
+            const container = document.getElementById('cart-items-container');
+            const emptyMsg = document.getElementById('empty-cart-msg');
+            const checkoutBtn = document.getElementById('checkout-btn');
+            const totalEl = document.getElementById('cart-total');
+
+            if(cart.length === 0) {
+                emptyMsg.style.display = 'flex';
+                Array.from(container.children).forEach(child => {
+                    if(child.id !== 'empty-cart-msg') child.remove();
+                });
+                totalEl.textContent = '$0.00';
+                
+                // Deshabilitar botón
+                checkoutBtn.className = "w-full bg-gray-200 text-gray-400 cursor-not-allowed font-black py-4 rounded-xl flex justify-center items-center gap-3 transition-all duration-300";
+                return;
+            }
+
+            emptyMsg.style.display = 'none';
+            let html = '';
+            let total = 0;
+
+            cart.forEach(item => {
+                const subtotal = item.price * item.qty;
+                total += subtotal;
+                html += `
+                    <div class="flex gap-4 items-center bg-white p-3 rounded-xl border border-gray-100 shadow-sm mb-3">
+                        <img src="${item.img}" class="w-16 h-16 rounded-lg object-cover bg-gray-100">
+                        <div class="flex-1">
+                            <h4 class="font-bold text-gray-900 text-sm line-clamp-1">${item.name}</h4>
+                            <p class="text-brand-600 font-black text-sm">$${item.price.toLocaleString('es-MX')}</p>
+                            
+                            <div class="flex items-center gap-3 mt-2">
+                                <button onclick="updateQty(${item.id}, -1)" class="w-6 h-6 rounded bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200"><i class="fa-solid fa-minus text-xs"></i></button>
+                                <span class="font-bold text-sm w-4 text-center">${item.qty}</span>
+                                <button onclick="updateQty(${item.id}, 1)" class="w-6 h-6 rounded bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200"><i class="fa-solid fa-plus text-xs"></i></button>
+                            </div>
+                        </div>
+                        <button onclick="removeFromCart(${item.id})" class="text-gray-300 hover:text-red-500 transition-colors p-2">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+            });
+
+            // Mantener solo el mensaje de vacío y reescribir items
+            const justEmptyMsg = emptyMsg.outerHTML;
+            container.innerHTML = justEmptyMsg + html;
+            
+            // Actualizar total y habilitar botón
+            totalEl.textContent = `$${total.toLocaleString('es-MX')}`;
+            checkoutBtn.className = "w-full bg-gradient-to-r from-emerald-500 to-emerald-400 text-white hover:from-emerald-600 hover:to-emerald-500 shadow-[0_10px_20px_rgba(16,185,129,0.3)] hover:shadow-[0_15px_30px_rgba(16,185,129,0.4)] hover:-translate-y-1 cursor-pointer font-black py-4 rounded-xl flex justify-center items-center gap-3 transition-all duration-300";
+        }
+
+        // --- 5. Lógica de Interfaz y WhatsApp ---
+        window.changeCategory = (cat) => {
+            activeCategory = cat;
+            renderCategories();
+            renderProducts();
+        };
+
+        window.toggleCart = () => {
+            document.getElementById('cart-panel').classList.toggle('open');
+            document.getElementById('overlay').classList.toggle('open');
+        };
+
+        // Toast System mejorado
+        window.showToast = (message) => {
+            // Asegurarnos de que existe el contenedor base para no generar errores
+            let container = document.getElementById('toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toast-container';
+                container.className = 'fixed bottom-6 left-6 z-[100] flex flex-col gap-3 pointer-events-none';
+                document.body.appendChild(container);
+            }
+
+            const toast = document.createElement('div');
+            toast.className = 'bg-gray-900 text-white px-6 py-4 rounded-xl shadow-xl flex items-center gap-3 border border-gray-800 transform translate-y-full opacity-0 transition-all duration-300 ease-out pointer-events-auto';
+            
+            toast.innerHTML = `
+                <div class="w-8 h-8 rounded-full bg-brand-500/20 text-brand-400 flex items-center justify-center">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <span class="font-bold">${message}</span>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Forzar un "reflow" en el navegador para la transición
+            void toast.offsetWidth;
+            
+            // Iniciar animación de entrada
+            toast.classList.remove('translate-y-full', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            // Eliminar después de 3 segundos limpiamente
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-full', 'opacity-0');
+                
+                setTimeout(() => {
+                    if (toast && toast.parentNode) toast.remove();
+                }, 300);
+            }, 3000);
+        };
+
+        // Cerrando y completando la función que se había quedado cortada
+        window.checkoutWhatsApp = () => {
+            if(cart.length === 0) return;
+
+            let orderText = "🛒 *NUEVO PEDIDO DE PRUEBA (DEMO)*\n\n";
+            let total = 0;
+
+            cart.forEach((item, index) => {
+                const subtotal = item.price * item.qty;
+                total += subtotal;
+                orderText += `${index + 1}. ${item.name} (x${item.qty}) - $${subtotal.toLocaleString('es-MX')}\n`;
+            });
+
+            orderText += `\n*Total Estimado: $${total.toLocaleString('es-MX')}*\n\n`;
+            orderText += "📝 *Nota del usuario:*\nMe gustaría recibir más información sobre los servicios de soluciones de e-commerce para mi negocio.";
+
+            const encodedText = encodeURIComponent(orderText);
+            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedText}`;
+            
+            window.open(whatsappUrl, '_blank');
+        };
+
+        // Agregando la función genérica para el botón de contacto del footer
+        window.checkoutGenericWhatsApp = () => {
+            const msg = "Me gustaría recibir más información sobre los servicios de soluciones de e-commerce para mi negocio.";
+            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+        };
+
+        // Funcionalidad para las animaciones CSS basadas en scroll
+        function initScrollAnimations() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.reveal, .reveal-left').forEach((el) => {
+                observer.observe(el);
+            });
+        }
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCategories();
+            renderProducts();
+            updateCartUI();
+            initScrollAnimations();
+        });
+
+    </script>
+</body>
+</html>
